@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 02: Advanced Power Query & Data Modeling</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Top Navigation Bar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-teal); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+    width: 4%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: var(--accent-blue);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(20, 184, 166, 0.08));
+    border-left: 4px solid var(--accent-blue);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #93c5fd; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .row-dropped { background: rgba(244, 63, 94, 0.16) !important; text-decoration: line-through; color: #fca5a5; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  .schema-diagram {
+    background: #0f172a;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin: 1rem 0;
+  }
+  .schema-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.82rem;
+  }
+  .schema-fact {
+    border: 2px solid var(--accent-gold);
+    background: rgba(245, 158, 11, 0.08);
+  }
+  .schema-dim {
+    border: 1px solid var(--accent-teal);
+  }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+    .schema-diagram { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 02 (2 Hours) • Advanced Power Query & Star Schema Data Modeling</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 25</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 02 Curriculum (25 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 02 Kickoff: Fixing the Hidden Date Trap">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Advanced Power Query</span>
+        <span class="tag tag-theory">00:00 – 00:06</span>
+      </div>
+      <h1 class="slide-title">Day 02 Kickoff: The "Mixed Date Format" Surprise in `subscribers.csv`</h1>
+      <p class="slide-subtitle">Yesterday we cleaned duplicates and dirty cities. Today we solve a nasty regional date bug before wiring our 9 tables into a Star Schema.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Accounting Vouchers From Two Different Branch Offices</div>
+        <p>Imagine Mumbai's billing system exports dates as <code>2025-11-06</code> (ISO Year-Month-Day), while another regional portal exports dates as <code>29/07/2025</code> (Indian Day/Month/Year). In <code>subscribers.csv</code>, <strong>4,200 rows</strong> use slashes (<code>DD/MM/YYYY</code>) and <strong>23,800 rows</strong> use hyphens (<code>YYYY-MM-DD</code>)! If you click standard Date conversion, Power BI throws 4,200 errors!</p>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Real Rows Caught in `subscribers.csv` (`signup_date` Column)</span><span>4,200 rows fail standard US Date parsing!</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>subscriber_id</th>
+              <th>full_name</th>
+              <th class="col-selected">signup_date (Raw Text)</th>
+              <th>Why Standard Change Type Fails</th>
+              <th>Parsed Date (Using Locale `"en-GB"`)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SUB026196</td>
+              <td>Pooja Kumar</td>
+              <td class="col-selected">2025-11-06</td>
+              <td>Valid ISO format</td>
+              <td class="row-selected">06-Nov-2025</td>
+            </tr>
+            <tr>
+              <td>SUB018594</td>
+              <td>Vivaan Sinha</td>
+              <td class="cell-dirty">29/07/2025</td>
+              <td>US parser thinks Month = 29 → <strong>Error!</strong></td>
+              <td class="row-selected">29-Jul-2025</td>
+            </tr>
+            <tr>
+              <td>SUB019579</td>
+              <td>Sai Shah</td>
+              <td class="cell-dirty">29/12/2023</td>
+              <td>US parser thinks Month = 29 → <strong>Error!</strong></td>
+              <td class="row-selected">29-Dec-2023</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Date Functions & Cohort Extraction">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Date Engineering</span>
+        <span class="tag tag-lab">00:06 – 00:12</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Power Query Date Functions (`Date.Year`, `Date.QuarterOfYear`)</h1>
+      <p class="slide-subtitle">Remember CMO Rashmi's #1 question? "Find the vintage cohort churning at 61%!" Vintage cohort simply means the Quarter a customer joined.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Step 1: Parse Mixed Dates Safely</div>
+          <div class="ui-path">Right-Click `signup_date` → Change Type → Using Locale → Date → English (United Kingdom)</div>
+          <div class="code-block">
+            <span class="fn">Table.TransformColumnTypes</span>(PrevStep, {{<span class="str">"signup_date"</span>, <span class="kw">type date</span>}}, <span class="str">"en-GB"</span>)
+          </div>
+          <p style="font-size:0.88rem; color:var(--accent-teal);">Setting locale to <code>"en-GB"</code> or <code>"en-IN"</code> handles both <code>29/07/2025</code> and <code>2025-11-06</code> cleanly!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Step 2: Build `Vintage_Cohort` Column (`2024Q3`)</div>
+          <div class="ui-path">Add Column → Custom Column</div>
+          <div class="code-block">
+            <span class="fn">Text.From</span>(<span class="fn">Date.Year</span>([signup_date])) &amp; <span class="str">"Q"</span> &amp; <span class="fn">Text.From</span>(<span class="fn">Date.QuarterOfYear</span>([signup_date]))
+          </div>
+          <p style="font-size:0.88rem;"><strong>Output:</strong> <code>2024-08-14</code> becomes <code>"2024Q3"</code>—the exact key needed to uncover the PL015 churn disaster!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Index Columns & Modulo / Integer-Divide">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Structural Columns</span>
+        <span class="tag tag-lab">00:12 – 00:18</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Index Columns (`Table.AddIndexColumn`)</h1>
+      <p class="slide-subtitle">What if a raw file arrives without a unique row ID, or you need to preserve the exact physical row order before sorting?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Syntax & Variations</div>
+          <div class="ui-path">Add Column → Index Column → From 0 / From 1 / Custom</div>
+          <div class="code-block">
+            <span class="cm">// Start numbering at 1, increment by 1</span><br>
+            <span class="fn">Table.AddIndexColumn</span>(PrevStep, <span class="str">"Row_Num"</span>, 1, 1, Int64.Type)
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">JioWave Use Cases</div>
+          <ul class="list-styled">
+            <li><strong>Audit Trail:</strong> Tagging raw rows before removing duplicates so you can prove which exact row numbers were dropped.</li>
+            <li><strong>Surrogate Keys:</strong> Creating clean numeric IDs (<code>1, 2, 3...</code>) instead of slow text IDs (<code>"REV0000001"</code>) to shrink model RAM by 40%.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Custom Columns vs. Column From Examples">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Smart Transformations</span>
+        <span class="tag tag-lab">00:18 – 00:24</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Column From Examples (`Table.AddColumn` AI Helper)</h1>
+      <p class="slide-subtitle">Don't know the M formula to extract <code>"2024-05"</code> from <code>"2024-05-01"</code>? Type two examples and let Power BI write the M code for you!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">How Column From Examples Works</div>
+          <ol class="list-styled">
+            <li>Select <code>revenue_month</code> in <code>revenue_monthly.csv</code>.</li>
+            <li>Click <code>Add Column → Column From Examples → From Selection</code>.</li>
+            <li>Type <code>2024-05</code> in Row 1 and press Enter. Power Query auto-fills all 564,274 rows and writes the M syntax at the top!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">JioWave Transformation Example</div>
+          <div class="table-wrapper" style="margin:0;">
+            <table>
+              <thead><tr><th>revenue_month</th><th class="col-selected">Year_Month (Auto-Generated)</th></tr></thead>
+              <tbody>
+                <tr><td>2024-05-01</td><td class="col-selected">2024-05</td></tr>
+                <tr><td>2024-06-01</td><td class="col-selected">2024-06</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block" style="margin-top:0.5rem;">
+            <span class="fn">Date.ToText</span>([revenue_month], <span class="str">"yyyy-MM"</span>)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Handling Errors (`try ... otherwise`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Defensive ETL</span>
+        <span class="tag tag-lab">00:24 – 00:30</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Bulletproof Queries with `try ... otherwise`</h1>
+      <p class="slide-subtitle">If next month's CSV contains a corrupted text value like `"N/A"` inside `overage_inr`, your scheduled 6:00 AM refresh will crash unless you handle errors.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">UI Option: Replace Errors</div>
+          <div class="ui-path">Right-Click Column Header → Replace Errors → Enter 0 or null</div>
+          <div class="code-block">
+            <span class="fn">Table.ReplaceErrorValues</span>(PrevStep, {{<span class="str">"overage_inr"</span>, 0}})
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">M-Code Pro Pattern: `try ... otherwise`</div>
+          <p>Works just like Excel's <code>IFERROR()</code> inside custom formulas:</p>
+          <div class="code-block">
+            <span class="kw">try</span> [overage_inr] / [rental_inr] <span class="kw">otherwise</span> 0
+          </div>
+          <p style="font-size:0.85rem; color:var(--accent-teal);">Prevents division-by-zero errors on zero-rental promotional trial plans!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Parameters in Power Query">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Dynamic Configuration</span>
+        <span class="tag tag-lab">00:30 – 00:36</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Power Query Parameters (`pFolderPath`, `pDataHogThreshold`)</h1>
+      <p class="slide-subtitle">Never hardcode file paths or business thresholds inside 9 separate queries!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Tax Rate Cell in an Accounting Workbook</div>
+        <p>In a good GST model, you put <code>18%</code> in one single assumption cell at the top—you never type <code>0.18</code> into 500 formulas. A <strong>Power Query Parameter</strong> is that single control cell for your entire data pipeline.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Use Case 1: Portable Folder Path (`pFolderPath`)</div>
+          <p>When you submit <code>JioWave_Dashboard.pbix</code> to your evaluator or CMO, their folder is <code>D:\BoardReview\</code>, not <code>C:\Users\YourName\Desktop\</code>. Using a parameter lets them switch folders in 1 click!</p>
+          <div class="ui-path">Home → Manage Parameters → New Parameter</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Use Case 2: Dynamic "Data Hog" Threshold</div>
+          <p>Create a numeric parameter <code>pDataHogGB = 50</code> and filter <code>usage_monthly</code> using <code>each [data_consumed_gb] >= pDataHogGB</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 6: Query Folding (How Power BI Talks to Databases)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: Enterprise Architecture</span>
+        <span class="tag tag-module">00:36 – 00:42</span>
+      </div>
+      <h1 class="slide-title">Topic 6: Query Folding — Why Order of Steps Matters</h1>
+      <p class="slide-subtitle">Remember the JioWave case brief mentions `JioWave_Database.sqlite` and `JioWave_MySQL_Dump.sql`? In enterprise roles, Power BI connects directly to SQL databases.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">What is Query Folding?</div>
+          <p>Query Folding is Power Query's ability to translate your clicks (Filter, Group By, Remove Columns) into <strong>one single SQL query</strong> executed by the fast database server—instead of downloading 10 million rows to your laptop first!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">How to Check & Preserve Folding</div>
+          <ul class="list-styled">
+            <li>Right-click any Applied Step → if <strong>"View Native Query"</strong> is clickable (not greyed out), folding is active!</li>
+            <li><strong>Golden Rule:</strong> Always put <code>Filter Rows</code> and <code>Remove Columns</code> <em>before</em> complex text formulas or custom functions.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 7: Custom M Functions (Reusable Cleaning Logic)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Automation</span>
+        <span class="tag tag-lab">00:42 – 00:48</span>
+      </div>
+      <h1 class="slide-title">Topic 7: Writing Your First Custom M Function (`fnCleanText`)</h1>
+      <p class="slide-subtitle">Instead of clicking Trim → Clean → Proper on 6 columns across 3 tables, write one reusable function!</p>
+
+      <div class="code-block">
+        <span class="cm">// In Home → New Source → Blank Query → Advanced Editor, name it `fnCleanText`:</span><br>
+        (rawText <span class="kw">as nullable text</span>) <span class="kw">as nullable text</span> => <br>
+        <span class="kw">let</span><br>
+        &nbsp;&nbsp;Trimmed = <span class="fn">Text.Trim</span>(rawText),<br>
+        &nbsp;&nbsp;Cleaned = <span class="fn">Text.Clean</span>(Trimmed),<br>
+        &nbsp;&nbsp;ProperCased = <span class="fn">Text.Proper</span>(Cleaned)<br>
+        <span class="kw">in</span><br>
+        &nbsp;&nbsp;ProperCased
+      </div>
+      <p style="font-size:0.9rem; color:var(--accent-teal);"><strong>Invoke Custom Function:</strong> Go to <code>Add Column → Invoke Custom Function</code> and apply <code>fnCleanText</code> to any dirty text column in 2 clicks!</p>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="Topic 8: Advanced Editor & M-Code Anatomy">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 8: Under the Hood</span>
+        <span class="tag tag-module">00:48 – 00:54</span>
+      </div>
+      <h1 class="slide-title">Topic 8: Reading the Advanced Editor (`let ... in`)</h1>
+      <p class="slide-subtitle">You don't need to memorize M code from scratch, but being able to read and tweak `let ... in` blocks makes you unstoppable.</p>
+
+      <div class="code-block">
+        <span class="kw">let</span><br>
+        &nbsp;&nbsp;<span class="cm">// Step 1: Load table</span><br>
+        &nbsp;&nbsp;Source = Csv.Document(File.Contents(pFolderPath &amp; <span class="str">"plans.csv"</span>)),<br>
+        &nbsp;&nbsp;<span class="cm">// Step 2: Promote headers (references Step 1!)</span><br>
+        &nbsp;&nbsp;Headers = Table.PromoteHeaders(Source),<br>
+        &nbsp;&nbsp;<span class="cm">// Step 3: Filter active plans (references Step 2!)</span><br>
+        &nbsp;&nbsp;ActiveOnly = Table.SelectRows(Headers, <span class="kw">each</span> [retire_date] = <span class="kw">null</span>)<br>
+        <span class="kw">in</span><br>
+        &nbsp;&nbsp;<span class="cm">// Final output returned to Power BI Data Model:</span><br>
+        &nbsp;&nbsp;ActiveOnly
+      </div>
+      <p style="font-size:0.9rem; color:var(--accent-rose);"><strong>Common Beginner Bug:</strong> Deleting a middle step breaks the chain because the next step still references its variable name! Always check step references in Advanced Editor.</p>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="Module 2: Intro to Data Modeling (Why Not One Big Table?)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 2: Data Modeling</span>
+        <span class="tag tag-theory">00:54 – 01:02</span>
+      </div>
+      <h1 class="slide-title">Module 2: Why Not Merge All 9 CSVs into One Giant Excel Sheet?</h1>
+      <p class="slide-subtitle">Every Excel user's first instinct is to VLOOKUP everything into one flat 564,274-row table. Here is why that destroys Power BI.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">The "Flat Table" Disaster</div>
+          <ul class="list-styled">
+            <li><strong>Memory Explosion:</strong> Repeating a customer's <code>full_name</code>, <code>city</code>, <code>state</code>, <code>occupation</code>, and <code>plan_name</code> 36 times across 564,274 billing rows bloats file size 10×.</li>
+            <li><strong>Double-Counting Trap:</strong> If a subscriber switched plans in <code>subscriptions.csv</code> (2 rows for 1 customer) and you join it to <code>revenue_monthly.csv</code>, their revenue gets <strong>doubled</strong>!</li>
+            <li><strong>Slow Refresh:</strong> Recalculating one massive flat table takes minutes instead of milliseconds.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">The Power BI Solution: Star Schema</div>
+          <p>Instead of merging everything into one bloated sheet, we load clean, separate tables into <strong>Model View</strong> and connect them via lightweight <strong>Relationships</strong>.</p>
+          <div class="analogy-box" style="margin-top:0.75rem; margin-bottom:0;">
+            <div class="analogy-title">Analogy: Master Registers vs. Daily Transaction Books</div>
+            <p>Keep your <strong>Customer Master</strong> (28,000 rows) separate from your <strong>Monthly Billing Register</strong> (564,274 rows), linked only by <code>subscriber_id</code>!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 -->
+    <section class="slide" data-title="Topic 9: Fact Tables vs. Dimension Tables">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 9: Star Schema Core</span>
+        <span class="tag tag-module">01:02 – 01:10</span>
+      </div>
+      <h1 class="slide-title">Topic 9: Fact Tables vs. Dimension Tables (WHO vs. HOW MUCH)</h1>
+      <p class="slide-subtitle">Every single table in our JioWave warehouse falls into one of two clear buckets.</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 4px solid var(--accent-teal);">
+          <div class="card-title" style="color:var(--accent-teal);">Dimension Tables (`dim_`) = WHO, WHAT, WHERE</div>
+          <p>Describe business entities. They are <strong>short & wide</strong> (many descriptive attributes, few rows, unique Primary Key).</p>
+          <ul class="list-styled">
+            <li><strong><code>dim_subscribers</code> (28,000 rows):</strong> Name, Tier, City, Vintage Quarter.</li>
+            <li><strong><code>dim_plans</code> (24 rows):</strong> Plan Name, Rental, Data Quota.</li>
+            <li><strong><code>dim_towers</code> (279 rows):</strong> Tower Name, City Tier, 4G/5G, Capex Cycle.</li>
+            <li><strong><code>dim_date</code> (1,096 rows):</strong> Fiscal Year, Quarter, Month (we will build this!).</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--accent-gold);">
+          <div class="card-title">Fact Tables (`fact_`) = HOW MUCH, WHEN</div>
+          <p>Record measurable business events and numbers. They are <strong>tall & narrow</strong> (hundreds of thousands of rows, numeric metrics + Foreign Keys).</p>
+          <ul class="list-styled">
+            <li><strong><code>fact_revenue_monthly</code> (564,274 rows):</strong> Rental, Overage, Add-on INR.</li>
+            <li><strong><code>fact_usage_monthly</code> (564,274 rows):</strong> Data GB, Voice Minutes, SMS.</li>
+            <li><strong><code>fact_tower_metrics</code> (10,044 rows):</strong> Traffic GB, Utilization %, Downtime.</li>
+            <li><strong><code>fact_subscriptions</code> (32,728 rows)</strong> & <strong><code>fact_migrations</code> (4,728 rows)</strong>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Topic 10: JioWave Star Schema Blueprint">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 10: Visual Architecture</span>
+        <span class="tag tag-lab">01:10 – 01:18</span>
+      </div>
+      <h1 class="slide-title">Topic 10: The JioWave Star Schema Blueprint</h1>
+      <p class="slide-subtitle">Look how Dimensions sit around the outside and push filters inward to the central Fact tables.</p>
+
+      <div class="schema-diagram">
+        <div style="display:flex; flex-direction:column; gap:0.85rem;">
+          <div class="schema-box schema-dim">
+            <strong style="color:var(--accent-teal);">dim_subscribers (1)</strong><br>
+            🔑 <code>subscriber_id</code><br>
+            • vintage_cohort<br>
+            • subscriber_tier<br>
+            • home_tower_id (FK)
+          </div>
+          <div class="schema-box schema-dim">
+            <strong style="color:var(--accent-teal);">dim_towers (1)</strong><br>
+            🔑 <code>tower_id</code><br>
+            • city, tower_tier<br>
+            • capex_cycle
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.85rem;">
+          <div class="schema-box schema-fact">
+            <strong style="color:var(--accent-gold);">fact_revenue_monthly (*)</strong><br>
+            🔗 <code>subscriber_id</code> (FK)<br>
+            🔗 <code>revenue_month</code> (FK)<br>
+            💰 <code>total_inr, rental_inr</code>
+          </div>
+          <div class="schema-box schema-fact">
+            <strong style="color:var(--accent-gold);">fact_usage_monthly (*)</strong><br>
+            🔗 <code>subscriber_id</code> (FK)<br>
+            🔗 <code>usage_month</code> (FK)<br>
+            📊 <code>data_consumed_gb</code>
+          </div>
+          <div class="schema-box schema-fact">
+            <strong style="color:var(--accent-gold);">fact_tower_metrics (*)</strong><br>
+            🔗 <code>tower_id</code> (FK)<br>
+            🔗 <code>metric_month</code> (FK)<br>
+            📡 <code>traffic_gb, downtime</code>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.85rem;">
+          <div class="schema-box schema-dim">
+            <strong style="color:var(--accent-teal);">dim_date (1)</strong><br>
+            🔑 <code>Date</code><br>
+            • Fiscal_Year (FY24-26)<br>
+            • Quarter, Month
+          </div>
+          <div class="schema-box schema-dim">
+            <strong style="color:var(--accent-teal);">dim_plans (1)</strong><br>
+            🔑 <code>plan_id</code><br>
+            • plan_name, segment<br>
+            • monthly_rental_inr
+          </div>
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text-muted); text-align:center;">Notice the "Waterfall Rule": Dimensions sit on TOP (1-side) and filter Facts at the BOTTOM (*-side).</p>
+    </section>
+
+    <!-- SLIDE 13 -->
+    <section class="slide" data-title="Topic 11: Primary Keys, Foreign Keys & Cardinality">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 11: Relationship Rules</span>
+        <span class="tag tag-module">01:18 – 01:25</span>
+      </div>
+      <h1 class="slide-title">Topic 11: Primary Keys, Foreign Keys & Cardinality (`1 : *`)</h1>
+      <p class="slide-subtitle">Before dragging a relationship line between two tables, check two rules: Unique Keys and Cardinality.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. One-to-Many (`1 : *`) — GOLD STANDARD</div>
+          <p><code>dim_subscribers[subscriber_id]</code> has <strong>1</strong> unique row per customer. <code>fact_revenue_monthly[subscriber_id]</code> has <strong>many (*)</strong> monthly bills per customer. Always aim for <code>1 : *</code>!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. One-to-One (`1 : 1`) — RARE</div>
+          <p>Both tables have unique keys. Usually means the two tables should simply be merged into one Dimension table in Power Query.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Many-to-Many (`* : *`) — DANGER!</div>
+          <p>Happens if you forget to remove the 200 duplicate rows in <code>subscribers.csv</code>! Power BI refuses <code>1 : *</code> and warns of ambiguous totals.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 14 -->
+    <section class="slide" data-title="Topic 12: Cross-Filter Direction (Single vs. Both)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 12: Filter Propagation</span>
+        <span class="tag tag-module">01:25 – 01:32</span>
+      </div>
+      <h1 class="slide-title">Topic 12: Cross-Filter Direction — Why "Single" Beats "Both"</h1>
+      <p class="slide-subtitle">Think of relationship arrows as one-way traffic valves controlling how slicer clicks flow across your dashboard.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Single Direction (`dim` ➔ `fact`) — ALWAYS DEFAULT</div>
+          <p>When Rashmi clicks <code>City = "Mumbai"</code> in a slicer from <code>dim_subscribers</code>, the filter arrow travels <strong>downhill</strong> into <code>fact_revenue_monthly</code> and sums only Mumbai revenue.</p>
+          <p style="margin-top:0.5rem; color:var(--accent-teal);"><strong>Safe & Fast:</strong> Prevents circular loop errors when multiple fact tables exist.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Bi-Directional (`dim` ⇄ `fact`) — AVOID!</div>
+          <p>Allows filters to travel <em>uphill</em> from Fact to Dimension. If you turn on Bi-Directional filtering across <code>fact_revenue</code> and <code>fact_usage</code>, Power BI blocks the relationship due to <strong>ambiguity</strong> (two competing filter paths!).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15 -->
+    <section class="slide" data-title="Topic 13: Active vs. Inactive Relationships (USERELATIONSHIP)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 13: Multi-Date Modeling</span>
+        <span class="tag tag-lab">01:32 – 01:38</span>
+      </div>
+      <h1 class="slide-title">Topic 13: Active vs. Inactive Relationships (Solid vs. Dotted Lines)</h1>
+      <p class="slide-subtitle">Look at `dim_subscribers`: each row has TWO dates—`signup_date` AND `churn_date`! How do we connect both to our Calendar table?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">The Power BI Rule: Only ONE Active Path</div>
+          <p>Between any two tables, Power BI allows only <strong>one solid (Active)</strong> relationship line at a time. Any second relationship appears as a <strong>dotted (Inactive)</strong> line.</p>
+          <ul class="list-styled">
+            <li><strong>Active (Solid):</strong> <code>dim_date[Date]</code> ➔ <code>dim_subscribers[signup_date]</code> (Counts New Acquisitions).</li>
+            <li><strong>Inactive (Dotted):</strong> <code>dim_date[Date]</code> ┄➔ <code>dim_subscribers[churn_date]</code> (Activated inside DAX via <code>USERELATIONSHIP()</code> when counting Monthly Churned Users!).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Why Not Create Two Separate Date Tables?</div>
+          <p>If you create two Date tables, the CMO has to click two different "Month" slicers on the dashboard! Keeping <strong>one master Date table</strong> with one active and one inactive line lets a single Month slicer control both Acquisitions and Churns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 16 -->
+    <section class="slide" data-title="Topic 14: Building & Marking a Dedicated Date Table">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 14: Time Intelligence Foundation</span>
+        <span class="tag tag-lab">01:38 – 01:45</span>
+      </div>
+      <h1 class="slide-title">Topic 14: Building a Dedicated `dim_date` Table (Indian Fiscal Year!)</h1>
+      <p class="slide-subtitle">JioWave operates on the Indian Fiscal Year (April 1 to March 31: FY24, FY25, FY26). Power BI's built-in Auto Date/Time only understands Jan–Dec!</p>
+
+      <div class="code-block">
+        <span class="cm">// Modeling Tab → New Table → Paste this DAX Calendar script:</span><br>
+        dim_date = <br>
+        <span class="fn">ADDCOLUMNS</span>(<br>
+        &nbsp;&nbsp;<span class="fn">CALENDAR</span>(<span class="fn">DATE</span>(2023, 4, 1), <span class="fn">DATE</span>(2026, 3, 31)),<br>
+        &nbsp;&nbsp;<span class="str">"Calendar_Year"</span>, <span class="fn">YEAR</span>([Date]),<br>
+        &nbsp;&nbsp;<span class="str">"Month_Num"</span>, <span class="fn">MONTH</span>([Date]),<br>
+        &nbsp;&nbsp;<span class="str">"Month_Name"</span>, <span class="fn">FORMAT</span>([Date], <span class="str">"MMM"</span>),<br>
+        &nbsp;&nbsp;<span class="str">"Fiscal_Year"</span>, <span class="kw">IF</span>(<span class="fn">MONTH</span>([Date]) >= 4, <span class="str">"FY"</span> &amp; <span class="fn">RIGHT</span>(<span class="fn">YEAR</span>([Date]) + 1, 2), <span class="str">"FY"</span> &amp; <span class="fn">RIGHT</span>(<span class="fn">YEAR</span>([Date]), 2)),<br>
+        &nbsp;&nbsp;<span class="str">"Fiscal_Quarter"</span>, <span class="str">"FQ"</span> &amp; <span class="fn">ROUNDUP</span>(<span class="fn">MOD</span>(<span class="fn">MONTH</span>([Date]) - 4, 12) + 1, 0) / 3<br>
+        )
+      </div>
+      <div class="ui-path">Mandatory Step: Table Tools → Mark as Date Table → Select `[Date]` Column!</div>
+    </section>
+
+    <!-- SLIDE 17 -->
+    <section class="slide" data-title="Topic 15: Model Hygiene (Hiding Keys & Sort By Column)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 15: Report Usability</span>
+        <span class="tag tag-module">01:45 – 01:51</span>
+      </div>
+      <h1 class="slide-title">Topic 15: Model Hygiene — Hiding Foreign Keys & Sorting Months</h1>
+      <p class="slide-subtitle">Remember the JioWave Grading Rubric? "Star schema; marked date table; single-direction relationships; hidden FK columns."</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">1. Hide All Foreign Keys (Eye Icon 👁️)</div>
+          <p>In Model View, click the eye icon on <code>subscriber_id</code> inside <code>fact_revenue_monthly</code> and <code>fact_usage_monthly</code>. Why? So report builders are forced to drag <code>subscriber_id</code> from <code>dim_subscribers</code> (the 1-side), preventing broken visuals!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Fix Alphabetical Month Sorting (`Apr, Aug, Dec...`)</div>
+          <p>By default, Power BI sorts text months alphabetically (<code>Apr, Aug, Dec, Feb...</code>). Select <code>Month_Name</code> in Table View → <code>Column Tools → Sort by Column → Month_Num</code> so charts flow chronologically!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 18: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Tracing a Multi-Table Subscriber Journey">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:51 – 01:54</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: How Star Schema Links 3 Tables for `SUB000013`</h1>
+      <p class="slide-subtitle">Trace how subscriber `SUB000013` (Diya Iyer) flows across `dim_subscribers`, `fact_subscriptions`, and `fact_plan_migrations` without double-counting.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Connected Star Schema Trace for `SUB000013`</span><span>Click Reveal to highlight the relationship keys & downgrade insight</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Table Name</th>
+              <th>Key / ID</th>
+              <th>Subscriber / Plan</th>
+              <th>Date / Window</th>
+              <th>Status / Direction</th>
+              <th>Financial Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>dim_subscribers (1)</strong></td>
+              <td class="cell-target" id="d2-inst-1">SUB000013</td>
+              <td>Diya Iyer (Diamond • Gurugram)</td>
+              <td>Signup: 2025-04-07</td>
+              <td>Active (<code>is_churned = 0</code>)</td>
+              <td>Home Tower: TW0029</td>
+            </tr>
+            <tr>
+              <td><strong>fact_subscriptions (*)</strong></td>
+              <td>SS0000015 (<code>SUB000013</code>)</td>
+              <td>PL016 (JioPremium 1999)</td>
+              <td>2025-04-07 to 2025-06-08</td>
+              <td>Inactive (<code>is_active = 0</code>)</td>
+              <td>₹1,999/mo rental</td>
+            </tr>
+            <tr>
+              <td><strong>fact_subscriptions (*)</strong></td>
+              <td>SS0000016 (<code>SUB000013</code>)</td>
+              <td>PL012 (JioPost 699)</td>
+              <td>2025-06-08 to Present</td>
+              <td>Active (<code>is_active = 1</code>)</td>
+              <td>₹699/mo rental</td>
+            </tr>
+            <tr>
+              <td><strong>fact_plan_migrations (*)</strong></td>
+              <td>MIG000003 (<code>SUB000013</code>)</td>
+              <td>PL016 ➔ PL012</td>
+              <td>2025-06-08</td>
+              <td class="cell-target" id="d2-inst-2">Down</td>
+              <td class="cell-target" id="d2-inst-3">-₹1,300/mo (-65%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Relationship & Business Diagnosis:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d2-inst-ans', ['d2-inst-1', 'd2-inst-2', 'd2-inst-3'])">🔍 Reveal Instructor Trace & Business Insight</button>
+          <button class="btn" onclick="resetSim('d2-inst-ans', ['d2-inst-1', 'd2-inst-2', 'd2-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d2-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Why This Explains CMO Rashmi's ARPU Mystery (Q2):</h4>
+          <ol class="list-styled">
+            <li><strong>One-to-Many Integrity:</strong> <code>SUB000013</code> appears <strong>once</strong> in <code>dim_subscribers</code> (1-side) and <strong>twice</strong> in <code>fact_subscriptions</code> (*-side). Because we did NOT merge <code>subscriptions</code> into <code>subscribers</code>, Diya Iyer is counted as <strong>1 customer</strong>, not 2!</li>
+            <li><strong>The Silent Revenue Bleed:</strong> Diya didn't churn—she <strong>downgraded</strong> from <code>PL016</code> (₹1,999) to <code>PL012</code> (₹699) on June 8, 2025, costing JioWave <strong>-₹1,300/month</strong> in recurring revenue!</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 19: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Diagnosing Cardinality & Relationship Direction">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:54 – 01:57</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Fixing a Broken Star Schema Relationship</h1>
+      <p class="slide-subtitle">A junior analyst tried to link `dim_towers` to `fact_tower_metrics` and `dim_subscribers` to `dim_towers`. Spot the exact cardinality and filter direction for each link!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Model View Relationship Configuration Matrix</span><span>Predict the 3 highlighted relationship settings</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>From Table (Column)</th>
+              <th>To Table (Column)</th>
+              <th>Cardinality</th>
+              <th>Cross-Filter Direction</th>
+              <th>Which Foreign Key Column Must Be Hidden?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>dim_towers[tower_id]</code> (279 unique)</td>
+              <td><code>fact_tower_metrics[tower_id]</code> (10,044 rows)</td>
+              <td class="cell-target" id="d2-stu1-c1">One to Many (1 : *)</td>
+              <td>Single (<code>dim_towers</code> ➔ <code>fact_tower_metrics</code>)</td>
+              <td><code>fact_tower_metrics[tower_id]</code></td>
+            </tr>
+            <tr>
+              <td><code>dim_towers[tower_id]</code> (279 unique)</td>
+              <td><code>dim_subscribers[home_tower_id]</code> (28,000 rows)</td>
+              <td>One to Many (1 : *)</td>
+              <td class="cell-target" id="d2-stu1-c2">Single (<code>dim_towers</code> ➔ <code>dim_subscribers</code>)</td>
+              <td class="cell-target" id="d2-stu1-c3"><code>dim_subscribers[home_tower_id]</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d2-stu1-ans', ['d2-stu1-c1', 'd2-stu1-c2', 'd2-stu1-c3'])">✅ Reveal Relationship Answers</button>
+          <button class="btn" onclick="resetSim('d2-stu1-ans', ['d2-stu1-c1', 'd2-stu1-c2', 'd2-stu1-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d2-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Verified Modeling Answers:</h4>
+          <ul class="list-styled">
+            <li><strong>Cardinality:</strong> <code>One to Many (1 : *)</code> because <code>dim_towers</code> has 279 unique towers while <code>fact_tower_metrics</code> has 36 monthly rows per tower (279 × 36 = 10,044 rows).</li>
+            <li><strong>Filter Flow ("Snowflake-to-Star Chain"):</strong> Filtering <code>dim_towers[tower_tier] = "Tier-2"</code> flows into <code>dim_subscribers</code>, which then filters <code>fact_revenue_monthly</code>—letting us see revenue and churn by Tower Tier!</li>
+            <li><strong>Hidden FK:</strong> Always hide <code>home_tower_id</code> on the Many-side (<code>dim_subscribers</code>) so visuals use <code>dim_towers[tower_id]</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 20: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Uncovering the Hidden Cohort & Down-Migration Ratio">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:57 – 01:59</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Verifying Cohort Churn & Pricing Pressure</h1>
+      <p class="slide-subtitle">Using the cleaned `Vintage_Cohort` column from Slide 2 and `fact_plan_migrations`, calculate the two headline findings CMO Rashmi needs.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified JioWave Warehouse Aggregates</span><span>Predict the Cohort Churn % and Down/Up Migration Ratio</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric / Segment</th>
+              <th>Numerator</th>
+              <th>Denominator</th>
+              <th>Computed Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cohort: <code>2024Q3 × PL015 × Tier-2</code></strong></td>
+              <td>581 Churned Subscribers</td>
+              <td>849 Total Cohort Subscribers</td>
+              <td class="cell-target" id="d2-stu2-c1">68.43% Churn (~5.7× headline!)</td>
+            </tr>
+            <tr>
+              <td><strong>Plan Migration Pressure (`fact_plan_migrations`)</strong></td>
+              <td>3,717 Downward Migrations</td>
+              <td>1,011 Upward Migrations</td>
+              <td class="cell-target" id="d2-stu2-c2">3.68× Down-to-Up Ratio</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d2-stu2-ans', ['d2-stu2-c1', 'd2-stu2-c2'])">✅ Reveal Analytical Findings</button>
+          <button class="btn" onclick="resetSim('d2-stu2-ans', ['d2-stu2-c1', 'd2-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d2-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Verification on JioWave Data:</h4>
+          <ul class="list-styled">
+            <li><strong>The Hot Cohort (Q1 Discovery):</strong> In the <code>2024Q3 × PL015 (JioPostFree6 399) × Tier-2</code> segment, <strong>581 out of 849</strong> subscribers churned = <strong>68.43%</strong> churn rate! Remember <code>PL015</code> was a 6-month promotional plan launched in July 2024—the moment the free promo ended in Q1 2025, Tier-2 customers abandoned JioWave!</li>
+            <li><strong>Downward Pricing Pressure (Q2 Discovery):</strong> <code>3,717 ÷ 1,011 = 3.68×</code>—customers are downgrading plans nearly 4 times faster than upgrading!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 21 -->
+    <section class="slide" data-title="Common Data Modeling Mistakes Checklist">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Troubleshooting Guide</span>
+        <span class="tag tag-module">01:59</span>
+      </div>
+      <h1 class="slide-title">5 Data Modeling Bugs That Break Power BI Dashboards</h1>
+      <p class="slide-subtitle">If a visual shows the exact same repeated number on every row of a table, check this list immediately!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Symptom 1: Every Bar in a Chart Shows the Same Total</div>
+          <p><strong>Cause:</strong> Missing relationship between the Dimension table on your chart axis and the Fact table in your Values field! Connect them in Model View.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Symptom 2: "Can't create relationship because duplicate values exist"</div>
+          <p><strong>Cause:</strong> Trailing spaces or case differences in your Dimension key (e.g., <code>"TW001"</code> vs <code>"tw001"</code>). Run <code>Text.Upper</code> + <code>Text.Trim</code> + <code>Table.Distinct</code> in Power Query.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Symptom 3: Date Slicer Doesn't Filter Revenue</div>
+          <p><strong>Cause:</strong> You dragged <code>fact_revenue_monthly[revenue_month]</code> into the slicer instead of <code>dim_date[Date]</code>, or forgot to link <code>dim_date</code> to the fact table.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Symptom 4: Auto Date/Time Bloating `.pbix` Size</div>
+          <p><strong>Cause:</strong> Power BI secretly creates hidden calendar tables for every date column. Turn it off via <code>File → Options → Data Load → Uncheck Auto date/time</code> once your custom <code>dim_date</code> is marked!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 22 -->
+    <section class="slide" data-title="Day 02 Hands-On Build Sequence (Model View)">
+      <div class="slide-meta">
+        <span class="tag tag-lab">Step-by-Step Build Lab</span>
+        <span class="tag tag-module">Practice Checklist</span>
+      </div>
+      <h1 class="slide-title">Your Exact 6-Step Model View Build Sequence</h1>
+      <p class="slide-subtitle">Execute these 6 steps tonight on your `JioWave_Day01_Cleaned.pbix` file.</p>
+
+      <div class="card">
+        <ol class="list-styled">
+          <li><strong>Fix Mixed Dates in Power Query:</strong> Convert <code>subscribers[signup_date]</code> using Locale <code>"en-GB"</code> and create the <code>Vintage_Cohort</code> column (<code>2024Q3</code>).</li>
+          <li><strong>Close & Apply:</strong> Load all 8 operational tables (plus <code>benchmarks</code> as a disconnected reference table) into the model.</li>
+          <li><strong>Create & Mark `dim_date`:</strong> Generate the FY24–FY26 DAX Calendar table (<code>2023-04-01</code> to <code>2026-03-31</code>) and click <strong>Mark as Date Table</strong>.</li>
+          <li><strong>Wire Star Schema Relationships:</strong> Link <code>dim_subscribers</code>, <code>dim_plans</code>, <code>dim_towers</code>, and <code>dim_date</code> to the Fact tables using <strong>Single-Direction (1 : *)</strong> relationships.</li>
+          <li><strong>Create Inactive Churn Date Link:</strong> Drag <code>dim_date[Date]</code> to <code>dim_subscribers[churn_date]</code> (verifying it renders as a dotted inactive line).</li>
+          <li><strong>Hide All Foreign Keys & Sort Months:</strong> Hide every FK column on the *-side of relationships and sort <code>Month_Name</code> by <code>Month_Num</code>. Save as <code>JioWave_Day02_StarSchema.pbix</code>!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 23 -->
+    <section class="slide" data-title="Day 03 Preview: Entering DAX (Data Analysis Expressions)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Looking Ahead</span>
+        <span class="tag tag-theory">Next Session Preview</span>
+      </div>
+      <h1 class="slide-title">Tomorrow (Day 03): Bringing Our Star Schema to Life with DAX</h1>
+      <p class="slide-subtitle">With our clean Star Schema wired today, tomorrow we start writing the DAX formulas that power our 5-page CMO Executive Report.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Calculated Columns vs. Measures</div>
+          <p>Why 95% of your calculations must be dynamic <strong>Measures</strong> rather than static Calculated Columns.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Core Aggregators & Iterators</div>
+          <p><code>SUM</code>, <code>DIVIDE</code>, <code>DISTINCTCOUNT</code>, and row-by-row iterators like <code>SUMX</code> & <code>AVERAGEX</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. The King of DAX: `CALCULATE()`</div>
+          <p>How to override filters to compute <code>Premium Tier ARPU</code>, <code>Churned Subscribers</code> (activating our dotted line via <code>USERELATIONSHIP</code>), and <code>Concentration Ratios</code>!</p>
+        </div>
+      </div>
+      <p style="text-align:center; color:var(--accent-gold); font-weight:700; margin-top:1rem;">Say "Day 3" whenever you are ready for the next 2-hour interactive deck!</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

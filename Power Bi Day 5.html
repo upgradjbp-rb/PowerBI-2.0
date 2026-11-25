@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 05: Visual Storytelling & Page 1 Morning Dashboard</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-teal); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(20, 184, 166, 0.16);
+    border-color: var(--accent-teal);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.14), rgba(59, 130, 246, 0.08));
+    border-left: 4px solid var(--accent-teal);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #5eead4; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  /* Mock Wireframe Grid */
+  .wireframe {
+    background: #090d16;
+    border: 2px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 240px 1fr 270px;
+    gap: 0.85rem;
+    margin: 1rem 0;
+  }
+  .wf-col { display: flex; flex-direction: column; gap: 0.65rem; }
+  .wf-box {
+    background: var(--bg-card);
+    border: 1px dashed var(--accent-teal);
+    border-radius: 8px;
+    padding: 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+    .wireframe { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 05 (2 Hours) • Visual Design Rules & Building Page 1: CMO 7:45 AM Morning Brief</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 22</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 05 Curriculum (22 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 05 Kickoff: Designing for the 3-Minute Boardroom Reader">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Report View & Storytelling</span>
+        <span class="tag tag-theory">00:00 – 00:06</span>
+      </div>
+      <h1 class="slide-title">Day 05 Kickoff: From Data Engine to Boardroom Story</h1>
+      <p class="slide-subtitle">Over Days 1–4, we built a rock-solid ETL pipeline, Star Schema, and DAX library. Starting today (Days 5–10), we build our 5-page CMO Executive Report—beginning with Page 1!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">The 7:45 AM Phone Rule (From Page 14 of the JioWave Brief)</div>
+        <p>"This is the Power BI page Rashmi opens on her phone at 7:45 AM before her first call. Build for the <strong>three-minute reader</strong>, then drill behind each card for the operations team who has more time." Six clean visuals beat sixty messy ones!</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. F-Pattern Eye Tracking</div>
+          <p>Executives read top-left to bottom-right. Place your <strong>Headline KPI Cards</strong> on the left/top, your <strong>Hero Trend Visual</strong> in the center, and your <strong>Action Watchlist</strong> on the right.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Color Restraint (Max 3 Colors)</div>
+          <p>Use neutral slate/navy for baseline bars, <strong>Teal/Blue</strong> for JioWave target performance, and <strong>Crimson/Amber</strong> <em>exclusively</em> to call attention to anomalies like the 68.43% churn cohort!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Action Titles, Not Label Titles</div>
+          <p>Never title a chart <code>"Churn Rate by Cohort"</code>. Title it: <strong><code>"2024Q3 × PL015 × Tier-2 Churns at 68.4% (5.7× Headline)"</code></strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Choosing the Right Visual for Every Question">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Chart Selection Matrix</span>
+        <span class="tag tag-module">00:06 – 00:14</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Visual Vocabulary — Never Use a Pie Chart for 32 Cities!</h1>
+      <p class="slide-subtitle">Every analytical question has one exact visual type that communicates the answer in under 3 seconds.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>JioWave Visual Selection Guide</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Analytical Goal</th>
+              <th>Best Power BI Visual</th>
+              <th>Visual to AVOID</th>
+              <th>Where We Use It in JioWave</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Single Headline Metric + Trend</strong></td>
+              <td><strong>New Card Visual</strong> (with Reference Labels)</td>
+              <td>Gauges (waste huge canvas space)</td>
+              <td>Page 1 Left Rail: 6 Executive KPIs</td>
+            </tr>
+            <tr>
+              <td><strong>Change Over Time (36 Months)</strong></td>
+              <td><strong>Line Chart</strong> (or Combo Line + Clustered Column)</td>
+              <td>Vertical Bar Chart with 36 skinny bars</td>
+              <td>Page 1 Center & Page 3: ARPU Trajectory by Tier</td>
+            </tr>
+            <tr>
+              <td><strong>Comparing Categories (24 Plans / 32 Cities)</strong></td>
+              <td><strong>Clustered Horizontal Bar Chart</strong> (sorted descending)</td>
+              <td>Pie Chart / Donut Chart / 3D Charts</td>
+              <td>Page 5: Plan Profit Contribution Ranking</td>
+            </tr>
+            <tr>
+              <td><strong>2-Variable Intersection (Cohort × Plan)</strong></td>
+              <td><strong>Matrix Visual</strong> with Conditional Heatmap</td>
+              <td>Stacked Bar with 24 colors</td>
+              <td>Page 2: Vintage Quarter × Plan × Tier Matrix</td>
+            </tr>
+            <tr>
+              <td><strong>Part-to-Whole Bridge (Mix vs. Rate)</strong></td>
+              <td><strong>Waterfall Chart</strong></td>
+              <td>Table of raw differences</td>
+              <td>Page 3: Explaining the ARPU Drop Bridge</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Setting Up Custom Canvas Size, Gridlines & JSON Theme">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Canvas & Branding</span>
+        <span class="tag tag-lab">00:14 – 00:22</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Canvas Setup, Snap-to-Grid & Custom Brand Theme</h1>
+      <p class="slide-subtitle">Before placing a single visual on Page 1, configure your report canvas like a UI/UX designer.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Step 1: Canvas Settings & Alignment</div>
+          <ul class="list-styled">
+            <li>Click empty canvas → <code>Format Page → Canvas settings → Type: 16:9 (1280 × 720 px)</code> (or Custom <code>1440 × 810</code> for executive density).</li>
+            <li>Go to <code>View Tab → Check [✓] Show gridlines & [✓] Snap to grid</code> so every card aligns to the exact pixel.</li>
+            <li>Set <code>Canvas background</code> to a clean soft off-white (<code>#F8FAFC</code>) with 0% transparency and card backgrounds to pure white (<code>#FFFFFF</code>) with subtle 1px borders.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Step 2: Corporate Color Theme (`View → Themes`)</div>
+          <p>Standardize typography (<code>Segoe UI</code>) and brand palette across all 5 pages automatically:</p>
+          <div class="code-block">
+            {<br>
+            &nbsp;&nbsp;<span class="str">"name"</span>: <span class="str">"JioWave Executive Theme"</span>,<br>
+            &nbsp;&nbsp;<span class="str">"dataColors"</span>: [<span class="str">"#0F172A"</span>, <span class="str">"#0D9488"</span>, <span class="str">"#F59E0B"</span>, <span class="str">"#E11D48"</span>, <span class="str">"#3B82F6"</span>]<br>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Page 1 Wireframe — CMO Morning Brief Layout">
+      <div class="slide-meta">
+        <span class="tag tag-module">Page 1 Blueprint</span>
+        <span class="tag tag-lab">00:22 – 00:30</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Exact Wireframe of Page 1 ("Executive Morning Brief")</h1>
+      <p class="slide-subtitle">Anchored directly to Page 14 of the JioWave Case Study Brief: KPIs on the left, Hero Chart in the center, Cohort Watchlist on the right.</p>
+
+      <div class="wireframe">
+        <div class="wf-col">
+          <div class="wf-box" style="border-color:var(--accent-gold);">
+            <strong style="color:var(--accent-gold);">LEFT RAIL: 6 KPI Cards</strong><br>
+            1. Annual Churn Rate (11.97%)<br>
+            2. Worst Cohort Churn (68.43%)<br>
+            3. Premium Tier ARPU (₹687.60)<br>
+            4. Top-10% Tower Util (95.2%)<br>
+            5. Migration Down/Up (3.68×)<br>
+            6. Total FY26 Revenue (₹14.45 Cr)
+          </div>
+        </div>
+        <div class="wf-col">
+          <div class="wf-box" style="border-color:var(--accent-blue); height:100%;">
+            <strong style="color:#93c5fd;">CENTER STAGE: Hero Visuals</strong><br><br>
+            <strong>Top Chart (Line Chart):</strong><br>
+            Monthly ARPU Trajectory by Tier (`Diamond` vs `Premium` vs `Mass`, FY24–FY26) with Constant Line at ₹700 target.<br><br>
+            <strong>Bottom Chart (Clustered Bar):</strong><br>
+            Churn Rate % by Vintage Quarter (`2023Q2` to `2026Q1`) showing the `2024Q3` spike!
+          </div>
+        </div>
+        <div class="wf-col">
+          <div class="wf-box" style="border-color:var(--accent-rose); height:100%;">
+            <strong style="color:#fda4af;">RIGHT RAIL: Action Watchlist</strong><br><br>
+            <strong>Table Visual + Conditional Icons:</strong><br>
+            Top 5 At-Risk Cohorts & Plans requiring immediate 90-Day Playbook intervention, plus Slicers (<code>Fiscal Year</code>, <code>City Tier</code>, <code>Segment</code>) at the top header bar!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: New Card Visual & Reference Labels">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: KPI Card Mastery</span>
+        <span class="tag tag-lab">00:30 – 00:40</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Building Executive KPI Cards with Reference Labels</h1>
+      <p class="slide-subtitle">A naked number like `11.97%` has no context. Power BI's New Card Visual lets you attach MoM Trend, Benchmark Comparison, and Status Flags inside one unified card!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">How to Configure a Multi-Layer KPI Card</div>
+          <ol class="list-styled">
+            <li>Insert the <strong>Card (new)</strong> visual from the Visualizations pane.</li>
+            <li>Drag all 6 core measures into the <strong>Data</strong> field well simultaneously (Power BI arranges them in a clean 1×6 vertical grid!).</li>
+            <li>Go to <code>Format Visual → Reference labels</code>: select each KPI card and add its matching <code>MoM Trend</code> measure and <code>Status Flag</code> measure underneath!</li>
+            <li>Turn on <strong>Accent bar</strong> (left edge colored Teal for healthy, Crimson for alert).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">DAX Measure for Worst Cohort Card</div>
+          <div class="code-block">
+            Worst Cohort Churn % = <br>
+            <span class="fn">CALCULATE</span>(<br>
+            &nbsp;&nbsp;[Churn Rate %],<br>
+            &nbsp;&nbsp;dim_subscribers[Vintage_Cohort] = <span class="str">"2024Q3"</span>,<br>
+            &nbsp;&nbsp;dim_plans[plan_id] = <span class="str">"PL015"</span>,<br>
+            &nbsp;&nbsp;dim_towers[tower_tier] = <span class="str">"Tier-2"</span><br>
+            ) <span class="cm">-- Evaluates to 68.43%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Line & Combo Charts + Analytics Pane Reference Lines">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Trend Storytelling</span>
+        <span class="tag tag-lab">00:40 – 00:50</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Hero Line Chart + Analytics Pane Benchmark Lines</h1>
+      <p class="slide-subtitle">How do we show Rashmi at a glance where JioWave's ARPU sits relative to the ₹700 challenger floor?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Building the Center Hero Line Chart</div>
+          <ul class="list-styled">
+            <li><strong>X-Axis:</strong> <code>dim_date[Date]</code> (set to Continuous axis so all 36 months flow smoothly without horizontal scrollbars!).</li>
+            <li><strong>Y-Axis:</strong> <code>[Monthly ARPU]</code>.</li>
+            <li><strong>Legend:</strong> <code>dim_subscribers[subscriber_tier]</code> (<code>Diamond</code>, <code>Premium</code>, <code>Mass</code>).</li>
+            <li>Turn on <strong>Series labels</strong> (so tier names sit directly at the end of each line instead of forcing the eye up to a legend!).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Adding Benchmark Lines (Magnifying Glass 🔍 Icon)</div>
+          <ol class="list-styled">
+            <li>Select the visual → click the <strong>Add further analyses to your visual (🔍)</strong> tab.</li>
+            <li>Expand <strong>Constant line → + Add line</strong>.</li>
+            <li>Set Value = <code>700</code>, Color = Dashed Gold, Data Label = <code>"Target Premium Floor (₹700)"</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 6: Slicers, Sync Slicers & Filter Pane Hierarchy">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: Interactive Filtering</span>
+        <span class="tag tag-lab">00:50 – 01:00</span>
+      </div>
+      <h1 class="slide-title">Topic 6: Slicers & Sync Slicers — Controlling All 5 Pages Together</h1>
+      <p class="slide-subtitle">If CMO Rashmi selects `Fiscal Year = FY26` on Page 1, she expects Pages 2, 3, 4, and 5 to stay filtered to `FY26` when she clicks through!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Modern Slicer Best Practices</div>
+          <ul class="list-styled">
+            <li>Limit canvas slicers to <strong>3 or 4 high-impact dimensions</strong> in the top header bar: <code>Fiscal_Year</code>, <code>tower_tier</code> (Metro / Tier-1 / Tier-2), and <code>segment</code> (Prepaid / Postpaid / Broadband).</li>
+            <li>Use <strong>Tile / Button style</strong> (`Slicer settings → Style: Tile`) for short lists like <code>FY24 | FY25 | FY26</code> so the CMO can tap them on her phone!</li>
+            <li>Put low-frequency filters (like specific <code>city</code> or <code>occupation</code>) inside the collapsible <strong>Filters Pane</strong> on the right.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Sync Slicers (`View → Sync slicers`)</div>
+          <ol class="list-styled">
+            <li>Select your <code>Fiscal_Year</code> slicer on Page 1.</li>
+            <li>Open <code>View Tab → Sync slicers</code>.</li>
+            <li>Check the <strong>Sync (🔄)</strong> box across Pages 1–5, and check the <strong>Visible (👁️)</strong> box wherever you want the slicer bar displayed!</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 7: Conditional Formatting (Data Bars, Icons & Color Scales)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Visual Cues</span>
+        <span class="tag tag-lab">01:00 – 01:10</span>
+      </div>
+      <h1 class="slide-title">Topic 7: Conditional Formatting — Making Anomalies Jump Off the Screen</h1>
+      <p class="slide-subtitle">On Page 1's Right Rail Watchlist table, we don't want Rashmi reading 20 numbers. Conditional formatting guides her eyes straight to the danger zones.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Background Color Scale</div>
+          <p>Right-click <code>[Churn Rate %]</code> in the table field well → <code>Conditional formatting → Background color</code>. Set Low (6%) = Soft Mint, High (60%+) = Crimson Red.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Inline Data Bars</div>
+          <p>Apply <strong>Data bars</strong> on <code>[Total Subscribers]</code> so the CMO immediately sees whether a high churn rate affects 10 customers or 849 customers!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Rule-Based KPI Icons</div>
+          <p>Apply <strong>Icons</strong> on <code>[Churn Rate %]</code>: Green Check if <code>&lt; 0.12</code>, Amber Triangle if <code>0.12 – 0.25</code>, Red Diamond if <code>&gt; 0.25</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Investigating Acquisition Channels for the Hot Cohort">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:10 – 01:16</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Answering Question 1d — Was It One Failed Channel or Structural?</h1>
+      <p class="slide-subtitle">Look at Question 1d in the JioWave Case Study: "Cross-check the worst cohort (`2024Q3 × PL015 × Tier-2`) against acquisition channel data. Was it a single failed campaign or a structural mis-targeting?"</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`2024Q3 × PL015 × Tier-2` Cohort Breakdown by Acquisition Channel (849 Subscribers)</span><span>Click Reveal to highlight the channel pattern</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Acquisition Channel</th>
+              <th>Cohort Subscribers</th>
+              <th>Churned Subscribers</th>
+              <th>Churn Rate %</th>
+              <th>Diagnostic Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>App</strong></td>
+              <td>261</td>
+              <td>180</td>
+              <td class="cell-target" id="d5-inst-1">68.97%</td>
+              <td>Severe across largest volume channel</td>
+            </tr>
+            <tr>
+              <td><strong>Online</strong></td>
+              <td>184</td>
+              <td>124</td>
+              <td class="cell-target" id="d5-inst-2">67.39%</td>
+              <td>Severe across digital acquisition</td>
+            </tr>
+            <tr>
+              <td><strong>Store</strong></td>
+              <td>158</td>
+              <td>105</td>
+              <td>66.46%</td>
+              <td>Severe even in offline retail stores!</td>
+            </tr>
+            <tr>
+              <td><strong>Partner</strong></td>
+              <td>89</td>
+              <td>65</td>
+              <td>73.03%</td>
+              <td>Severe in channel partners</td>
+            </tr>
+            <tr>
+              <td><strong>Referral</strong></td>
+              <td>80</td>
+              <td>62</td>
+              <td class="cell-target" id="d5-inst-3">77.50%</td>
+              <td>Highest channel churn (promo hunters!)</td>
+            </tr>
+            <tr>
+              <td><strong>Inbound</strong></td>
+              <td>77</td>
+              <td>45</td>
+              <td>58.44%</td>
+              <td>Lowest, yet still ~5× company average!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Analytical Verdict for Page 1 Watchlist & Board Memo:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d5-inst-ans', ['d5-inst-1', 'd5-inst-2', 'd5-inst-3'])">🔍 Reveal Instructor Channel Diagnosis</button>
+          <button class="btn" onclick="resetSim('d5-inst-ans', ['d5-inst-1', 'd5-inst-2', 'd5-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d5-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Structural Product-Market Mis-Targeting (NOT a Single Bad Ad Campaign!):</h4>
+          <ol class="list-styled">
+            <li><strong>Every Channel Bleeds (58.4% to 77.5%):</strong> Whether customers joined via <strong>App (68.97%)</strong>, <strong>Online (67.39%)</strong>, <strong>Offline Store (66.46%)</strong>, or <strong>Referral (77.50%)</strong>, nearly 2 out of 3 churned!</li>
+            <li><strong>Root Cause:</strong> <code>PL015 ("JioPostFree6 399")</code> offered 6 free months upon launch in 2024Q3. Price-sensitive Tier-2 users signed up purely for the free window and churned the exact month billing kicked in. <strong>Immediate Action:</strong> Kill <code>PL015</code> and replace zero-cost trial promos with loyalty-vested step-up discounts!</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Verifying Page 1 Morning KPI Cards">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:16 – 01:19</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Auditing the 6 Morning KPI Cards (March 2026 Snapshot)</h1>
+      <p class="slide-subtitle">Before presenting Page 1 to CMO Rashmi, verify the exact March 2026 (`2026-03-01`) KPI values and identify which cards trigger a Crimson Alert Flag.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Page 1 Left-Rail KPI Cards (As of March 2026)</span><span>Predict the 2 highlighted KPI values & alert statuses</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>KPI Card</th>
+              <th>Current Value</th>
+              <th>Benchmark / Target</th>
+              <th>Status Flag</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Overall Annual Churn Rate</strong></td>
+              <td>11.97%</td>
+              <td>≤ 12.00% (TRAI Benchmark)</td>
+              <td>✓ Within Tolerance</td>
+            </tr>
+            <tr>
+              <td><strong>2. Worst Cohort (`2024Q3 × PL015 × Tier-2`)</strong></td>
+              <td class="cell-target" id="d5-stu1-c1">68.43%</td>
+              <td>≤ 12.00%</td>
+              <td class="cell-target" id="d5-stu1-c2">▲ CRITICAL ALERT (5.7×)</td>
+            </tr>
+            <tr>
+              <td><strong>3. Premium Tier ARPU (Mar 2026)</strong></td>
+              <td>₹687.60</td>
+              <td>≥ ₹700.00 Target Floor</td>
+              <td>▲ Below ₹700 Floor</td>
+            </tr>
+            <tr>
+              <td><strong>4. Top-10% Towers Peak Utilization (Mar 2026)</strong></td>
+              <td class="cell-target" id="d5-stu1-c3">95.20%</td>
+              <td>75% – 85% Optimal Band</td>
+              <td>▲ QoS Congestion Risk (&gt;95%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d5-stu1-ans', ['d5-stu1-c1', 'd5-stu1-c2', 'd5-stu1-c3'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d5-stu1-ans', ['d5-stu1-c1', 'd5-stu1-c2', 'd5-stu1-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d5-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Verified Page 1 Morning Card Metrics:</h4>
+          <ul class="list-styled">
+            <li><strong>Worst Cohort Churn:</strong> <strong>68.43%</strong> (581 churned ÷ 849 total)—triggers a Crimson Alert accent bar because it runs at <strong>5.7×</strong> the 11.97% headline!</li>
+            <li><strong>Top-10% Towers Utilization (28 of 279 towers in Mar 2026):</strong> Averages <strong>95.20%</strong> (crossing the 95% Quality-of-Service congestion danger line mentioned on Page 4 of the case brief!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Choosing Visuals & Action Titles for Page 1">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:19 – 01:20</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Replacing Weak Chart Titles with Executive Action Titles</h1>
+      <p class="slide-subtitle">A junior analyst put generic titles on Page 1's visuals. Upgrade each generic label into a quantified Action Title backed by our verified JioWave findings.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Page 1 Visual Title Makeover</span><span>Click Reveal to see board-ready Action Titles</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Visual Slot</th>
+              <th>Weak Generic Title (Avoid)</th>
+              <th>Quantified Boardroom Action Title (Use This!)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Center Top Line Chart</strong></td>
+              <td><code>"Monthly ARPU by Tier"</code></td>
+              <td class="cell-target" id="d5-stu2-c1"><code>"Diamond ARPU Fell -5.7% in FY26 While Down-Migrations Hit 3.68×"</code></td>
+            </tr>
+            <tr>
+              <td><strong>Right Rail Watchlist Table</strong></td>
+              <td><code>"Subscriber Churn Table"</code></td>
+              <td class="cell-target" id="d5-stu2-c2"><code>"Action Watchlist: 2024Q3 PL015 Tier-2 Cohort Bleeds at 68.4% Across All Channels"</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d5-stu2-ans', ['d5-stu2-c1', 'd5-stu2-c2'])">✅ Reveal Action Titles</button>
+          <button class="btn" onclick="resetSim('d5-stu2-ans', ['d5-stu2-c1', 'd5-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d5-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Why Action Titles Win Executive Buy-In:</h4>
+          <p>If Rashmi only has 3 minutes at 7:45 AM, she doesn't have to interpret axes—every chart title states the <strong>exact conclusion and rupee/percentage magnitude</strong> upfront!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Day 05 Build Checklist & Day 06 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Page 1 Complete!</span>
+        <span class="tag tag-theory">Next: Page 2 Forensics</span>
+      </div>
+      <h1 class="slide-title">Day 05 Milestone: Page 1 ("Executive Morning Brief") Built!</h1>
+      <p class="slide-subtitle">Your 5-page report now has its executive landing page. Tomorrow (Day 06), we build Page 2: Cohort Churn Forensics!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Page 1 Build Checklist</div>
+          <ol class="list-styled">
+            <li>Configure 16:9 canvas with Snap-to-Grid and JioWave Corporate Theme.</li>
+            <li>Place the 6 New Card KPIs on the left rail with Reference Labels & Crimson/Teal accent bars.</li>
+            <li>Build the Center Line Chart (Monthly ARPU by Tier + ₹700 Constant Line) and Right Rail Watchlist Table with Conditional Icons.</li>
+            <li>Add Top Slicer Bar (<code>Fiscal_Year</code>, <code>tower_tier</code>, <code>segment</code>).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 06 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Page 2 Build (Cohort Churn Forensics — Q1):</strong> Matrix Heatmaps, Decomposition Trees, Drill-Through Pages, and Custom Tooltip Pages so Rashmi can hover over any cell and see channel & city breakdowns!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 6" whenever you're ready for Page 2!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

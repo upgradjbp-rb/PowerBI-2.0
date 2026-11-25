@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 06: Page 2 Cohort Churn Forensics & Interactive Drill-Downs</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-rose); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-rose), var(--accent-gold));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(244, 63, 94, 0.16);
+    border-color: var(--accent-rose);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.14), rgba(245, 158, 11, 0.08));
+    border-left: 4px solid var(--accent-rose);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #fda4af; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 06 (2 Hours) • Page 2 Build: Cohort Churn Forensics, Matrix Heatmaps, Decomposition Trees & Drill-Through</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 22</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 06 Curriculum (22 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 06 Kickoff: Solving Question 1 (Where Is Real Churn Hiding?)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Page 2 Forensics</span>
+        <span class="tag tag-theory">00:00 – 00:06</span>
+      </div>
+      <h1 class="slide-title">Day 06 Kickoff: Building Page 2 — "Cohort Churn Forensics (Q1)"</h1>
+      <p class="slide-subtitle">Yesterday we built Page 1 (the 3-minute Morning Dashboard). Today we build Page 2 so CMO Rashmi can slice, drill, and expose every single cohort hiding beneath the 11.97% headline!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Audit Analogy: From Consolidated P&L to Branch-Level Ledger</div>
+        <p>Page 1 was the Consolidated Balance Sheet showing a healthy 11.97% average. Page 2 is the <strong>Forensic Audit Schedule</strong> where we cross-tabulate <code>Signup Quarter (Vintage) × Plan × City Tier</code> to pinpoint the exact branch losing money—and prove its Concentration Ratio to the Board!</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The 4 Sub-Questions of Question 1 We Solve on Page 2 Today</div>
+        <ol class="list-styled">
+          <li><strong>Q1a (Vintage Spread):</strong> Compute churn rate across all 12 acquisition quarters (<code>2023Q1</code> to <code>2025Q4</code>). What is the spread between best and worst vintage?</li>
+          <li><strong>Q1b (3-Way Decomposition):</strong> Slice by <code>Vintage × Plan × Tower Tier</code>. Which exact combinations explode past 65%+ churn?</li>
+          <li><strong>Q1c (Concentration Ratio):</strong> What share of total churned subscribers (3,352) comes from the worst cohort vs. its share of the subscriber base (28,000)?</li>
+          <li><strong>Q1d (Channel Root Cause):</strong> Interactive Drill-Through & Custom Tooltip showing City & Acquisition Channel breakdown!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Matrix Visual & Hierarchical Drill-Down">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Matrix Visual</span>
+        <span class="tag tag-lab">00:06 – 00:14</span>
+      </div>
+      <h1 class="slide-title">Topic 1: The Matrix Visual — Power BI's Interactive Pivot Table</h1>
+      <p class="slide-subtitle">Unlike a flat Table visual, a Matrix lets you nest multiple hierarchy levels on Rows and Columns with +/- expand icons and heatmap coloring.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Configuring the Cohort Matrix on Page 2</div>
+          <ul class="list-styled">
+            <li><strong>Rows Field Well:</strong> Drag <code>dim_plans[segment]</code> ➔ <code>dim_plans[plan_name]</code> ➔ <code>dim_towers[tower_tier]</code>.</li>
+            <li><strong>Columns Field Well:</strong> Drag <code>dim_subscribers[Vintage_Cohort]</code> (<code>2023Q1</code> to <code>2025Q4</code>).</li>
+            <li><strong>Values Field Well:</strong> Drag <code>[Churn Rate %]</code> and <code>[Total Subscribers]</code>.</li>
+            <li>Turn on <strong>Stepped Layout = Off</strong> (`Format → Row headers → Options`) so Plan and Tier appear in clean separate columns!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Mastering the 4 Drill-Down Icons (Top-Right of Visual)</div>
+          <ul class="list-styled">
+            <li><strong>Single Down Arrow (↓):</strong> Click-to-drill into one specific Plan (e.g., click <code>PL015</code> to see its Metro, Tier-1, and Tier-2 split).</li>
+            <li><strong>Double Down Arrow (⇊):</strong> Jumps to the next level across <em>all</em> plans at once.</li>
+            <li><strong>Forked Pitchfork Arrow (⑂):</strong> Expands all hierarchies together (<code>Plan + Tier</code>) so you can sort the entire matrix from highest to lowest churn!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Cohort Heatmap Formatting & Sample-Size Guardrails">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Heatmap Engineering</span>
+        <span class="tag tag-lab">00:14 – 00:22</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Building a DAX-Driven Heatmap Color Measure</h1>
+      <p class="slide-subtitle">Why shouldn't you use Power BI's default color scale blindly? Because a cohort with 2 subscribers where 1 churned shows 50% churn—creating false alarms!</p>
+
+      <div class="code-block">
+        <span class="cm">// Guardrail Measure: Only flag cohorts with meaningful sample size (>= 50 subscribers)</span><br>
+        Cohort Heatmap Color = <br>
+        <span class="kw">VAR</span> SubsCount = [Total Subscribers]<br>
+        <span class="kw">VAR</span> ChurnVal  = [Churn Rate %]<br>
+        <span class="kw">RETURN</span><br>
+        &nbsp;&nbsp;<span class="fn">SWITCH</span>(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">TRUE</span>(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;SubsCount &lt; 50, <span class="str">"#1E293B"</span>,           <span class="cm">-- Neutral dark slate for tiny sample sizes</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;ChurnVal &gt;= 0.50, <span class="str">"#E11D48"</span>,         <span class="cm">-- Crimson Alert (&gt;= 50% Churn!)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;ChurnVal &gt;= 0.18, <span class="str">"#D97706"</span>,         <span class="cm">-- Amber Warning (18% - 49%)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"#0F766E"</span>                            <span class="cm">-- Healthy Teal (&lt; 18%)</span><br>
+        &nbsp;&nbsp;)
+      </div>
+      <div class="ui-path">Format Visual → Cell elements → Background color → Format style: Field value → Select `[Cohort Heatmap Color]`</div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Q1a & Q1b Findings — Vintage Spread & 3-Way Matrix">
+      <div class="slide-meta">
+        <span class="tag tag-lab">Verified Data Discovery</span>
+        <span class="tag tag-module">00:22 – 00:32</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Verified Q1a & Q1b Output — Exposing the `2024Q3 × PL015` Spike</h1>
+      <p class="slide-subtitle">Look at how cleanly the heatmap isolates `2024Q3` (30.39% overall vintage churn) and specifically `PL015 (JioPostFree6 399)` across Tier-2 and Urban towers!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified Vintage Quarter Churn Spread (Q1a)</span><span>Spread = 30.39% (Worst) - 5.25% (Best) = 25.14 percentage points!</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Vintage Quarter</th>
+              <th>2023Q1</th>
+              <th>2023Q3</th>
+              <th>2024Q1</th>
+              <th>2024Q2</th>
+              <th class="cell-dirty">2024Q3 (Spike!)</th>
+              <th>2024Q4</th>
+              <th>2025Q2</th>
+              <th class="row-selected">2025Q4 (Best)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Subscribers</strong></td>
+              <td>2,085</td>
+              <td>2,250</td>
+              <td>2,123</td>
+              <td>2,304</td>
+              <td class="cell-dirty"><strong>3,867</strong></td>
+              <td>2,199</td>
+              <td>2,244</td>
+              <td class="row-selected">1,849</td>
+            </tr>
+            <tr>
+              <td><strong>Churn Rate %</strong></td>
+              <td>8.82%</td>
+              <td>8.13%</td>
+              <td>10.22%</td>
+              <td>9.59%</td>
+              <td class="cell-dirty"><strong>30.39%</strong></td>
+              <td>8.87%</td>
+              <td>9.36%</td>
+              <td class="row-selected"><strong>5.25%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: AI Decomposition Tree Visual">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: AI Root-Cause Visual</span>
+        <span class="tag tag-lab">00:32 – 00:42</span>
+      </div>
+      <h1 class="slide-title">Topic 4: The AI Decomposition Tree — Live Root-Cause Exploration in the Boardroom</h1>
+      <p class="slide-subtitle">During the live board call, CEO Manish Kalra might ask: "Okay, show me churn split by Region first, then Occupation, then Plan!" A Decomposition Tree lets you branch in ANY order live!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">How to Build the Decomposition Tree</div>
+          <ol class="list-styled">
+            <li>Insert the <strong>Decomposition tree</strong> visual on the bottom-left of Page 2.</li>
+            <li><strong>Analyze:</strong> Drag <code>[Churned Subscribers]</code> (or <code>[Churn Rate %]</code>).</li>
+            <li><strong>Explain by:</strong> Drag <code>Vintage_Cohort</code>, <code>plan_name</code>, <code>tower_tier</code>, <code>region</code>, <code>acquisition_channel</code>, and <code>occupation</code>.</li>
+            <li>Click the <strong>+</strong> icon next to <code>3,352 Churned Subscribers</code> and choose <strong>High value 💡</strong>—Power BI's AI engine automatically finds the #1 driver (<code>2024Q3</code> ➔ <code>JioPostFree6 399</code> ➔ <code>Tier-2</code>)!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Why Executives Love AI Splits (Lightbulb Icon 💡)</div>
+          <p>When you click <strong>High value</strong>, a dotted AI line connects the nodes. Whenever the CMO changes a Slicer (e.g., filtering to <em>West Region</em>), the Decomposition Tree dynamically recalculates the worst path for West Region automatically!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Custom Report Page Tooltips (Hover Forensics)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Hover Tooltips</span>
+        <span class="tag tag-lab">00:42 – 00:52</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Custom Report Page Tooltips — Mini Dashboards on Hover</h1>
+      <p class="slide-subtitle">Instead of a boring black box showing two numbers when Rashmi hovers over `2024Q3 × PL015 × Tier-2`, let's pop up a sleek mini-chart showing the Top 5 Bleeding Cities and Channel Split!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">4-Step Custom Tooltip Setup</div>
+          <ol class="list-styled">
+            <li>Create a new hidden report page named <strong><code>TT_Cohort_Detail</code></strong> (Right-click tab → <strong>Hide Page</strong>).</li>
+            <li>Go to <code>Format Page → Page information → Toggle [ON] Allow use as tooltip</code>.</li>
+            <li>Set <code>Canvas settings → Type: Tooltip (320 × 240 px)</code>.</li>
+            <li>Place a compact horizontal bar chart of <code>[Churn Rate %] by City</code> on <code>TT_Cohort_Detail</code>. Then select your Page 2 Matrix → <code>Format → General → Tooltips → Page: TT_Cohort_Detail</code>!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">What Pops Up When Hovering `2024Q3 × PL015 × Tier-2`</div>
+          <ul class="list-styled">
+            <li><strong>Patna:</strong> 76.12% churn (51 / 67 subs)</li>
+            <li><strong>Coimbatore:</strong> 73.08% churn (57 / 78 subs)</li>
+            <li><strong>Vadodara:</strong> 72.88% churn (43 / 59 subs)</li>
+            <li><strong>Vijayawada:</strong> 72.31% churn (47 / 65 subs)</li>
+            <li><strong>Mysuru:</strong> 72.22% churn (39 / 54 subs)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 6: Drill-Through Pages & Cross-Highlight Controls">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: Interactive Navigation</span>
+        <span class="tag tag-lab">00:52 – 01:02</span>
+      </div>
+      <h1 class="slide-title">Topic 6: Drill-Through Pages & Edit Interactions</h1>
+      <p class="slide-subtitle">Allow operations managers to right-click any cohort or city and jump straight to a subscriber-level action list ready for retention outreach!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">1. Configuring a Drill-Through Target Page</div>
+          <ol class="list-styled">
+            <li>Create a hidden page named <strong><code>DT_Subscriber_Action_List</code></strong> containing a clean table of active/at-risk subscribers (<code>subscriber_id</code>, <code>full_name</code>, <code>city</code>, <code>plan_name</code>, <code>tenure_days</code>).</li>
+            <li>In the Visualizations pane under <strong>Drill through</strong>, drag <code>Vintage_Cohort</code>, <code>plan_name</code>, and <code>tower_tier</code>.</li>
+            <li>Power BI automatically places a <strong>Back Button (⬅)</strong> in the top-left corner (`Ctrl + Click` in Desktop, single click in Power BI Service).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Edit Interactions (`Format → Edit interactions`)</div>
+          <p>By default, clicking a bar in a chart <strong>Cross-Highlights</strong> (fades out) other charts. For Line Charts and KPI Cards, Cross-Highlighting looks messy—switch the interaction icon to <strong>Filter (funnel icon)</strong> so clicking a bar cleanly filters the trend line!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 7: Computing the Concentration Ratio in DAX (Q1c)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Concentration Math</span>
+        <span class="tag tag-lab">01:02 – 01:12</span>
+      </div>
+      <h1 class="slide-title">Topic 7: DAX Concentration Ratio — Proving Disproportionate Impact (Q1c)</h1>
+      <p class="slide-subtitle">Question 1c asks: "What share of total churned subscribers come from the worst cohort? Express this as a concentration ratio."</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">What Is a Concentration Ratio?</div>
+        <p><code>Concentration Ratio = (% Share of Total Churned Subscribers) ÷ (% Share of Total Subscriber Base)</code>. If churn were uniform across JioWave, a cohort holding 3% of subscribers would cause 3% of churn (Concentration Ratio = <strong>1.0×</strong>). Anything above <strong>3.0×</strong> proves severe structural concentration!</p>
+      </div>
+
+      <div class="code-block">
+        Churn Concentration Ratio = <br>
+        <span class="kw">VAR</span> CohortChurned = [Churned Subscribers]<br>
+        <span class="kw">VAR</span> AllChurned    = <span class="fn">CALCULATE</span>([Churned Subscribers], <span class="fn">ALL</span>(dim_subscribers), <span class="fn">ALL</span>(dim_plans), <span class="fn">ALL</span>(dim_towers))<br>
+        <span class="kw">VAR</span> ShareOfChurn  = <span class="fn">DIVIDE</span>(CohortChurned, AllChurned, 0)<br><br>
+        <span class="kw">VAR</span> CohortSubs    = [Total Subscribers]<br>
+        <span class="kw">VAR</span> AllSubs       = <span class="fn">CALCULATE</span>([Total Subscribers], <span class="fn">ALL</span>(dim_subscribers), <span class="fn">ALL</span>(dim_plans), <span class="fn">ALL</span>(dim_towers))<br>
+        <span class="kw">VAR</span> ShareOfBase   = <span class="fn">DIVIDE</span>(CohortSubs, AllSubs, 0)<br>
+        <span class="kw">RETURN</span><br>
+        &nbsp;&nbsp;<span class="fn">DIVIDE</span>(ShareOfChurn, ShareOfBase, 0)
+      </div>
+    </section>
+
+    <!-- SLIDE 9: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Verifying Q1c Concentration Ratio">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:12 – 01:18</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Quantifying the Concentration Ratio for the Board</h1>
+      <p class="slide-subtitle">Watch how the instructor verifies the exact Concentration Ratio for both `2024Q3 × PL015 × Tier-2` and the entire `2024Q3 × PL015` launch cohort.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified Concentration Analysis (`All Subscribers = 28,000` | `All Churned = 3,352`)</span><span>Click Reveal to highlight the Concentration Ratio proof</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Cohort Definition</th>
+              <th>Subscribers</th>
+              <th>% of Base</th>
+              <th>Churned</th>
+              <th>% of Total Churn</th>
+              <th>Concentration Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>2024Q3 × PL015 × Tier-2</strong></td>
+              <td>849</td>
+              <td class="cell-target" id="d6-inst-1">3.03%</td>
+              <td>581</td>
+              <td class="cell-target" id="d6-inst-2">17.33%</td>
+              <td class="cell-target" id="d6-inst-3">5.72× (17.33% ÷ 3.03%)</td>
+            </tr>
+            <tr>
+              <td><strong>2024Q3 × PL015 × Urban</strong></td>
+              <td>560</td>
+              <td>2.00%</td>
+              <td>402</td>
+              <td>11.99%</td>
+              <td>6.00× (11.99% ÷ 2.00%)</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>Combined 2024Q3 × PL015 (Tier-2 + Urban)</strong></td>
+              <td><strong>1,409</strong></td>
+              <td><strong>5.03%</strong></td>
+              <td><strong>983</strong></td>
+              <td><strong>29.33%</strong></td>
+              <td><strong>5.83× (Nearly 30% of all churn from 5% of users!)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Boardroom Synthesis:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d6-inst-ans', ['d6-inst-1', 'd6-inst-2', 'd6-inst-3'])">🔍 Reveal Instructor Concentration Proof</button>
+          <button class="btn" onclick="resetSim('d6-inst-ans', ['d6-inst-1', 'd6-inst-2', 'd6-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d6-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">The Single Most Important Finding for CMO Rashmi's Board Deck:</h4>
+          <p>The <code>2024Q3 × PL015 × Tier-2</code> cohort accounts for just <strong>3.03%</strong> of JioWave's customer base (<code>849 ÷ 28,000</code>), yet generates <strong>17.33%</strong> of all churned customers (<code>581 ÷ 3,352</code>)—a <strong>5.72× Concentration Ratio</strong>! Combined with Urban <code>2024Q3 × PL015</code>, just <strong>5.03%</strong> of JioWave's subscribers account for <strong>29.33%</strong> of all company churn!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Computing City-Level Churn Inside the Hot Cohort">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:18 – 01:22</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Verifying Custom Tooltip Numbers for Patna & Coimbatore</h1>
+      <p class="slide-subtitle">Look at the Custom Tooltip breakdown for `2024Q3 × PL015 × Tier-2` below. Calculate the exact Churn Rate % for **Patna** and **Coimbatore**, and identify which city has the higher churn rate vs. higher churn volume!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`TT_Cohort_Detail` Tooltip Data (`2024Q3 × PL015 × Tier-2`)</span><span>Predict the 2 Churn Rate % cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tier-2 City</th>
+              <th>Cohort Subscribers</th>
+              <th>Churned Subscribers</th>
+              <th>Churn Rate %</th>
+              <th>Role in 90-Day Playbook</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Coimbatore</strong></td>
+              <td>78</td>
+              <td>57</td>
+              <td class="cell-target" id="d6-stu1-c1">73.08%</td>
+              <td>#1 by Churned Volume (57 users)</td>
+            </tr>
+            <tr>
+              <td><strong>Patna</strong></td>
+              <td>67</td>
+              <td>51</td>
+              <td class="cell-target" id="d6-stu1-c2">76.12%</td>
+              <td>#1 by Churn Rate % (76.12%)</td>
+            </tr>
+            <tr>
+              <td><strong>Vijayawada</strong></td>
+              <td>65</td>
+              <td>47</td>
+              <td>72.31%</td>
+              <td>#3 by Churned Volume (47 users)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d6-stu1-ans', ['d6-stu1-c1', 'd6-stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d6-stu1-ans', ['d6-stu1-c1', 'd6-stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d6-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Calculation Proof:</h4>
+          <ul class="list-styled">
+            <li><strong>Coimbatore Churn Rate %:</strong> <code>57 ÷ 78 = <strong>73.08%</strong></code> (highest absolute volume of churned users in Tier-2).</li>
+            <li><strong>Patna Churn Rate %:</strong> <code>51 ÷ 67 = <strong>76.12%</strong></code> (highest percentage rate among major Tier-2 cities).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Calculating What Headline Churn Would Be Without PL015">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:22 – 01:25</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: "What-If" Simulation — JioWave Churn Excluding `2024Q3 × PL015`</h1>
+      <p class="slide-subtitle">CMO Rashmi asks: "If we hadn't launched that disastrous `2024Q3 × PL015` cohort (1,409 subs, 983 churned), what would our remaining company churn rate look like?"</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Company-Wide Churn Ex-Cohort Simulation</span><span>Calculate the remaining subscribers, churned users, and adjusted churn rate %</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Scope</th>
+              <th>Subscribers</th>
+              <th>Churned Subscribers</th>
+              <th>Churn Rate %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total JioWave Base</td>
+              <td>28,000</td>
+              <td>3,352</td>
+              <td>11.97%</td>
+            </tr>
+            <tr>
+              <td>Less: <code>2024Q3 × PL015</code> Cohort</td>
+              <td>-1,409</td>
+              <td>-983</td>
+              <td>69.77%</td>
+            </tr>
+            <tr>
+              <td><strong>Remaining Core Base (Ex-Cohort)</strong></td>
+              <td class="cell-target" id="d6-stu2-c1">26,591</td>
+              <td class="cell-target" id="d6-stu2-c2">2,369</td>
+              <td class="cell-target" id="d6-stu2-c3">8.91%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d6-stu2-ans', ['d6-stu2-c1', 'd6-stu2-c2', 'd6-stu2-c3'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('d6-stu2-ans', ['d6-stu2-c1', 'd6-stu2-c2', 'd6-stu2-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d6-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Executive Story for the Series-C Investors:</h4>
+          <p><code>2,369 ÷ 26,591 = <strong>8.91%</strong></code>! Excluding the single flawed <code>2024Q3 × PL015</code> promo cohort, JioWave's core business operates at a healthy <strong>8.91% annual churn</strong>—well below the 12% industry benchmark!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Day 06 Build Checklist & Day 07 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Page 2 Complete!</span>
+        <span class="tag tag-theory">Next: Page 3 ARPU & Migrations</span>
+      </div>
+      <h1 class="slide-title">Day 06 Milestone: Page 2 ("Cohort Churn Forensics") Complete!</h1>
+      <p class="slide-subtitle">You now have Pages 1 and 2 built in your `.pbix` report. Tomorrow (Day 07), we build Page 3: ARPU Trajectory & Migration Economics!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Page 2 Build Checklist</div>
+          <ol class="list-styled">
+            <li>Build the <code>Vintage Quarter × Plan × Tower Tier</code> Matrix with DAX Heatmap conditional formatting.</li>
+            <li>Add the AI Decomposition Tree (`Churned Subscribers` explained by Cohort, Plan, Tier, Channel).</li>
+            <li>Create the hidden <code>TT_Cohort_Detail</code> Tooltip page and <code>DT_Subscriber_Action_List</code> Drill-Through page.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 07 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Page 3 Build (ARPU & Plan Migration Economics — Q2):</strong> Waterfall Charts (Mix vs. Rate decomposition), Sankey/Matrix Migration flows (3.68× down-migration), and What-If Parameter Sliders to model FY27 revenue recovery!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 7" whenever you're ready for Page 3!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

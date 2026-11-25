@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 04: DAX Time Intelligence & Ranking</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-gold); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: var(--accent-gold);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(59, 130, 246, 0.08));
+    border-left: 4px solid var(--accent-gold);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: var(--accent-gold); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 04 (2 Hours) • Time Intelligence, Indian Fiscal YTD & Tower Ranking (`RANKX`)</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 22</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 04 Curriculum (22 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 04 Kickoff: Why Static Totals Never Convince a Board">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Time Intelligence</span>
+        <span class="tag tag-theory">00:00 – 00:06</span>
+      </div>
+      <h1 class="slide-title">Day 04 Kickoff: Moving From "What Happened?" to "Which Way Are We Moving?"</h1>
+      <p class="slide-subtitle">A single number like "₹28.26 Cr total revenue" tells the board nothing about momentum. Executives think in MoM (Month-over-Month), YoY (Year-over-Year), and Fiscal YTD.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: The Balance Sheet vs. Comparative Income Statement</div>
+        <p>In accounting, you never present FY26 revenue in isolation—you put <strong>FY25 right next to FY26</strong> and compute <code>% Growth</code>. DAX Time Intelligence functions automatically shift your <code>dim_date</code> filter backward by 1 month, 1 quarter, or 1 full year without requiring complex VLOOKUPs!</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The 4 Mandatory Rules Before Writing Any Time Intelligence DAX</div>
+        <ol class="list-styled">
+          <li>You MUST have a dedicated <code>dim_date</code> table covering full unbroken years (<code>2023-04-01</code> to <code>2026-03-31</code>).</li>
+          <li><code>dim_date</code> MUST be officially marked via <strong>Table Tools → Mark as Date Table</strong>.</li>
+          <li>Every visual's X-axis or Slicer MUST use <code>dim_date[Date]</code> (or its Month/Year columns), never the raw date column from <code>fact_revenue_monthly</code>.</li>
+          <li>For Indian companies (April–March fiscal year), pass <code>"3-31"</code> as the year-end argument in YTD functions!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: `PREVIOUSMONTH` & Month-over-Month (MoM) Growth">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Period Shifts</span>
+        <span class="tag tag-lab">00:06 – 00:14</span>
+      </div>
+      <h1 class="slide-title">Topic 1: `PREVIOUSMONTH()` & `DATEADD()` — Tracking Monthly Momentum</h1>
+      <p class="slide-subtitle">Remember CMO Rashmi's Morning Dashboard? Every KPI card shows a "Trend MoM" badge (`-2.1%`, `+180 bps`). Here is the exact DAX behind it.</p>
+
+      <div class="code-block">
+        <span class="cm">// Step 1: Shift current month's filter back by 1 month:</span><br>
+        Prev Month Revenue = <span class="fn">CALCULATE</span>([Total Revenue INR], <span class="fn">PREVIOUSMONTH</span>(dim_date[Date]))<br><br>
+        <span class="cm">// Step 2: Compute MoM % Change safely with DIVIDE:</span><br>
+        Revenue MoM % = <span class="fn">DIVIDE</span>([Total Revenue INR] - [Prev Month Revenue], [Prev Month Revenue], 0)
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">`PREVIOUSMONTH` vs. `DATEADD`</div>
+          <p><code>PREVIOUSMONTH(dim_date[Date])</code> always jumps back exactly 1 calendar month. If you want to jump back <strong>3 months</strong> or <strong>6 months</strong> (e.g., to compare against 6 months ago before the PL015 promo expired!), use <code>DATEADD(dim_date[Date], -6, MONTH)</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Understanding Basis Points (`bps`) in Telecom & Finance</div>
+          <p>When a percentage changes from <code>10.0%</code> to <code>11.8%</code>, analysts don't say "+1.8%" (which sounds tiny)—they say <strong>+180 bps</strong> (1% = 100 basis points).</p>
+          <div class="code-block" style="margin-top:0.4rem;">
+            Churn MoM bps = ([Churn Rate %] - [Prev Month Churn %]) * 10000
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: `SAMEPERIODLASTYEAR` & YoY Growth">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Year-over-Year</span>
+        <span class="tag tag-lab">00:14 – 00:22</span>
+      </div>
+      <h1 class="slide-title">Topic 2: `SAMEPERIODLASTYEAR()` — Eliminating Seasonal Noise</h1>
+      <p class="slide-subtitle">Telecom usage spikes during IPL cricket season (Apr–May) and Diwali (Oct–Nov). Comparing November to October is misleading; comparing Nov 2025 to Nov 2024 is apples-to-apples!</p>
+
+      <div class="code-block">
+        <span class="cm">// Syntax: SAMEPERIODLASTYEAR( &lt;Calendar_Date_Column&gt; )</span><br><br>
+        SPLY Revenue = <span class="fn">CALCULATE</span>([Total Revenue INR], <span class="fn">SAMEPERIODLASTYEAR</span>(dim_date[Date]))<br><br>
+        Revenue YoY % = <span class="fn">DIVIDE</span>([Total Revenue INR] - [SPLY Revenue], [SPLY Revenue], 0)
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified JioWave Fiscal Year Trajectory (FY24 ➔ FY25 ➔ FY26)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fiscal Year</th>
+              <th>[Total Revenue INR]</th>
+              <th class="col-selected">[SPLY Revenue]</th>
+              <th class="row-selected">[Revenue YoY %]</th>
+              <th>Business Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>FY24</strong> (Apr 23 – Mar 24)</td>
+              <td>₹3,97,31,972 (₹3.97 Cr)</td>
+              <td class="col-selected"><em>Blank (No FY23 data)</em></td>
+              <td class="row-selected"><em>Blank</em></td>
+              <td>Launch / Ramp-up year</td>
+            </tr>
+            <tr>
+              <td><strong>FY25</strong> (Apr 24 – Mar 25)</td>
+              <td>₹9,83,81,158 (₹9.84 Cr)</td>
+              <td class="col-selected">₹3,97,31,972</td>
+              <td class="row-selected"><strong>+147.61%</strong></td>
+              <td>Rapid subscriber expansion</td>
+            </tr>
+            <tr>
+              <td><strong>FY26</strong> (Apr 25 – Mar 26)</td>
+              <td>₹14,45,29,848 (₹14.45 Cr)</td>
+              <td class="col-selected">₹9,83,81,158</td>
+              <td class="row-selected"><strong>+46.91%</strong></td>
+              <td>Maturing base; ARPU pressure emerging</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Indian Fiscal Year-to-Date (`DATESYTD` / `TOTALYTD`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Cumulative Totals</span>
+        <span class="tag tag-lab">00:22 – 00:30</span>
+      </div>
+      <h1 class="slide-title">Topic 3: `DATESYTD(dim_date[Date], "3-31")` — Indian Fiscal Year YTD</h1>
+      <p class="slide-subtitle">By default, DAX resets Year-to-Date on January 1st. For CFO Rohan Bose in Mumbai, the fiscal year runs April 1 to March 31!</p>
+
+      <div class="code-block">
+        <span class="cm">// Always pass "3-31" (March 31) as the 2nd argument for Indian Fiscal Year!</span><br>
+        Fiscal YTD Revenue = <span class="fn">CALCULATE</span>([Total Revenue INR], <span class="fn">DATESYTD</span>(dim_date[Date], <span class="str">"3-31"</span>))
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: How `DATESYTD(..., "3-31")` Accumulates Q1 FY26 Revenue</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Month (`dim_date`)</th>
+              <th>Monthly Revenue</th>
+              <th class="col-selected">Active Filter Window Created by `DATESYTD(..., "3-31")`</th>
+              <th class="row-selected">[Fiscal YTD Revenue]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Apr 2025</strong> (FY26 M1)</td>
+              <td>₹1,07,31,355</td>
+              <td class="col-selected"><code>2025-04-01</code> to <code>2025-04-30</code></td>
+              <td class="row-selected">₹1,07,31,355</td>
+            </tr>
+            <tr>
+              <td><strong>May 2025</strong> (FY26 M2)</td>
+              <td>₹1,09,40,784</td>
+              <td class="col-selected"><code>2025-04-01</code> to <code>2025-05-31</code></td>
+              <td class="row-selected">₹2,16,72,138</td>
+            </tr>
+            <tr>
+              <td><strong>Jun 2025</strong> (FY26 M3)</td>
+              <td>₹1,13,16,753</td>
+              <td class="col-selected"><code>2025-04-01</code> to <code>2025-06-30</code></td>
+              <td class="row-selected"><strong>₹3,29,88,892 (₹3.30 Cr)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Rolling 3-Month & 12-Month Moving Averages (`DATESINPERIOD`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Smoothing Trends</span>
+        <span class="tag tag-lab">00:30 – 00:38</span>
+      </div>
+      <h1 class="slide-title">Topic 4: `DATESINPERIOD()` — Smoothing Noisy Monthly Curves</h1>
+      <p class="slide-subtitle">Monthly overage charges bounce up and down every month. A 3-Month Rolling Average reveals the true underlying direction.</p>
+
+      <div class="code-block">
+        <span class="cm">// Syntax: DATESINPERIOD( &lt;Dates&gt;, &lt;StartDate&gt;, &lt;NumberOfIntervals&gt;, &lt;Interval&gt; )</span><br><br>
+        Rolling 3M Revenue = <br>
+        <span class="fn">CALCULATE</span>(<br>
+        &nbsp;&nbsp;[Total Revenue INR],<br>
+        &nbsp;&nbsp;<span class="fn">DATESINPERIOD</span>(dim_date[Date], <span class="fn">MAX</span>(dim_date[Date]), -3, MONTH)<br>
+        )
+      </div>
+      <p style="font-size:0.88rem; color:var(--accent-teal);"><strong>How it reads:</strong> "Starting from the last date in the current month (<code>MAX(dim_date[Date])</code>), step backward <code>-3</code> months and sum everything in that 90-day window!"</p>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Solving Q2 — Diagnosing the Premium ARPU Trajectory">
+      <div class="slide-meta">
+        <span class="tag tag-module">Case Study Q2 Deep Dive</span>
+        <span class="tag tag-lab">00:38 – 00:46</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Decomposing ARPU by Tier Across FY24–FY26</h1>
+      <p class="slide-subtitle">Let's build a proper `ARPU` measure and check how `Diamond`, `Premium`, and `Mass` behaved across all three fiscal years.</p>
+
+      <div class="code-block">
+        <span class="cm">// True Monthly ARPU = Total Revenue divided by Distinct Active Billed Subscribers:</span><br>
+        Monthly ARPU = <span class="fn">DIVIDE</span>([Total Revenue INR], <span class="fn">COUNTROWS</span>(fact_revenue_monthly), 0)
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified Tier-Wise ARPU Trajectory (FY24 ➔ FY25 ➔ FY26)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Subscriber Tier</th>
+              <th>FY24 ARPU</th>
+              <th>FY25 ARPU</th>
+              <th>FY26 ARPU</th>
+              <th>FY25 → FY26 Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Diamond</strong></td>
+              <td>₹1,998.11</td>
+              <td>₹2,275.10</td>
+              <td>₹2,145.74</td>
+              <td style="color:var(--accent-rose); font-weight:700;">-5.69% (High-tier erosion!)</td>
+            </tr>
+            <tr>
+              <td><strong>Premium</strong></td>
+              <td>₹652.20</td>
+              <td>₹647.46</td>
+              <td>₹681.95</td>
+              <td style="color:var(--accent-teal);">+5.33% (Recent tail dipped Feb→Mar 26)</td>
+            </tr>
+            <tr>
+              <td><strong>Mass</strong></td>
+              <td>₹338.32</td>
+              <td>₹344.77</td>
+              <td>₹355.76</td>
+              <td style="color:var(--accent-teal);">+3.19% (Steady)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 6: Ranking Functions (`RANKX`) — Finding Top Towers & Plans">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: Ranking & Pareto</span>
+        <span class="tag tag-lab">00:46 – 00:56</span>
+      </div>
+      <h1 class="slide-title">Topic 6: `RANKX()` — Ranking All 279 Cell Towers & 24 Tariff Plans</h1>
+      <p class="slide-subtitle">Remember CNO Vikram Tandon's question (Q3)? "Rank all 279 towers by traffic GB and find what share the top 20% carry!" And Q4: "Rank all 24 plans by revenue contribution!"</p>
+
+      <div class="code-block">
+        <span class="cm">// Syntax: RANKX( &lt;All_Table_Scope&gt;, &lt;Measure_to_Rank_By&gt;, , DESC, Dense )</span><br><br>
+        Total Tower Traffic GB = <span class="fn">SUM</span>(fact_tower_metrics[traffic_gb])<br><br>
+        Tower Traffic Rank = <br>
+        <span class="fn">IF</span>(<br>
+        &nbsp;&nbsp;<span class="fn">HASONEVALUE</span>(dim_towers[tower_id]),<br>
+        &nbsp;&nbsp;<span class="fn">RANKX</span>(<span class="fn">ALL</span>(dim_towers[tower_id]), [Total Tower Traffic GB], , DESC, Dense)<br>
+        )
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Why `ALL(dim_towers[tower_id])` Is Mandatory Inside `RANKX`</div>
+        <p>Inside a table visual showing one tower per row, Filter Context narrows <code>dim_towers</code> down to just <strong>1 tower</strong>! If you rank a tower against a list of 1 tower, every single tower gets <strong>Rank #1</strong>! Wrapping <code>dim_towers[tower_id]</code> in <code>ALL()</code> restores the full list of all 279 towers so Power BI can assign Ranks 1 through 279.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 7: `TOPN()` & Concentration Ratios (Pareto 80/20 Rule)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Concentration Analysis</span>
+        <span class="tag tag-lab">00:56 – 01:06</span>
+      </div>
+      <h1 class="slide-title">Topic 7: `TOPN()` — Computing Top-Decile Tower Traffic Share</h1>
+      <p class="slide-subtitle">20% of 279 towers equals the top 56 towers. Let's write a single DAX measure that calculates what % of JioWave's entire data traffic flows through those top 56 towers!</p>
+
+      <div class="code-block">
+        Top 20% Towers Traffic Share = <br>
+        <span class="kw">VAR</span> TopNCount = <span class="fn">ROUND</span>(0.20 * <span class="fn">COUNTROWS</span>(<span class="fn">ALL</span>(dim_towers)), 0)  <span class="cm">-- 56 Towers</span><br>
+        <span class="kw">VAR</span> Top56Traffic = <br>
+        &nbsp;&nbsp;<span class="fn">CALCULATE</span>(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;[Total Tower Traffic GB],<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">TOPN</span>(TopNCount, <span class="fn">ALL</span>(dim_towers), [Total Tower Traffic GB], DESC)<br>
+        &nbsp;&nbsp;)<br>
+        <span class="kw">VAR</span> AllTraffic = <span class="fn">CALCULATE</span>([Total Tower Traffic GB], <span class="fn">ALL</span>(dim_towers))<br>
+        <span class="kw">RETURN</span><br>
+        &nbsp;&nbsp;<span class="fn">DIVIDE</span>(Top56Traffic, AllTraffic, 0)  <span class="cm">-- Evaluates to 46.45% of all network traffic!</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Auditing CNO Vikram's ₹47 Cr Tower Capex">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:06 – 01:12</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Are Recently Built Towers Carrying Their Share of Traffic?</h1>
+      <p class="slide-subtitle">Watch how our `Capex_Cycle` column (from Day 1) + DAX `DIVIDE` measures evaluate CNO Vikram Tandon's recent network expansion.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>JioWave Network Capex Audit (`dim_towers` + `fact_tower_metrics`)</span><span>Click Reveal to highlight the Capex Efficiency verdict</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tower Cohort (`Capex_Cycle`)</th>
+              <th>Tower Count</th>
+              <th>Share of Towers (%)</th>
+              <th>Total Traffic (GB)</th>
+              <th>Share of Traffic (%)</th>
+              <th>Efficiency Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Legacy Towers (Pre-FY24)</strong></td>
+              <td>209</td>
+              <td>74.91%</td>
+              <td>2,05,40,620 GB</td>
+              <td>75.77%</td>
+              <td>Workhorse core network</td>
+            </tr>
+            <tr>
+              <td><strong>Recent Capex Towers (FY24–26)</strong></td>
+              <td class="cell-target" id="d4-inst-1">70</td>
+              <td class="cell-target" id="d4-inst-2">25.09%</td>
+              <td>65,68,850 GB</td>
+              <td class="cell-target" id="d4-inst-3">24.23%</td>
+              <td class="cell-target" id="d4-inst-4">Proportional (0.97× parity!)</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>Total Network</strong></td>
+              <td><strong>279</strong></td>
+              <td><strong>100.00%</strong></td>
+              <td><strong>2,71,09,470 GB</strong></td>
+              <td><strong>100.00%</strong></td>
+              <td><strong>Top 20% (56 towers) carry 46.45%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Executive Takeaway for CNO Vikram & CMO Rashmi:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d4-inst-ans', ['d4-inst-1', 'd4-inst-2', 'd4-inst-3', 'd4-inst-4'])">🔍 Reveal Instructor Capex Audit</button>
+          <button class="btn" onclick="resetSim('d4-inst-ans', ['d4-inst-1', 'd4-inst-2', 'd4-inst-3', 'd4-inst-4'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d4-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Data-Backed Answer to Q3 (Tower Capex Efficiency):</h4>
+          <ol class="list-styled">
+            <li><strong>Proportional Traffic Delivery:</strong> The 70 towers installed from FY24 onward represent <strong>25.09%</strong> of JioWave's tower fleet (<code>70 ÷ 279</code>) and carry <strong>24.23%</strong> of total network traffic (<code>6.57M GB ÷ 27.11M GB</code>)—nearly 1:1 parity!</li>
+            <li><strong>Where the Real Bottleneck Hides:</strong> The top 20% (56 congested towers) carry <strong>46.45%</strong> of all traffic. Future capex should shift from building greenfield towers to upgrading capacity on those top 56 congested towers!</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Computing MoM Change on Premium ARPU">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:12 – 01:16</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Computing Feb ➔ Mar 2026 Premium ARPU Dip</h1>
+      <p class="slide-subtitle">Using the `PREVIOUSMONTH` pattern from Slide 2, examine JioWave's Premium tier monthly numbers for Feb 2026 and Mar 2026 and compute the exact MoM % change in Premium Revenue and Premium ARPU.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`fact_revenue_monthly` Filtered to `Premium` Tier</span><span>Predict the MoM % Change cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Active Premium Subs</th>
+              <th>Premium Revenue (INR)</th>
+              <th>Premium ARPU (INR)</th>
+              <th>Revenue MoM %</th>
+              <th>ARPU MoM %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Feb 2026</strong> (`2026-02-01`)</td>
+              <td>5,724</td>
+              <td>₹39,51,141.56</td>
+              <td>₹690.28</td>
+              <td>+0.24%</td>
+              <td>+0.25%</td>
+            </tr>
+            <tr>
+              <td><strong>Mar 2026</strong> (`2026-03-01`)</td>
+              <td>5,723</td>
+              <td>₹39,35,150.53</td>
+              <td>₹687.60</td>
+              <td class="cell-target" id="d4-stu1-c1">-0.40%</td>
+              <td class="cell-target" id="d4-stu1-c2">-0.39%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d4-stu1-ans', ['d4-stu1-c1', 'd4-stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d4-stu1-ans', ['d4-stu1-c1', 'd4-stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d4-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Step-by-Step Arithmetic Proof:</h4>
+          <ul class="list-styled">
+            <li><strong>Revenue MoM %:</strong> <code>(39,35,150.53 - 39,51,141.56) ÷ 39,51,141.56 = -15,991.03 ÷ 39,51,141.56 = <strong>-0.40%</strong></code>.</li>
+            <li><strong>ARPU MoM %:</strong> <code>(687.60 - 690.28) ÷ 690.28 = -2.68 ÷ 690.28 = <strong>-0.39%</strong></code> (driven by downward plan migrations reducing per-user rental even while subscriber count stayed flat at ~5,723!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: YoY Growth & Fiscal YTD Verification">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:16 – 01:20</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Verifying Diamond Tier YoY Revenue Growth</h1>
+      <p class="slide-subtitle">CFO Rohan Bose wants to see how Diamond Tier revenue grew from FY25 to FY26, even though Diamond ARPU slipped from ₹2,275.10 to ₹2,145.74.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`Diamond` Tier Fiscal Year Comparison</span><span>Predict the YoY Revenue Growth % and Explain the Paradox</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>FY25 Revenue (INR)</th>
+              <th>FY26 Revenue (INR)</th>
+              <th>YoY Revenue Growth %</th>
+              <th>Why Revenue Grew Despite Lower ARPU</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Diamond</strong></td>
+              <td>₹1,92,29,142.10</td>
+              <td>₹2,73,88,221.21</td>
+              <td class="cell-target" id="d4-stu2-c1">+42.43%</td>
+              <td class="cell-target" id="d4-stu2-c2">Billed volume grew +51% (8,452 → 12,764 bills)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d4-stu2-ans', ['d4-stu2-c1', 'd4-stu2-c2'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('d4-stu2-ans', ['d4-stu2-c1', 'd4-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d4-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Calculation & Strategic Insight:</h4>
+          <p><strong>YoY Growth:</strong> <code>(2,73,88,221.21 - 1,92,29,142.10) ÷ 1,92,29,142.10 = +42.43%</code>. Total Diamond revenue rose because subscriber count expanded rapidly, masking the fact that per-user yield (ARPU) dropped by <code>-5.69%</code>—precisely the "volume-hides-rate-erosion" trap CMO Rashmi warned us about!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Day 04 Wrap-Up & Transition to Visual Storytelling (Days 5–10)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Milestone Summary</span>
+        <span class="tag tag-theory">End of Day 04</span>
+      </div>
+      <h1 class="slide-title">Day 04 Complete: You Now Have the Full Analytical Engine!</h1>
+      <p class="slide-subtitle">Over Days 1–4, you mastered Power Query ETL, Star Schema Modeling, `CALCULATE`, Time Intelligence, and `RANKX`. Starting Day 05, we build the 5-page CMO Executive Dashboard!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's DAX Lab Checklist</div>
+          <ul class="list-styled">
+            <li>Add <code>Prev Month Revenue</code>, <code>Revenue MoM %</code>, <code>SPLY Revenue</code>, and <code>Revenue YoY %</code>.</li>
+            <li>Add <code>Fiscal YTD Revenue</code> using <code>DATESYTD(dim_date[Date], "3-31")</code>.</li>
+            <li>Add <code>Tower Traffic Rank</code> (<code>RANKX</code>) and <code>Top 20% Towers Traffic Share</code> (<code>TOPN</code>).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 05 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Visual Design & Report Architecture:</strong> Choosing the right chart for every question, building Page 1 (CMO 7:45 AM Morning Dashboard), KPI cards with conditional formatting, and custom themes!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 5" whenever you're ready to start building the visual report!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

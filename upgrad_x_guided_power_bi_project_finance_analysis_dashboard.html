@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upgrad X | Guided Power BI Project: Finance Analysis Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              red: '#E94256',
+              redDark: '#C82D40',
+              blue: '#2563EB',
+              emerald: '#10B981',
+              gold: '#F59E0B',
+              navy: '#091E53',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B1120;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #E94256;
+    }
+
+    /* Dark Slate Glassmorphism */
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .glass-header {
+      background: rgba(11, 17, 32, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    /* Power BI UI Pill Badges */
+    .pbi-table {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(37, 99, 235, 0.22);
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      color: #93C5FD;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.12rem 0.55rem;
+      border-radius: 0.45rem;
+      white-space: nowrap;
+    }
+
+    .pbi-measure {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(16, 185, 129, 0.20);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      color: #6EE7B7;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.12rem 0.55rem;
+      border-radius: 0.45rem;
+      white-space: nowrap;
+    }
+
+    .pbi-param {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(245, 158, 11, 0.20);
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      color: #FCD34D;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.12rem 0.55rem;
+      border-radius: 0.45rem;
+      white-space: nowrap;
+    }
+
+    /* Slide Fade Animation */
+    @keyframes slideFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-animate {
+      animation: slideFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Custom Checkbox */
+    .step-checkbox:checked + .step-label {
+      text-decoration: line-through;
+      color: #64748B;
+    }
+
+    /* Subtle Radial Grid Background */
+    .bg-grid-pattern {
+      background-color: #0B1120;
+      background-image:
+        radial-gradient(at 88% 10%, rgba(233, 66, 86, 0.13) 0px, transparent 50%),
+        radial-gradient(at 12% 88%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+        linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    }
+
+    /* Fullscreen / Presentation Mode */
+    body.presentation-mode #sidebar {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-grid-pattern text-slate-100 font-sans antialiased selection:bg-brand-red selection:text-white overflow-hidden h-screen flex flex-col">
+
+  <!-- FIXED TOP HEADER BAR -->
+  <header class="glass-header h-16 px-4 lg:px-6 flex items-center justify-between z-30 shrink-0">
+    <!-- Left: Slide Index Toggle + upGrad X Branding + Project Title -->
+    <div class="flex items-center gap-3 sm:gap-4">
+      <button id="toggleSidebarBtn" onclick="toggleSidebar()" title="Toggle Slide Index Sidebar"
+        class="inline-flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition focus:outline-none">
+        <i class="fa-solid fa-bars-staggered text-sm text-brand-red"></i>
+        <span class="hidden sm:inline">Slide Index</span>
+      </button>
+
+      <!-- upGrad X Logo -->
+      <div class="flex items-center gap-2.5 select-none">
+        <div class="flex items-center bg-slate-900 border border-slate-700/80 px-3 py-1.5 rounded-xl shadow-md">
+          <span class="font-extrabold tracking-tight text-white text-base sm:text-lg leading-none">upgrad</span>
+          <span class="ml-1.5 inline-flex items-center justify-center w-6 h-6 rounded-md bg-brand-red text-white font-black text-sm shadow-sm shadow-brand-red/40">X</span>
+        </div>
+        <div class="hidden md:block h-6 w-px bg-slate-800"></div>
+        <div class="hidden md:flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-white leading-tight">Finance Analysis Dashboard</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              Power BI Edition (upgrad X Guided Project)
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-mono">PowerBI_Finance_Analysis.pbix • 1800 × 950 px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Overall Completion Progress Counter -->
+    <div class="hidden xl:flex items-center gap-3 bg-slate-900/90 border border-slate-800 px-4 py-1.5 rounded-full">
+      <i class="fa-solid fa-list-check text-emerald-400 text-xs"></i>
+      <span class="text-xs font-medium text-slate-300">Build Checklist:</span>
+      <div class="w-28 h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div id="checklistProgressBar" class="h-full bg-gradient-to-r from-brand-red via-amber-400 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
+      </div>
+      <span id="checklistProgressText" class="text-xs font-mono font-bold text-white">0/38 (0%)</span>
+    </div>
+
+    <!-- Right: Interactive Canvas Preview Jump, Presentation Mode, Slide Counter -->
+    <div class="flex items-center gap-2 sm:gap-2.5">
+      <!-- Jump to Interactive Canvas Preview (Slide 10) -->
+      <button onclick="goToSlide(9)" title="Jump to Live Interactive Dashboard Preview"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/40 hover:bg-blue-600/30 hover:text-white transition">
+        <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i>
+        <span class="hidden sm:inline">Interactive Canvas Preview</span>
+      </button>
+
+      <!-- Fullscreen / Presentation Mode Toggle -->
+      <button id="presentationBtn" onclick="togglePresentationMode()" title="Toggle Fullscreen / Presentation Mode"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800/90 text-slate-200 border border-slate-700 hover:border-brand-red/60 hover:text-white transition">
+        <i class="fa-solid fa-expand"></i>
+        <span class="hidden md:inline">Present</span>
+      </button>
+
+      <!-- Slide Counter -->
+      <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs font-semibold text-slate-300">
+        <span id="currentSlideNum" class="text-brand-red font-bold">01</span> / <span id="totalSlidesNum">10</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOP SLIDE PROGRESS BAR -->
+  <div class="w-full h-1 bg-slate-900 shrink-0">
+    <div id="slideProgressBar" class="h-full bg-gradient-to-r from-brand-red via-blue-500 to-emerald-400 transition-all duration-300" style="width: 10%"></div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- COLLAPSIBLE SLIDE INDEX SIDEBAR -->
+    <aside id="sidebar" class="w-72 lg:w-80 bg-slate-950/95 border-r border-slate-800/90 flex flex-col justify-between shrink-0 transition-all duration-300 z-20 overflow-y-auto">
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-3 px-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">10-Slide Curriculum Index</span>
+          <button onclick="resetChecklist()" class="text-[11px] text-slate-500 hover:text-brand-red transition" title="Reset all progress checkboxes">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+        </div>
+
+        <nav id="slideNavList" class="space-y-1">
+          <!-- Populated dynamically via JS -->
+        </nav>
+      </div>
+
+      <!-- Bottom Quick Hex Palette & Legend -->
+      <div class="p-4 border-t border-slate-800/80 bg-slate-900/50 space-y-3">
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Quick-Copy Layout Hex Codes</p>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="copyText('#091E53', 'Copied Sidebar Navy #091E53!')" class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-lg px-2 py-1 text-[11px] font-mono text-slate-200 transition">
+              <span class="w-3 h-3 rounded-sm bg-[#091E53] border border-slate-600 shrink-0"></span>#091E53
+            </button>
+            <button onclick="copyText('#F5F7FB', 'Copied Canvas Light #F5F7FB!')" class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-lg px-2 py-1 text-[11px] font-mono text-slate-200 transition">
+              <span class="w-3 h-3 rounded-sm bg-[#F5F7FB] border border-slate-600 shrink-0"></span>#F5F7FB
+            </button>
+            <button onclick="copyText('#FFFFFF', 'Copied Card White #FFFFFF!')" class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-lg px-2 py-1 text-[11px] font-mono text-slate-200 transition">
+              <span class="w-3 h-3 rounded-sm bg-[#FFFFFF] border border-slate-600 shrink-0"></span>#FFFFFF
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/70">
+          <span class="pbi-table text-[10px]">Table / Col</span>
+          <span class="pbi-measure text-[10px]">DAX Measure</span>
+          <span class="pbi-param text-[10px]">Parameter</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN SLIDE VIEWPORT -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+      <div id="slideViewport" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center">
+        <div id="slideContainer" class="w-full max-w-6xl my-auto">
+          <!-- Active Slide Rendered Here -->
+        </div>
+      </div>
+
+      <!-- FIXED BOTTOM NAVIGATION BAR -->
+      <footer class="glass-header h-16 px-4 sm:px-8 flex items-center justify-between shrink-0 z-20">
+        <button id="prevBtn" onclick="prevSlide()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800/90 text-slate-200 border border-slate-700 hover:bg-slate-700 disabled:opacity-40 disabled:pointer-events-none transition">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Previous</span>
+        </button>
+
+        <!-- Clickable Dot Indicators + Keyboard Shortcut Hints -->
+        <div class="flex flex-col items-center gap-1">
+          <div id="slideDots" class="flex items-center gap-1.5">
+            <!-- Populated dynamically via JS -->
+          </div>
+          <span class="hidden sm:inline text-[11px] text-slate-500">
+            Navigate with <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300 font-mono text-[10px]">←</kbd> <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300 font-mono text-[10px]">→</kbd> Arrow Keys
+          </span>
+        </div>
+
+        <button id="nextBtn" onclick="nextSlide()"
+          class="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold bg-brand-red text-white shadow-lg shadow-brand-red/25 hover:bg-brand-redDark transition">
+          <span>Next Slide</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </footer>
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-20 right-6 z-50 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="flex items-center gap-2.5 bg-slate-900/95 border border-emerald-500/60 text-emerald-200 px-4 py-3 rounded-xl shadow-2xl">
+      <i class="fa-solid fa-circle-check text-emerald-400"></i>
+      <span id="toastMessage" class="text-sm font-semibold">Copied to clipboard!</span>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // State Variables
+    let currentSlideIndex = 0;
+    let checkedSteps = JSON.parse(localStorage.getItem('upgradx_pbi_finance_checks') || '{}');
+    let slide6SelectedMetric = 0; // 0: Total Amount, 1: Total Fees, 2: Total Tax, 3: Total Transactions
+    let simYear = '2025';
+    let simMetric = 'amount';
+    let simPage = 'overview';
+
+    // Helper: Render Persistent Checkbox Item
+    function renderCheckItem(id, htmlText) {
+      const isChecked = !!checkedSteps[id];
+      return `
+        <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-950/65 hover:bg-slate-900/95 border border-slate-800/80 cursor-pointer transition select-none">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${id}', this.checked)"
+            class="step-checkbox mt-0.5 w-4 h-4 rounded accent-brand-red cursor-pointer shrink-0" />
+          <span class="step-label text-xs sm:text-[13px] text-slate-200 leading-relaxed">${htmlText}</span>
+        </label>
+      `;
+    }
+
+    // Helper: Render DAX Code Card with One-Click Copy
+    function renderDaxCard(id, title, badgeText, badgeClass, daxCode) {
+      const encodedCode = encodeURIComponent(daxCode);
+      return `
+        <div class="bg-slate-950/90 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 flex flex-col justify-between transition">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white text-xs sm:text-sm">${title}</span>
+              <span class="${badgeClass}">${badgeText}</span>
+            </div>
+            <button onclick="copyEncoded('${encodedCode}', 'Copied ${title} DAX!')"
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-brand-red text-slate-200 hover:text-white text-[11px] font-semibold transition flex items-center gap-1.5 shrink-0">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+          <pre class="font-mono text-xs text-emerald-300 bg-slate-900/90 border border-slate-800/80 rounded-lg p-2.5 overflow-x-auto leading-relaxed">${escapeHtml(daxCode)}</pre>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function copyEncoded(encodedStr, msg) {
+      copyText(decodeURIComponent(encodedStr), msg);
+    }
+
+    // =========================================================================
+    // 10 SELF-CONTAINED CURRICULUM SLIDES
+    // =========================================================================
+    const slides = [
+      // SLIDE 01: Project Overview & Architecture Blueprint
+      {
+        navTitle: '01. Project Overview & Blueprint',
+        render: () => `
+          <div class="slide-animate space-y-6">
+            <!-- Hero Banner -->
+            <div class="glass-panel rounded-3xl p-6 sm:p-9 border border-slate-700/70 relative overflow-hidden">
+              <div class="absolute -right-20 -top-20 w-72 h-72 bg-brand-red/15 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div class="flex flex-wrap items-center gap-2.5 mb-4">
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  <i class="fa-solid fa-bolt mr-1.5"></i>Power BI Edition (upgrad X Guided Project)
+                </span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-slate-900 text-slate-300 border border-slate-700">
+                  Deliverable: PowerBI_Finance_Analysis.pbix
+                </span>
+              </div>
+
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight mb-3">
+                Finance Analysis Dashboard — <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-amber-400 to-emerald-400">End-to-End Power BI Walkthrough</span>
+              </h1>
+              <p class="text-slate-300 text-sm sm:text-base max-w-3xl leading-relaxed">
+                A complete, step-by-step enterprise BI build taking raw CSV transaction and customer logs through Power Query ETL, 1:Many Star Schema modeling, Time Intelligence YoY DAX, Dynamic Field Parameters, and a multi-page Drill-Through executive report.
+              </p>
+
+              <!-- 6 Core Architecture Overview Cards -->
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-7">
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-brand-red text-lg mb-1"><i class="fa-solid fa-file-csv"></i></div>
+                  <div class="text-xs font-bold text-white">2 CSV Sources</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">finance_transactions &amp; customers</div>
+                </div>
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-blue-400 text-lg mb-1"><i class="fa-solid fa-diagram-project"></i></div>
+                  <div class="text-xs font-bold text-white">1:* Star Schema</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">Customers + DAX Calendar</div>
+                </div>
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-emerald-400 text-lg mb-1"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                  <div class="text-xs font-bold text-white">INR (₹) &amp; YoY DAX</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">SAMEPERIODLASTYEAR</div>
+                </div>
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-amber-400 text-lg mb-1"><i class="fa-solid fa-sliders"></i></div>
+                  <div class="text-xs font-bold text-white">Field Parameter</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">4-Metric Dynamic Switch</div>
+                </div>
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-purple-400 text-lg mb-1"><i class="fa-solid fa-vector-square"></i></div>
+                  <div class="text-xs font-bold text-white">1800 × 950 px</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">#091E53 Sidebar + #F5F7FB</div>
+                </div>
+                <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-3.5">
+                  <div class="text-rose-400 text-lg mb-1"><i class="fa-solid fa-layer-group"></i></div>
+                  <div class="text-xs font-bold text-white">2 Drill-Through Pages</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">Overview + Transactions</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Phase Roadmap Cards (Click any phase to jump directly to its slide) -->
+            <div>
+              <div class="flex items-center justify-between mb-3 px-1">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Interactive 8-Phase Roadmap (Click Any Phase to Jump)</h2>
+                <span class="text-xs text-slate-500">10 Guided Slides</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                ${[
+                  { phase: 'Phase 1', title: 'Data Import & Power Query ETL', slide: 1, icon: 'fa-broom', color: 'text-brand-red', desc: 'Load 2 CSVs, deduplicate, trim, abs(), impute null fee 14.52, merge names.' },
+                  { phase: 'Phase 2', title: 'Data Modeling & DAX Calendar', slide: 2, icon: 'fa-calendar-days', color: 'text-blue-400', desc: '1:* relationships, CALENDAR() table, chronological Month sorting.' },
+                  { phase: 'Phase 3', title: 'Core & YoY DAX Measures', slide: 3, icon: 'fa-calculator', color: 'text-emerald-400', desc: '22 DAX measures across Amount, Txns, Avg Value, Fees, Tax & INR formatting.' },
+                  { phase: 'Phase 4', title: 'Dynamic Metric Parameter', slide: 5, icon: 'fa-sliders', color: 'text-amber-400', desc: 'Modeling Field Parameter + SWITCH() Dynamic Item title column.' },
+                  { phase: 'Phase 5', title: '1800×950 Canvas Layout', slide: 6, icon: 'fa-palette', color: 'text-purple-400', desc: 'Navy #091E53 sidebar, #F5F7FB main panel, Card (new) header banner.' },
+                  { phase: 'Phase 6', title: 'Top Slicers & 5 YoY KPI Cards', slide: 7, icon: 'fa-gauge-high', color: 'text-sky-400', desc: 'Year (2025), Metric, Occupation & Category slicers + YoY Reference Labels.' },
+                  { phase: 'Phase 7', title: '6 Overview Charts & Interactions', slide: 8, icon: 'fa-chart-area', color: 'text-rose-400', desc: 'Smooth Area trend, 2 Donuts, 2 Horizontal Bars, fx Heat-Map Table.' },
+                  { phase: 'Phase 8', title: 'Transactions Drill-Through & Sim', slide: 9, icon: 'fa-magnifying-glass-chart', color: 'text-emerald-300', desc: '10-col detail table, Drill-Through, Page Navigator & Live Simulator.' },
+                ].map(p => `
+                  <button onclick="goToSlide(${p.slide})"
+                    class="text-left glass-panel rounded-2xl p-4 border border-slate-800 hover:border-brand-red/60 hover:bg-slate-800/70 transition group">
+                    <div class="flex items-center justify-between mb-1.5">
+                      <span class="text-[11px] font-mono font-bold uppercase ${p.color}">${p.phase}</span>
+                      <i class="fa-solid ${p.icon} ${p.color} text-sm group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm mb-1 group-hover:text-brand-red transition">${p.title}</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">${p.desc}</p>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 02: Phase 1 — Data Import & Power Query ETL
+      {
+        navTitle: '02. Phase 1: Power Query ETL',
+        render: () => `
+          <div class="slide-animate space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-brand-red">Phase 1 • Data Ingestion &amp; Cleansing</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Data Import &amp; Power Query Transformation</h2>
+              </div>
+              <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
+                Ribbon: <span class="text-amber-300">Home → Transform data</span>
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left Column: Step 1 CSV Ingestion -->
+              <div class="lg:col-span-5 space-y-4">
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">
+                      <i class="fa-solid fa-file-import mr-1.5"></i>1. Load CSV Files
+                    </h3>
+                    <span class="text-[11px] font-mono text-slate-400">Text/CSV Connector</span>
+                  </div>
+
+                  ${renderCheckItem('p1_load1', '<strong>Load Transactions:</strong> Top ribbon <strong>Home</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Get data → Text/CSV</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> select <span class="pbi-table">finance_transactions.csv</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Open → Load</strong>.')}
+                  ${renderCheckItem('p1_load2', '<strong>Load Customers:</strong> Repeat <strong>Home → Get data → Text/CSV</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> select <span class="pbi-table">customers.csv</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Open → Load</strong>.')}
+                </div>
+
+                <!-- ETL Summary Quick Reference -->
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 space-y-2.5">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Power Query Rules Summary</h4>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5">
+                      <span class="text-slate-400 block text-[10px]">Deduplicate Key</span>
+                      <code class="text-sky-300 font-bold">transaction_id</code>
+                    </div>
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5">
+                      <span class="text-slate-400 block text-[10px]">Null Fee Imputation</span>
+                      <code class="text-emerald-300 font-bold">null → 14.52</code>
+                    </div>
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5">
+                      <span class="text-slate-400 block text-[10px]">Sign Correction</span>
+                      <code class="text-amber-300 font-bold">amount → Abs()</code>
+                    </div>
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2.5">
+                      <span class="text-slate-400 block text-[10px]">Merged Column</span>
+                      <code class="text-purple-300 font-bold">Customer Name</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Step 2 7-Step Power Query Checklist -->
+              <div class="lg:col-span-7 glass-panel rounded-2xl p-5 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between mb-1">
+                  <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">
+                    <i class="fa-solid fa-wand-sparkles mr-1.5"></i>2. Clean Data in Power Query Editor (7 Steps)
+                  </h3>
+                  <span class="text-[11px] text-slate-400">Home → Transform data</span>
+                </div>
+
+                ${renderCheckItem('p1_etl1', '<strong>1. Remove Duplicate Transactions:</strong> In left Queries pane select <span class="pbi-table">finance_transactions</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> right-click <code>transaction_id</code> header <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Remove Duplicates</strong>.')}
+                ${renderCheckItem('p1_etl2', '<strong>2. Trim Whitespace in Channel:</strong> Select <code>channel</code> header <i class="fa-solid fa-arrow-right text-[10px]"></i> top <strong>Transform</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Format → Trim</strong>.')}
+                ${renderCheckItem('p1_etl3', '<strong>3. Fix Negative Values in Amount:</strong> Select <code>amount</code> header <i class="fa-solid fa-arrow-right text-[10px]"></i> top <strong>Transform</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Scientific</strong> (under Number Column) <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Absolute Value</strong>.')}
+                ${renderCheckItem('p1_etl4', '<strong>4. Handle Null Values in Fee Amount:</strong> Right-click <code>fee_amount</code> header <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Replace Values</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> Find: <code>null</code>, Replace With: <code>14.52</code> (dataset avg) <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>OK</strong>.')}
+                ${renderCheckItem('p1_etl5', '<strong>5. Standardize Currency to Uppercase:</strong> Select <code>currency</code> header <i class="fa-solid fa-arrow-right text-[10px]"></i> top <strong>Transform</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Format → UPPERCASE</strong>.')}
+                ${renderCheckItem('p1_etl6', '<strong>6. Merge First &amp; Last Names:</strong> Select <span class="pbi-table">customers</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> click <code>first_name</code> + <code>Ctrl</code>-click <code>second_name</code> <i class="fa-solid fa-arrow-right text-[10px]"></i> right-click <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Merge Columns</strong> (Separator: <strong>Space</strong>, Name: <code>Customer Name</code>) <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>OK</strong>.')}
+                ${renderCheckItem('p1_etl7', '<strong>7. Save &amp; Return to Power BI:</strong> Top-left corner <strong>Home</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Close &amp; Apply</strong>.')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 03: Phase 2 — Data Modeling & DAX Calendar Table
+      {
+        navTitle: '03. Phase 2: Modeling & Calendar',
+        render: () => `
+          <div class="slide-animate space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-blue-400">Phase 2 • Star Schema &amp; Date Dimension</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Data Modeling &amp; DAX Calendar Table</h2>
+              </div>
+              <span class="px-3 py-1.5 rounded-xl bg-blue-500/15 border border-blue-500/40 text-xs font-semibold text-blue-300">
+                Cardinality: 1 to Many (1:*)
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left: Visual Star Schema Diagram + Checklist -->
+              <div class="lg:col-span-5 glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between space-y-4">
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Star Schema Relationship Diagram</h3>
+
+                  <!-- Visual Diagram -->
+                  <div class="bg-slate-950/95 border border-slate-800 rounded-2xl p-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                      <!-- Dimension 1: customers -->
+                      <div class="bg-slate-900 border border-blue-500/50 rounded-xl p-2.5">
+                        <div class="text-[11px] font-bold text-blue-300 border-b border-slate-800 pb-1 mb-1.5 flex items-center justify-between">
+                          <span>customers</span>
+                          <span class="px-1.5 py-0.2 bg-blue-500/20 rounded text-[10px]">1</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-amber-300 font-bold"><i class="fa-solid fa-key mr-1"></i>customer_id</div>
+                        <div class="text-[10px] text-slate-400">Customer Name, gender, state</div>
+                      </div>
+
+                      <!-- Dimension 2: Calendar -->
+                      <div class="bg-slate-900 border border-emerald-500/50 rounded-xl p-2.5">
+                        <div class="text-[11px] font-bold text-emerald-300 border-b border-slate-800 pb-1 mb-1.5 flex items-center justify-between">
+                          <span>Calendar</span>
+                          <span class="px-1.5 py-0.2 bg-emerald-500/20 rounded text-[10px]">1</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-amber-300 font-bold"><i class="fa-solid fa-calendar mr-1"></i>Date</div>
+                        <div class="text-[10px] text-slate-400">Year, Month, Month Number</div>
+                      </div>
+                    </div>
+
+                    <!-- Relationship Arrows -->
+                    <div class="flex justify-around text-xs font-mono text-slate-400">
+                      <span>1 ──▶ *</span>
+                      <span>1 ──▶ *</span>
+                    </div>
+
+                    <!-- Fact Table: finance_transactions -->
+                    <div class="bg-slate-900 border-2 border-brand-red/60 rounded-xl p-3">
+                      <div class="text-xs font-bold text-white border-b border-slate-800 pb-1 mb-1.5 flex items-center justify-between">
+                        <span><i class="fa-solid fa-table mr-1.5 text-brand-red"></i>finance_transactions (Fact)</span>
+                        <span class="px-1.5 py-0.5 bg-brand-red/20 text-brand-red rounded text-[10px]">* Many</span>
+                      </div>
+                      <div class="grid grid-cols-2 gap-1 text-[10px] font-mono text-slate-300">
+                        <div>• customer_id (FK)</div>
+                        <div>• transaction_date (FK)</div>
+                        <div>• amount, fee_amount</div>
+                        <div>• tax_amount, status</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  ${renderCheckItem('p2_rel1', '<strong>Model View:</strong> Drag <code>customer_id</code> from <span class="pbi-table">customers</span> onto <code>customer_id</code> in <span class="pbi-table">finance_transactions</span> (1:*).')}
+                  ${renderCheckItem('p2_rel2', '<strong>Connect Calendar:</strong> Drag <code>Date</code> from <span class="pbi-table">Calendar</span> onto <code>transaction_date</code> in <span class="pbi-table">finance_transactions</span> (1:*).')}
+                </div>
+              </div>
+
+              <!-- Right: Copyable DAX Table & Columns + Sort Order Warning -->
+              <div class="lg:col-span-7 glass-panel rounded-2xl p-5 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Table View → Table Tools → New Table &amp; Columns</h3>
+                  <span class="text-[11px] text-slate-400">Format Date as Data type: Date</span>
+                </div>
+
+                ${renderDaxCard('p2_cal', 'Calendar Table', 'New Table', 'pbi-table', `Calendar = \nCALENDAR(\n    MIN('finance_transactions'[transaction_date]),\n    MAX('finance_transactions'[transaction_date])\n)`)}
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  ${renderDaxCard('p2_yr', 'Year', 'New Column', 'pbi-measure', `Year = YEAR('Calendar'[Date])`)}
+                  ${renderDaxCard('p2_mo', 'Month', 'New Column', 'pbi-measure', `Month = FORMAT('Calendar'[Date], "mmm")`)}
+                  ${renderDaxCard('p2_mn', 'Month Number', 'New Column', 'pbi-measure', `Month Number = MONTH('Calendar'[Date])`)}
+                </div>
+
+                <!-- Crucial Sort by Column Callout -->
+                <div class="bg-amber-500/15 border border-amber-500/40 rounded-xl p-3.5 flex items-start gap-3">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base mt-0.5"></i>
+                  <div class="text-xs text-amber-100 leading-relaxed">
+                    <strong class="text-amber-300">Crucial Chronological Month Sorting:</strong> Select the <code>Month</code> column in <span class="pbi-table">Calendar</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> top ribbon <strong>Column tools</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Sort by column</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> select <code>Month Number</code> (prevents alphabetical Apr, Aug, Dec sorting!).
+                  </div>
+                </div>
+
+                ${renderCheckItem('p2_sort', 'Created <code>Calendar</code> table, set <code>Date</code> data type, added Year/Month/Month Number, and applied <strong>Sort by column → Month Number</strong>.')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 04: Phase 3 — Core DAX & Time Intelligence Measures (Part 1)
+      {
+        navTitle: '04. Phase 3: DAX Measures (Part 1)',
+        render: () => `
+          <div class="slide-animate space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Phase 3 (Part 1 of 2) • Right-click finance_transactions → New measure</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Core DAX &amp; Time Intelligence Measures</h2>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-700 text-xs font-mono text-emerald-300">
+                12 Measures • Click Copy on Any Formula
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Group 1: Total Amount -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-blue-400">1. Total Amount &amp; YoY</span>
+                  <span class="text-[10px] font-mono text-slate-400">4 Measures</span>
+                </div>
+                ${renderDaxCard('d1_1', 'Total Amount', 'Base', 'pbi-measure', `Total Amount = SUM('finance_transactions'[amount])`)}
+                ${renderDaxCard('d1_2', 'Previous Year Amount', 'PY', 'pbi-measure', `Previous Year Amount =\nCALCULATE(\n    [Total Amount],\n    SAMEPERIODLASTYEAR('Calendar'[Date])\n)`)}
+                ${renderDaxCard('d1_3', 'YoY Amount', 'Delta', 'pbi-measure', `YoY Amount = [Total Amount] - [Previous Year Amount]`)}
+                ${renderDaxCard('d1_4', 'YoY Amount %', '%', 'pbi-measure', `YoY Amount % =\nDIVIDE([YoY Amount], [Previous Year Amount])`)}
+                ${renderCheckItem('p3_g1', 'Created all 4 <strong>Amount</strong> measures')}
+              </div>
+
+              <!-- Group 2: Total Transactions -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">2. Total Transactions &amp; YoY</span>
+                  <span class="text-[10px] font-mono text-slate-400">4 Measures</span>
+                </div>
+                ${renderDaxCard('d2_1', 'Total Transactions', 'Base', 'pbi-measure', `Total Transactions = DISTINCTCOUNT('finance_transactions'[transaction_id])`)}
+                ${renderDaxCard('d2_2', 'Previous Year Transactions', 'PY', 'pbi-measure', `Previous Year Transactions =\nCALCULATE(\n    [Total Transactions],\n    SAMEPERIODLASTYEAR('Calendar'[Date])\n)`)}
+                ${renderDaxCard('d2_3', 'YoY Transactions', 'Delta', 'pbi-measure', `YoY Transactions = [Total Transactions] - [Previous Year Transactions]`)}
+                ${renderDaxCard('d2_4', 'YoY Transactions %', '%', 'pbi-measure', `YoY Transactions % =\nDIVIDE([YoY Transactions], [Previous Year Transactions])`)}
+                ${renderCheckItem('p3_g2', 'Created all 4 <strong>Transactions</strong> measures')}
+              </div>
+
+              <!-- Group 3: Average Transaction Value -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-amber-400">3. Avg Transaction Value</span>
+                  <span class="text-[10px] font-mono text-slate-400">4 Measures</span>
+                </div>
+                ${renderDaxCard('d3_1', 'Average Transaction Value', 'Base', 'pbi-measure', `Average Transaction Value = AVERAGE('finance_transactions'[amount])`)}
+                ${renderDaxCard('d3_2', 'Previous Year Avg Transaction', 'PY', 'pbi-measure', `Previous Year Avg Transaction =\nCALCULATE(\n    [Average Transaction Value],\n    SAMEPERIODLASTYEAR('Calendar'[Date])\n)`)}
+                ${renderDaxCard('d3_3', 'YoY Avg Transaction', 'Delta', 'pbi-measure', `YoY Avg Transaction = [Average Transaction Value] - [Previous Year Avg Transaction]`)}
+                ${renderDaxCard('d3_4', 'YoY Avg Transaction %', '%', 'pbi-measure', `YoY Avg Transaction % =\nDIVIDE([YoY Avg Transaction], [Previous Year Avg Transaction])`)}
+                ${renderCheckItem('p3_g3', 'Created all 4 <strong>Avg Transaction</strong> measures')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 05: Phase 3 — Fees, Tax, Header Measures & Formatting (Part 2)
+      {
+        navTitle: '05. Phase 3: Fees, Tax & INR Format',
+        render: () => `
+          <div class="slide-animate space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Phase 3 (Part 2 of 2) • Fees, Tax, Titles &amp; Number Formatting</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Fees, Tax, Header Measures &amp; INR (₹) Formatting</h2>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-xs font-semibold text-emerald-300">
+                Currency: English (India) ₹
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Group 4: Total Fees -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-purple-400">4. Total Fees &amp; YoY</span>
+                  <span class="text-[10px] font-mono text-slate-400">4 Measures</span>
+                </div>
+                ${renderDaxCard('d4_1', 'Total Fees', 'Base', 'pbi-measure', `Total Fees = SUM('finance_transactions'[fee_amount])`)}
+                ${renderDaxCard('d4_2', 'Previous Year Fees', 'PY', 'pbi-measure', `Previous Year Fees =\nCALCULATE(\n    [Total Fees],\n    SAMEPERIODLASTYEAR('Calendar'[Date])\n)`)}
+                ${renderDaxCard('d4_3', 'YoY Fees', 'Delta', 'pbi-measure', `YoY Fees = [Total Fees] - [Previous Year Fees]`)}
+                ${renderDaxCard('d4_4', 'YoY Fees %', '%', 'pbi-measure', `YoY Fees % =\nDIVIDE([YoY Fees], [Previous Year Fees])`)}
+                ${renderCheckItem('p3_g4', 'Created all 4 <strong>Fees</strong> measures')}
+              </div>
+
+              <!-- Group 5: Total Tax -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-rose-400">5. Total Tax &amp; YoY</span>
+                  <span class="text-[10px] font-mono text-slate-400">4 Measures</span>
+                </div>
+                ${renderDaxCard('d5_1', 'Total Tax', 'Base', 'pbi-measure', `Total Tax = SUM('finance_transactions'[tax_amount])`)}
+                ${renderDaxCard('d5_2', 'Previous Year Tax', 'PY', 'pbi-measure', `Previous Year Tax =\nCALCULATE(\n    [Total Tax],\n    SAMEPERIODLASTYEAR('Calendar'[Date])\n)`)}
+                ${renderDaxCard('d5_3', 'YoY Tax', 'Delta', 'pbi-measure', `YoY Tax = [Total Tax] - [Previous Year Tax]`)}
+                ${renderDaxCard('d5_4', 'YoY Tax %', '%', 'pbi-measure', `YoY Tax % =\nDIVIDE([YoY Tax], [Previous Year Tax])`)}
+                ${renderCheckItem('p3_g5', 'Created all 4 <strong>Tax</strong> measures')}
+              </div>
+
+              <!-- Group 6 & 7: Header Measures & Formatting Rules -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col justify-between space-y-3">
+                <div class="space-y-2.5">
+                  <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-400">6. Header &amp; Context Measures</span>
+                    <span class="text-[10px] font-mono text-slate-400">2 Measures</span>
+                  </div>
+                  ${renderDaxCard('d6_1', 'Dashboard Title', 'Text', 'pbi-measure', `Dashboard Title = "Finance Analysis"`)}
+                  ${renderDaxCard('d6_2', 'Selected Year', 'Context', 'pbi-measure', `Selected Year = SELECTEDVALUE('Calendar'[Year])`)}
+                </div>
+
+                <!-- Step 7: Measure Formatting Guide -->
+                <div class="bg-slate-950/90 border border-emerald-500/35 rounded-xl p-3.5 space-y-2">
+                  <div class="text-xs font-bold text-emerald-300"><i class="fa-solid fa-paintbrush mr-1.5"></i>7. Measure Formatting Guide</div>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">
+                    • <strong>Percentage Measures:</strong> Select <code>YoY Amount %</code>, <code>YoY Transactions %</code>, <code>YoY Avg Transaction %</code>, <code>YoY Fees %</code>, <code>YoY Tax %</code> <i class="fa-solid fa-arrow-right text-[9px]"></i> top <strong>Measure tools</strong> <i class="fa-solid fa-arrow-right text-[9px]"></i> click <strong>%</strong>.
+                  </p>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">
+                    • <strong>INR Currency Measures:</strong> Select <code>Total Amount</code>, <code>Average Transaction Value</code>, <code>Total Fees</code>, <code>Total Tax</code> (and YoY currency deltas) <i class="fa-solid fa-arrow-right text-[9px]"></i> <strong>Measure tools → Currency format dropdown → English (India) (₹)</strong>.
+                  </p>
+                </div>
+
+                ${renderCheckItem('p3_g6', 'Created Title/Year measures &amp; applied <strong>%</strong> and <strong>₹ English (India)</strong> formats')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 06: Phase 4 — Dynamic Metric Field Parameter
+      {
+        navTitle: '06. Phase 4: Dynamic Field Parameter',
+        render: () => {
+          const metricConfigs = [
+            { order: 0, label: 'Total Amount', val: '₹48.62 Cr', yoy: '+14.8% vs previous year', bars: [42, 55, 49, 68, 74, 92], color: 'bg-blue-500' },
+            { order: 1, label: 'Total Fees', val: '₹1.84 Cr', yoy: '+9.2% vs previous year', bars: [35, 44, 52, 60, 71, 80], color: 'bg-purple-500' },
+            { order: 2, label: 'Total Tax', val: '₹8.75 Cr', yoy: '+14.8% vs previous year', bars: [40, 53, 47, 65, 72, 89], color: 'bg-amber-500' },
+            { order: 3, label: 'Total Transactions', val: '1,26,840', yoy: '+11.4% vs previous year', bars: [50, 58, 62, 70, 81, 95], color: 'bg-emerald-500' },
+          ];
+          const active = metricConfigs[slide6SelectedMetric];
+
+          return `
+            <div class="slide-animate space-y-5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Phase 4 • Modeling → New Parameter → Fields</span>
+                  <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Dynamic Metric Field Parameter</h2>
+                </div>
+                <span class="pbi-param">Parameter Name: Dynamic Metric</span>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Left: Step-by-Step Creation & SWITCH DAX -->
+                <div class="lg:col-span-6 glass-panel rounded-2xl p-5 border border-slate-800 space-y-3.5">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">1. Create Field Parameter</h3>
+                  <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-300 space-y-2">
+                    <div>• Click top ribbon <strong>Modeling</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>New parameter → Fields</strong>.</div>
+                    <div>• <strong>Name:</strong> <code class="text-amber-300 font-bold">Dynamic Metric</code></div>
+                    <div>• <strong>Check all 4 measures:</strong>
+                      <div class="flex flex-wrap gap-1.5 mt-1.5">
+                        <span class="pbi-measure">[Total Amount]</span>
+                        <span class="pbi-measure">[Total Fees]</span>
+                        <span class="pbi-measure">[Total Tax]</span>
+                        <span class="pbi-measure">[Total Transactions]</span>
+                      </div>
+                    </div>
+                    <div>• Click <strong>Create</strong>.</div>
+                  </div>
+
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-1">2. Add Dynamic Title DAX Column</h3>
+                  <p class="text-xs text-slate-400">
+                    Expand <span class="pbi-param">Dynamic Metric</span> in Data pane (unhide hidden order columns if prompted) <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>New column</strong>:
+                  </p>
+
+                  ${renderDaxCard('p4_sw', 'Dynamic Item', 'Calculated Column', 'pbi-param', `Dynamic Item =\nSWITCH(\n    'Dynamic Metric'[Dynamic Metric Order],\n    0, "Total Amount",\n    1, "Total Fees",\n    2, "Total Tax",\n    3, "Total Transactions",\n    "Other"\n)`)}
+
+                  ${renderCheckItem('p4_done', 'Created <strong>Dynamic Metric</strong> field parameter &amp; <code>Dynamic Item</code> SWITCH column')}
+                </div>
+
+                <!-- Right: Interactive Mini-Simulator -->
+                <div class="lg:col-span-6 glass-panel rounded-2xl p-5 border border-amber-500/30 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold uppercase tracking-wider text-amber-300">
+                        <i class="fa-solid fa-flask mr-1.5"></i>Interactive Field Parameter Simulator
+                      </span>
+                      <span class="text-[11px] text-slate-400">Click a slicer pill below</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">
+                      Test how selecting different values in the <code class="text-amber-300">Dynamic Metric</code> slicer dynamically updates chart Y-axes and titles across the dashboard:
+                    </p>
+
+                    <!-- Slicer Buttons -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                      ${metricConfigs.map(m => `
+                        <button onclick="setSlide6Metric(${m.order})"
+                          class="px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                            slide6SelectedMetric === m.order
+                              ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-lg shadow-amber-500/25'
+                              : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500'
+                          }">
+                          <span class="block text-[10px] font-mono opacity-75">Order: ${m.order}</span>
+                          ${m.label}
+                        </button>
+                      `).join('')}
+                    </div>
+
+                    <!-- Simulated Dynamic Visual -->
+                    <div class="bg-slate-950/95 border border-slate-800 rounded-2xl p-4 space-y-3">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <div class="text-[11px] font-mono text-slate-400">Dynamic Item Title:</div>
+                          <div class="text-base font-extrabold text-white">${active.label} by Month</div>
+                        </div>
+                        <div class="text-right">
+                          <div class="text-lg font-black text-emerald-400">${active.val}</div>
+                          <div class="text-[11px] text-slate-400">${active.yoy}</div>
+                        </div>
+                      </div>
+
+                      <!-- Mini Trend Bars -->
+                      <div class="flex items-end justify-between gap-2 h-28 pt-4 px-2 border-t border-slate-800/80">
+                        ${['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((mo, i) => `
+                          <div class="flex-1 flex flex-col items-center gap-1.5">
+                            <div class="w-full ${active.color} rounded-t-md transition-all duration-300" style="height: ${active.bars[i]}%"></div>
+                            <span class="text-[10px] font-mono text-slate-400">${mo}</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="text-[11px] text-slate-400 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                    <strong class="text-slate-200">Why use Dynamic Item?</strong> Power BI Field Parameters work natively in visual axes, while the <code>SWITCH()</code> column lets you bind clean dynamic text titles to cards and headers.
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      },
+
+      // SLIDE 07: Phase 5 — Canvas Setup & Background Layout
+      {
+        navTitle: '07. Phase 5: 1800×950 Canvas Layout',
+        render: () => `
+          <div class="slide-animate space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-purple-400">Phase 5 • Report Canvas &amp; Shape Containers</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Canvas Setup &amp; Background Layout (1800 × 950 px)</h2>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-700 text-xs font-mono text-purple-300">
+                Custom Size: 1800 px × 950 px • Vertical Align: Middle
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left: Exact Shape & Header Specs -->
+              <div class="lg:col-span-5 glass-panel rounded-2xl p-5 border border-slate-800 space-y-2.5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Exact Layout Checklist</h3>
+
+                ${renderCheckItem('p5_1', '<strong>1. Page Setup:</strong> Click empty canvas <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Format page → Canvas settings</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> Type: <strong>Custom</strong>, Width: <code>1800 px</code>, Height: <code>950 px</code>, Vertical alignment: <strong>Middle</strong>.')}
+                ${renderCheckItem('p5_2', '<strong>2. Left Navigation Panel:</strong> <strong>Insert → Shapes → Rounded Rectangle</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> Rounded Corners: <code>3%</code>, Fill: <code>#091E53</code>, Border: <strong>Off</strong> (position along left edge).')}
+                ${renderCheckItem('p5_3', '<strong>3. Main Content Background:</strong> <strong>Insert → Shapes → Rounded Rectangle</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> Width: <code>1530 px</code>, Rounded Corners: <code>1%</code>, Fill: <code>#F5F7FB</code>, Border: <strong>On</strong> (light grey, right of sidebar).')}
+                ${renderCheckItem('p5_4', '<strong>4. Header Title &amp; Subtitle:</strong> <strong>Insert → Card (new)</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> drag <span class="pbi-measure">Dashboard Title</span> <i class="fa-solid fa-arrow-right text-[10px]"></i> Background: <strong>Off</strong>, Callout size: <code>23 Bold</code>, Label: <code>Real-time insights into transactions, customers and risks</code> (size <code>11</code>).')}
+                ${renderCheckItem('p5_5', '<strong>5. Optional Logo:</strong> <strong>Insert → Image</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> place bank/project logo at top of the <code>#091E53</code> sidebar.')}
+              </div>
+
+              <!-- Right: Visual Scaled Wireframe Diagram -->
+              <div class="lg:col-span-7 glass-panel rounded-2xl p-5 border border-slate-700/80 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold text-slate-300"><i class="fa-solid fa-ruler-combined mr-1.5 text-purple-400"></i>Proportional 1800 × 950 px Canvas Wireframe</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="copyText('#091E53', 'Copied #091E53!')" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono text-blue-300 hover:border-blue-400">Copy #091E53</button>
+                    <button onclick="copyText('#F5F7FB', 'Copied #F5F7FB!')" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono text-slate-200 hover:border-white">Copy #F5F7FB</button>
+                  </div>
+                </div>
+
+                <!-- Scaled Wireframe -->
+                <div class="bg-slate-950 border-2 border-dashed border-slate-700 rounded-2xl p-3 aspect-[18/9.5] flex gap-2.5 select-none">
+                  <!-- Left Sidebar (#091E53) -->
+                  <div class="w-[15%] bg-[#091E53] rounded-xl p-2.5 flex flex-col justify-between text-white shadow-lg">
+                    <div class="space-y-2">
+                      <div class="bg-white/10 border border-white/20 rounded-lg py-1.5 text-center text-[10px] font-bold">LOGO</div>
+                      <div class="space-y-1 pt-2">
+                        <div class="bg-blue-600 rounded px-2 py-1 text-[9px] font-bold">Overview</div>
+                        <div class="bg-white/5 rounded px-2 py-1 text-[9px] text-slate-300">Transactions</div>
+                      </div>
+                    </div>
+                    <div class="space-y-1.5 border-t border-white/15 pt-2">
+                      <div class="text-[8px] uppercase text-blue-200 font-semibold">Sidebar Slicers</div>
+                      <div class="bg-white/10 rounded px-1.5 py-1 text-[8px]">Occupation ▾</div>
+                      <div class="bg-white/10 rounded px-1.5 py-1 text-[8px]">Category ▾</div>
+                    </div>
+                    <div class="text-[8px] font-mono text-blue-300 text-center">#091E53 (3%)</div>
+                  </div>
+
+                  <!-- Main Content Container (#F5F7FB, 1530px) -->
+                  <div class="flex-1 bg-[#F5F7FB] border border-slate-300 rounded-lg p-3 flex flex-col justify-between text-slate-900">
+                    <!-- Top Header Row -->
+                    <div class="flex items-start justify-between border-b border-slate-200 pb-2">
+                      <div>
+                        <div class="text-sm sm:text-base font-extrabold text-[#091E53] leading-tight">Finance Analysis</div>
+                        <div class="text-[9px] sm:text-[10px] text-slate-500">Real-time insights into transactions, customers and risks</div>
+                      </div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="bg-white border border-slate-300 rounded px-2 py-0.5 text-[9px] font-semibold text-slate-700">Year: 2025 ▾</span>
+                        <span class="bg-white border border-slate-300 rounded px-2 py-0.5 text-[9px] font-semibold text-slate-700">Metric: Amount ▾</span>
+                      </div>
+                    </div>
+
+                    <!-- KPI Row Placeholder -->
+                    <div class="grid grid-cols-5 gap-1.5">
+                      ${['Total Amount', 'Transactions', 'Avg Value', 'Total Fees', 'Total Tax'].map(k => `
+                        <div class="bg-white border-l-4 border-[#091E53] rounded-md p-1.5 shadow-sm">
+                          <div class="text-[8px] text-slate-500 truncate">${k}</div>
+                          <div class="text-[10px] font-extrabold text-slate-900">₹XX.XX</div>
+                        </div>
+                      `).join('')}
+                    </div>
+
+                    <!-- Charts Grid Placeholder -->
+                    <div class="grid grid-cols-3 gap-1.5 flex-1 my-1.5">
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Monthly Trend Area</div>
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Status Donut (65%)</div>
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Customer Segment</div>
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Total by State</div>
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Type Matrix (fx)</div>
+                      <div class="bg-white border border-slate-200 rounded p-1.5 text-[8px] font-semibold text-slate-500">Gender Donut</div>
+                    </div>
+
+                    <div class="flex justify-between text-[8px] font-mono text-slate-500">
+                      <span>Main Panel Width: 1530 px</span>
+                      <span>Fill: #F5F7FB • Corner Radius: 1%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 08: Phase 6 — Top Slicers & 5 YoY KPI Cards
+      {
+        navTitle: '08. Phase 6: Slicers & 5 YoY KPI Cards',
+        render: () => `
+          <div class="slide-animate space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Phase 6 • Interactive Controls &amp; Card (new) Visual</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Top Slicers &amp; 5 YoY KPI Cards</h2>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-sky-500/15 border border-sky-500/40 text-xs font-semibold text-sky-300">
+                Card (new) • 6% Rounded • 5px Accent Bar • Callout 25pt
+              </span>
+            </div>
+
+            <!-- 4 Slicers Configuration Grid -->
+            <div class="glass-panel rounded-2xl p-5 border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-amber-300"><i class="fa-solid fa-filter mr-1.5"></i>1. Setup 4 Slicers (Header + Left Sidebar)</h3>
+                <span class="text-[11px] text-slate-400">All 4 use Slicer Style = Dropdown</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3">
+                  <div class="text-[10px] font-bold uppercase text-blue-400 mb-1">Header Slicer 1</div>
+                  <div class="font-bold text-white text-sm mb-1">Year Slicer</div>
+                  <div class="mb-1.5"><span class="pbi-table">'Calendar'[Year]</span></div>
+                  <p class="text-[11px] text-slate-400">Dropdown • <strong>Single select</strong> • Default: <code class="text-emerald-300">2025</code></p>
+                </div>
+
+                <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3">
+                  <div class="text-[10px] font-bold uppercase text-amber-400 mb-1">Header Slicer 2</div>
+                  <div class="font-bold text-white text-sm mb-1">Dynamic Metric Slicer</div>
+                  <div class="mb-1.5"><span class="pbi-param">'Dynamic Metric'[Dynamic Metric]</span></div>
+                  <p class="text-[11px] text-slate-400">Dropdown • <strong>Single select</strong></p>
+                </div>
+
+                <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3">
+                  <div class="text-[10px] font-bold uppercase text-purple-400 mb-1">Sidebar Slicer 1</div>
+                  <div class="font-bold text-white text-sm mb-1">Occupation Slicer</div>
+                  <div class="mb-1.5"><span class="pbi-table">customers[occupation]</span></div>
+                  <p class="text-[11px] text-slate-400">Dropdown • <strong>Multi-select enabled</strong></p>
+                </div>
+
+                <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3">
+                  <div class="text-[10px] font-bold uppercase text-emerald-400 mb-1">Sidebar Slicer 2</div>
+                  <div class="font-bold text-white text-sm mb-1">Category Slicer</div>
+                  <div class="mb-1.5"><span class="pbi-table">finance_transactions[merchant_category]</span></div>
+                  <p class="text-[11px] text-slate-400">Dropdown • <strong>Multi-select enabled</strong></p>
+                </div>
+              </div>
+              ${renderCheckItem('p6_slicers', 'Configured all 4 Dropdown slicers (Year single-select 2025, Dynamic Metric single-select, Occupation &amp; Merchant Category multi-select).')}
+            </div>
+
+            <!-- 5 KPI Cards Reference Label Mapping -->
+            <div class="glass-panel rounded-2xl p-5 border border-slate-800 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400"><i class="fa-solid fa-id-card mr-1.5"></i>2. Build 5 KPI Cards (Card (new) + Reference Labels)</h3>
+                <span class="text-[11px] text-slate-400">Reference Value: 15pt • Detail: "vs previous year" (White bg)</span>
+              </div>
+
+              <!-- 5 KPI Visual Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                ${[
+                  { num: 1, base: 'Total Amount', ref: 'YoY Amount', sample: '₹48.62 Cr', delta: '+₹6.27 Cr' },
+                  { num: 2, base: 'Total Transactions', ref: 'YoY Transactions', sample: '1,26,840', delta: '+12,980' },
+                  { num: 3, base: 'Average Transaction Value', ref: 'YoY Avg Transaction', sample: '₹38,331', delta: '+₹1,140' },
+                  { num: 4, base: 'Total Fees', ref: 'YoY Fees', sample: '₹1.84 Cr', delta: '+₹15.5 L' },
+                  { num: 5, base: 'Total Tax', ref: 'YoY Tax', sample: '₹8.75 Cr', delta: '+₹1.12 Cr' },
+                ].map(k => `
+                  <div class="bg-[#F5F7FB] text-slate-900 rounded-xl p-3 border-l-[5px] border-[#091E53] shadow-md flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Series ${k.num}</span>
+                        <span class="w-5 h-5 rounded-md bg-[#091E53]/10 text-[#091E53] flex items-center justify-center text-[10px]"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                      </div>
+                      <div class="text-xs font-bold text-slate-700 leading-snug">${k.base}</div>
+                      <div class="text-lg font-black text-slate-950 my-1">${k.sample}</div>
+                    </div>
+                    <div class="bg-white rounded-md px-2 py-1 border border-slate-200 mt-1">
+                      <div class="text-[10px] font-mono font-bold text-emerald-700">Ref: ${k.ref}</div>
+                      <div class="text-[9px] text-slate-500">${k.delta} vs previous year</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              ${renderCheckItem('p6_kpis', 'Inserted <strong>Card (new)</strong> with all 5 base measures, set 6% rounded corners + 5px accent bar + 25pt Bold callout, mapped all 5 YoY Reference labels (size 15 + "vs previous year"), and placed mini-icons.')}
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 09: Phase 7 — Building the 6 Overview Charts & Interactions
+      {
+        navTitle: '09. Phase 7: 6 Overview Charts',
+        render: () => `
+          <div class="slide-animate space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-rose-400">Phase 7 • #FFFFFF Card Containers (Corner Radius 4, Height 300 px)</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Building the 6 Overview Charts &amp; Interactions</h2>
+              </div>
+              <button onclick="copyText('#FFFFFF', 'Copied Card Container White #FFFFFF!')"
+                class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-700 hover:border-white text-xs font-mono text-white transition">
+                Card Fill: #FFFFFF • Height: 300 px
+              </button>
+            </div>
+
+            <!-- 6 Charts Structured Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              <!-- Chart 1 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-blue-400">1. Monthly Trend Area Chart</span>
+                  <i class="fa-solid fa-chart-area text-blue-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>X-axis:</strong> <span class="pbi-table text-[10px]">'Calendar'[Month]</span><br/>
+                  • <strong>Y-axis:</strong> <span class="pbi-param text-[10px]">'Dynamic Metric'[Dynamic Metric]</span><br/>
+                  • <strong>Format:</strong> Line type = <strong>Smooth</strong>, Width = <code>3</code>, Shaded transparency = <code>75%</code>, Markers = <strong>On (size 6)</strong>. Sort by Month <strong>Ascending</strong>.
+                </p>
+              </div>
+
+              <!-- Chart 2 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-emerald-400">2. Donut Chart 1: Transaction Status</span>
+                  <i class="fa-solid fa-chart-pie text-emerald-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>Legend:</strong> <span class="pbi-table text-[10px]">finance_transactions[transaction_status]</span><br/>
+                  • <strong>Values:</strong> <span class="pbi-param text-[10px]">'Dynamic Metric'[Dynamic Metric]</span><br/>
+                  • <strong>Format:</strong> Custom hex slices for <strong>Success, Failed, Pending</strong>; Hole radius = <code>65%</code>.
+                </p>
+              </div>
+
+              <!-- Chart 3 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-amber-400">3. Horizontal Bar 1: Customer Segment</span>
+                  <i class="fa-solid fa-chart-bar text-amber-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>Visual:</strong> Clustered bar chart<br/>
+                  • <strong>Y-axis:</strong> <span class="pbi-table text-[10px]">customers[customer_segment]</span><br/>
+                  • <strong>X-axis:</strong> <span class="pbi-param text-[10px]">'Dynamic Metric'[Dynamic Metric]</span><br/>
+                  • <strong>Format:</strong> Turn <strong>On</strong> Data labels; turn <strong>Off</strong> X-axis values.
+                </p>
+              </div>
+
+              <!-- Chart 4 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-purple-400">4. Horizontal Bar 2: Total by State</span>
+                  <i class="fa-solid fa-map-location-dot text-purple-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>Visual:</strong> Clustered bar chart<br/>
+                  • <strong>Y-axis:</strong> <span class="pbi-table text-[10px]">customers[state]</span><br/>
+                  • <strong>X-axis:</strong> <span class="pbi-param text-[10px]">'Dynamic Metric'[Dynamic Metric]</span><br/>
+                  • <strong>Sort:</strong> Sort by Metric <strong>Descending</strong> (places top state e.g., <strong>Maharashtra</strong> at top).
+                </p>
+              </div>
+
+              <!-- Chart 5 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-sky-400">5. Transaction Type Analysis Table</span>
+                  <i class="fa-solid fa-table-cells text-sky-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>Columns:</strong> <code>transaction_type</code>, <code>Total Amount</code>, <code>Total Fees</code>, <code>Total Tax</code>, <code>Total Transactions</code>.<br/>
+                  • <strong>Headers:</strong> <code>Type, Amount, Fees, Tax, Transactions</code>.<br/>
+                  • <strong>Cell elements:</strong> Turn <strong>On</strong> Background color (<code>fx</code>) gradient heat-map on numeric columns.
+                </p>
+              </div>
+
+              <!-- Chart 6 -->
+              <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-pink-400">6. Donut Chart 2: Total by Gender</span>
+                  <i class="fa-solid fa-venus-mars text-pink-400 text-xs"></i>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  • <strong>Legend:</strong> <span class="pbi-table text-[10px]">customers[gender]</span><br/>
+                  • <strong>Values:</strong> <span class="pbi-param text-[10px]">'Dynamic Metric'[Dynamic Metric]</span><br/>
+                  • <strong>Colors:</strong> Custom slice colors — <strong>Blue</strong> for Male, <strong>Pink</strong> for Female.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 7: Edit Interactions Banner + Checkboxes -->
+            <div class="glass-panel rounded-2xl p-4 border border-blue-500/35 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div class="text-xs text-slate-200">
+                <strong class="text-blue-300"><i class="fa-solid fa-filter-circle-dollar mr-1.5"></i>7. Configure Chart Interactions:</strong> Select the <strong>Monthly Trend Area chart</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> top ribbon <strong>Format</strong> tab <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Edit interactions</strong> <i class="fa-solid fa-arrow-right text-[10px]"></i> click the <strong>Filter icon</strong> (instead of Highlight) on all related bar and donut charts.
+              </div>
+              <div class="shrink-0">
+                ${renderCheckItem('p7_all', 'Built all 6 charts in #FFFFFF cards &amp; set Edit Interactions to Filter')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 10: Phase 8 — Transactions Drill-Through, Navigation & Live Dashboard Preview
+      {
+        navTitle: '10. Phase 8: Drill-Through & Live Sim',
+        render: () => {
+          // Dynamic Simulator Data Matrix
+          const simData = {
+            '2025': {
+              amount: { k1: '₹48.62 Cr', d1: '+14.8%', k2: '1,26,840', d2: '+11.4%', k3: '₹38,331', d3: '+3.1%', k4: '₹1.84 Cr', d4: '+9.2%', k5: '₹8.75 Cr', d5: '+14.8%', label: 'Total Amount', bars: [45, 58, 52, 70, 78, 95], mh: '₹14.2 Cr', ka: '₹9.8 Cr', dl: '₹7.4 Cr' },
+              fees:   { k1: '₹48.62 Cr', d1: '+14.8%', k2: '1,26,840', d2: '+11.4%', k3: '₹38,331', d3: '+3.1%', k4: '₹1.84 Cr', d4: '+9.2%', k5: '₹8.75 Cr', d5: '+14.8%', label: 'Total Fees', bars: [38, 49, 54, 62, 73, 86], mh: '₹54.1 L', ka: '₹36.8 L', dl: '₹28.2 L' },
+              tax:    { k1: '₹48.62 Cr', d1: '+14.8%', k2: '1,26,840', d2: '+11.4%', k3: '₹38,331', d3: '+3.1%', k4: '₹1.84 Cr', d4: '+9.2%', k5: '₹8.75 Cr', d5: '+14.8%', label: 'Total Tax', bars: [44, 57, 51, 69, 77, 94], mh: '₹2.55 Cr', ka: '₹1.76 Cr', dl: '₹1.33 Cr' },
+              txns:   { k1: '₹48.62 Cr', d1: '+14.8%', k2: '1,26,840', d2: '+11.4%', k3: '₹38,331', d3: '+3.1%', k4: '₹1.84 Cr', d4: '+9.2%', k5: '₹8.75 Cr', d5: '+14.8%', label: 'Total Transactions', bars: [52, 60, 65, 74, 83, 96], mh: '37,120', ka: '25,490', dl: '19,340' },
+            },
+            '2024': {
+              amount: { k1: '₹42.35 Cr', d1: '+10.2%', k2: '1,13,860', d2: '+8.6%', k3: '₹37,194', d3: '+1.5%', k4: '₹1.68 Cr', d4: '+7.4%', k5: '₹7.62 Cr', d5: '+10.2%', label: 'Total Amount', bars: [38, 46, 44, 59, 66, 81], mh: '₹12.4 Cr', ka: '₹8.5 Cr', dl: '₹6.4 Cr' },
+              fees:   { k1: '₹42.35 Cr', d1: '+10.2%', k2: '1,13,860', d2: '+8.6%', k3: '₹37,194', d3: '+1.5%', k4: '₹1.68 Cr', d4: '+7.4%', k5: '₹7.62 Cr', d5: '+10.2%', label: 'Total Fees', bars: [32, 41, 45, 53, 62, 74], mh: '₹49.5 L', ka: '₹33.1 L', dl: '₹25.6 L' },
+              tax:    { k1: '₹42.35 Cr', d1: '+10.2%', k2: '1,13,860', d2: '+8.6%', k3: '₹37,194', d3: '+1.5%', k4: '₹1.68 Cr', d4: '+7.4%', k5: '₹7.62 Cr', d5: '+10.2%', label: 'Total Tax', bars: [37, 45, 43, 58, 65, 80], mh: '₹2.23 Cr', ka: '₹1.53 Cr', dl: '₹1.15 Cr' },
+              txns:   { k1: '₹42.35 Cr', d1: '+10.2%', k2: '1,13,860', d2: '+8.6%', k3: '₹37,194', d3: '+1.5%', k4: '₹1.68 Cr', d4: '+7.4%', k5: '₹7.62 Cr', d5: '+10.2%', label: 'Total Transactions', bars: [45, 52, 56, 63, 72, 85], mh: '33,280', ka: '22,840', dl: '17,410' },
+            }
+          };
+
+          const cur = simData[simYear][simMetric];
+
+          return `
+            <div class="slide-animate space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Phase 8 • Multi-Page Drill-Through &amp; Live Dashboard Simulator</span>
+                  <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Transactions Drill-Through, Navigation &amp; Live Preview</h2>
+                </div>
+                <span class="px-3 py-1 rounded-xl bg-brand-red/20 border border-brand-red/40 text-xs font-mono font-bold text-brand-red">
+                  <i class="fa-solid fa-floppy-disk mr-1.5"></i>Save: PowerBI_Finance_Analysis.pbix
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Left: Phase 8 Exact Steps (5 cols) -->
+                <div class="lg:col-span-5 glass-panel rounded-2xl p-4 border border-slate-800 space-y-2">
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Phase 8 Execution Steps</h3>
+
+                  ${renderCheckItem('p8_1', '<strong>1. Duplicate Page:</strong> Right-click page tab <i class="fa-solid fa-arrow-right text-[10px]"></i> <strong>Duplicate Page</strong>. Rename Page 1 to <code>Overview Analysis</code> and Page 2 to <code>Transactions</code>.')}
+                  ${renderCheckItem('p8_2', '<strong>2. Transactions Detail Table:</strong> Delete charts, keep 1 large card, stretch a <strong>Table</strong> visual with 10 fields: <code>transaction_id</code>, <code>transaction_date</code>, <code>Customer Name</code>, <code>transaction_type</code>, <code>transaction_status</code>, <code>gender</code>, <code>customer_segment</code>, <code>Total Amount</code>, <code>Total Fees</code>, <code>Total Tax</code>.')}
+                  ${renderCheckItem('p8_3', '<strong>3. Set Up Drill-Through:</strong> Under Drill-through / Cross-report filter add: <code>Total Amount</code>, <code>Total Fees</code>, <code>Total Tax</code>, <code>Total Transactions</code>, <code>Average Transaction Value</code>.')}
+                  ${renderCheckItem('p8_4', '<strong>4. Page Navigator:</strong> <strong>Insert → Buttons → Page navigator</strong> inside <code>#091E53</code> sidebar (Vertical grid, Rounded Rectangle 5px, Size 12 Semi-Bold, Active blue highlight).')}
+                  ${renderCheckItem('p8_5', '<strong>5. Sync &amp; Save:</strong> Copy slicers to <code>Transactions</code> <i class="fa-solid fa-arrow-right text-[10px]"></i> click <strong>Sync Visuals</strong>. Save as <code>PowerBI_Finance_Analysis.pbix</code>.')}
+                </div>
+
+                <!-- Right: Interactive Miniature Live Finance Dashboard Simulator (7 cols) -->
+                <div class="lg:col-span-7 glass-panel rounded-2xl p-3.5 border border-blue-500/40 flex flex-col justify-between">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <span class="text-xs font-bold text-blue-300"><i class="fa-solid fa-display mr-1.5"></i>Live Finance Dashboard Simulator (1800 × 950)</span>
+                    <span class="text-[10px] text-slate-400">Interactive: Switch Year, Metric &amp; Page Tabs</span>
+                  </div>
+
+                  <!-- Simulated Power BI Canvas -->
+                  <div class="bg-[#091E53] rounded-xl p-2 flex gap-2 shadow-2xl border border-slate-700 select-none">
+                    <!-- Simulated Left Sidebar (#091E53) -->
+                    <div class="w-28 sm:w-32 shrink-0 flex flex-col justify-between py-1 px-1 text-white">
+                      <div>
+                        <div class="flex items-center gap-1.5 px-2 py-1.5 mb-3 bg-white/10 rounded-lg">
+                          <span class="w-4 h-4 rounded bg-brand-red flex items-center justify-center text-[9px] font-black">X</span>
+                          <span class="text-[10px] font-extrabold tracking-tight">FINANCE BI</span>
+                        </div>
+
+                        <!-- Vertical Page Navigator -->
+                        <div class="text-[8px] uppercase tracking-wider text-blue-300 px-1 mb-1">Page Navigator</div>
+                        <div class="space-y-1">
+                          <button onclick="setSimPage('overview')"
+                            class="w-full text-left px-2.5 py-1.5 rounded-[5px] text-[10px] font-semibold transition ${
+                              simPage === 'overview' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'
+                            }">
+                            <i class="fa-solid fa-chart-pie mr-1"></i>Overview Analysis
+                          </button>
+                          <button onclick="setSimPage('transactions')"
+                            class="w-full text-left px-2.5 py-1.5 rounded-[5px] text-[10px] font-semibold transition ${
+                              simPage === 'transactions' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'
+                            }">
+                            <i class="fa-solid fa-table-list mr-1"></i>Transactions
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Synced Sidebar Slicers -->
+                      <div class="space-y-1.5 pt-3 border-t border-white/15">
+                        <div class="text-[8px] uppercase text-blue-300">Synced Slicers</div>
+                        <div class="bg-white/10 rounded px-2 py-1 text-[9px] text-slate-200 flex justify-between"><span>Occupation</span><span>All ▾</span></div>
+                        <div class="bg-white/10 rounded px-2 py-1 text-[9px] text-slate-200 flex justify-between"><span>Category</span><span>All ▾</span></div>
+                      </div>
+                    </div>
+
+                    <!-- Simulated Main Panel (#F5F7FB) -->
+                    <div class="flex-1 bg-[#F5F7FB] text-slate-900 rounded-lg p-2.5 flex flex-col justify-between space-y-2 overflow-hidden">
+                      <!-- Header & Top Slicers -->
+                      <div class="flex flex-wrap items-center justify-between gap-1.5 border-b border-slate-200 pb-1.5">
+                        <div>
+                          <div class="text-xs sm:text-sm font-extrabold text-[#091E53] leading-none">Finance Analysis</div>
+                          <div class="text-[8px] sm:text-[9px] text-slate-500 mt-0.5">Real-time insights into transactions, customers and risks</div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                          <select onchange="setSimYear(this.value)" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-800 focus:outline-none">
+                            <option value="2025" ${simYear === '2025' ? 'selected' : ''}>Year: 2025</option>
+                            <option value="2024" ${simYear === '2024' ? 'selected' : ''}>Year: 2024</option>
+                          </select>
+                          <select onchange="setSimMetric(this.value)" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-[10px] font-bold text-blue-700 focus:outline-none">
+                            <option value="amount" ${simMetric === 'amount' ? 'selected' : ''}>Total Amount</option>
+                            <option value="fees" ${simMetric === 'fees' ? 'selected' : ''}>Total Fees</option>
+                            <option value="tax" ${simMetric === 'tax' ? 'selected' : ''}>Total Tax</option>
+                            <option value="txns" ${simMetric === 'txns' ? 'selected' : ''}>Total Transactions</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      ${simPage === 'overview' ? `
+                        <!-- OVERVIEW ANALYSIS PAGE CONTENT -->
+                        <!-- 5 KPI Cards -->
+                        <div class="grid grid-cols-5 gap-1.5">
+                          ${[
+                            { t: 'Total Amount', v: cur.k1, d: cur.d1 },
+                            { t: 'Transactions', v: cur.k2, d: cur.d2 },
+                            { t: 'Avg Value', v: cur.k3, d: cur.d3 },
+                            { t: 'Total Fees', v: cur.k4, d: cur.d4 },
+                            { t: 'Total Tax', v: cur.k5, d: cur.d5 },
+                          ].map(k => `
+                            <div class="bg-white rounded-md p-1.5 border-l-4 border-[#091E53] shadow-sm">
+                              <div class="text-[8px] text-slate-500 truncate">${k.t}</div>
+                              <div class="text-[10px] sm:text-xs font-black text-slate-900">${k.v}</div>
+                              <div class="text-[7px] font-bold text-emerald-600">${k.d} <span class="text-slate-400 font-normal">vs PY</span></div>
+                            </div>
+                          `).join('')}
+                        </div>
+
+                        <!-- 6 Overview Visuals Mini-Grid -->
+                        <div class="grid grid-cols-3 gap-1.5">
+                          <!-- 1. Monthly Trend Area -->
+                          <div class="bg-white rounded p-2 border border-slate-200">
+                            <div class="text-[9px] font-bold text-slate-800 mb-1">${cur.label} Trend</div>
+                            <div class="flex items-end gap-1 h-12 pt-1">
+                              ${cur.bars.map(h => `<div class="flex-1 bg-blue-500/80 border-t-2 border-blue-700 rounded-t-xs" style="height:${h}%"></div>`).join('')}
+                            </div>
+                          </div>
+
+                          <!-- 2. Transaction Status Donut -->
+                          <div class="bg-white rounded p-2 border border-slate-200 flex flex-col justify-between">
+                            <div class="text-[9px] font-bold text-slate-800">Transaction Status</div>
+                            <div class="flex items-center justify-around my-auto">
+                              <div class="w-10 h-10 rounded-full border-[6px] border-emerald-500 border-r-amber-400 border-b-rose-500 flex items-center justify-center text-[7px] font-bold">86%</div>
+                              <div class="text-[8px] space-y-0.5 text-slate-600">
+                                <div><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"></span>Success</div>
+                                <div><span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 mr-1"></span>Pending</div>
+                                <div><span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 mr-1"></span>Failed</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- 3. Customer Segment Bar -->
+                          <div class="bg-white rounded p-2 border border-slate-200 space-y-1">
+                            <div class="text-[9px] font-bold text-slate-800">Customer Segment</div>
+                            <div class="space-y-1 text-[8px]">
+                              <div class="flex items-center gap-1"><span class="w-12 truncate">Corporate</span><div class="h-2 bg-blue-600 rounded w-3/5"></div></div>
+                              <div class="flex items-center gap-1"><span class="w-12 truncate">Retail</span><div class="h-2 bg-blue-500 rounded w-2/5"></div></div>
+                              <div class="flex items-center gap-1"><span class="w-12 truncate">HNI</span><div class="h-2 bg-blue-400 rounded w-1/3"></div></div>
+                            </div>
+                          </div>
+
+                          <!-- 4. Total by State -->
+                          <div class="bg-white rounded p-2 border border-slate-200 space-y-1">
+                            <div class="text-[9px] font-bold text-slate-800">${cur.label} by State</div>
+                            <div class="space-y-1 text-[8px]">
+                              <div class="flex items-center justify-between"><span class="font-semibold">Maharashtra</span><span class="font-mono font-bold text-blue-700">${cur.mh}</span></div>
+                              <div class="flex items-center justify-between"><span>Karnataka</span><span class="font-mono text-slate-600">${cur.ka}</span></div>
+                              <div class="flex items-center justify-between"><span>Delhi</span><span class="font-mono text-slate-600">${cur.dl}</span></div>
+                            </div>
+                          </div>
+
+                          <!-- 5. Transaction Type Heat-Map Table -->
+                          <div class="bg-white rounded p-2 border border-slate-200">
+                            <div class="text-[9px] font-bold text-slate-800 mb-1">Type Matrix (fx)</div>
+                            <div class="grid grid-cols-3 gap-0.5 text-[7px] text-center font-semibold">
+                              <div class="text-left text-slate-500">UPI</div><div class="bg-blue-200 rounded">₹21.4Cr</div><div class="bg-emerald-200 rounded">64.2K</div>
+                              <div class="text-left text-slate-500">NEFT</div><div class="bg-blue-100 rounded">₹16.8Cr</div><div class="bg-emerald-100 rounded">38.1K</div>
+                              <div class="text-left text-slate-500">Card</div><div class="bg-blue-50 rounded">₹10.4Cr</div><div class="bg-emerald-50 rounded">24.5K</div>
+                            </div>
+                          </div>
+
+                          <!-- 6. Total by Gender Donut -->
+                          <div class="bg-white rounded p-2 border border-slate-200 flex flex-col justify-between">
+                            <div class="text-[9px] font-bold text-slate-800">Total by Gender</div>
+                            <div class="flex items-center justify-around my-auto">
+                              <div class="w-10 h-10 rounded-full border-[6px] border-blue-600 border-l-pink-500 flex items-center justify-center text-[7px] font-bold">58/42</div>
+                              <div class="text-[8px] space-y-0.5 text-slate-600">
+                                <div><span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 mr-1"></span>Male (58%)</div>
+                                <div><span class="inline-block w-1.5 h-1.5 rounded-full bg-pink-500 mr-1"></span>Female (42%)</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ` : `
+                        <!-- TRANSACTIONS DRILL-THROUGH PAGE CONTENT -->
+                        <div class="bg-white rounded-lg border border-slate-200 p-2 flex-1 flex flex-col justify-between">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[10px] font-extrabold text-[#091E53]">Transactions Detail Table (10 Drill-Through Columns • ${simYear})</span>
+                            <span class="text-[8px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">Drill-Through Active</span>
+                          </div>
+                          <div class="overflow-x-auto">
+                            <table class="w-full text-[8px] text-left border-collapse">
+                              <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                  <th class="py-1 px-1">transaction_id</th>
+                                  <th class="py-1 px-1">Date</th>
+                                  <th class="py-1 px-1">Customer Name</th>
+                                  <th class="py-1 px-1">Type</th>
+                                  <th class="py-1 px-1">Status</th>
+                                  <th class="py-1 px-1">Segment</th>
+                                  <th class="py-1 px-1 text-right">Amount</th>
+                                  <th class="py-1 px-1 text-right">Fees</th>
+                                  <th class="py-1 px-1 text-right">Tax</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-100 font-mono">
+                                <tr>
+                                  <td class="py-1 px-1 font-bold text-blue-700">TXN-90412</td>
+                                  <td class="py-1 px-1">14-Nov-${simYear}</td>
+                                  <td class="py-1 px-1 font-sans font-semibold">Aarav Sharma</td>
+                                  <td class="py-1 px-1 font-sans">UPI</td>
+                                  <td class="py-1 px-1 text-emerald-700 font-bold">Success</td>
+                                  <td class="py-1 px-1 font-sans">Corporate</td>
+                                  <td class="py-1 px-1 text-right font-bold">₹42,500</td>
+                                  <td class="py-1 px-1 text-right">₹14.52</td>
+                                  <td class="py-1 px-1 text-right">₹7,650</td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1 px-1 font-bold text-blue-700">TXN-90413</td>
+                                  <td class="py-1 px-1">14-Nov-${simYear}</td>
+                                  <td class="py-1 px-1 font-sans font-semibold">Priya Deshmukh</td>
+                                  <td class="py-1 px-1 font-sans">NEFT</td>
+                                  <td class="py-1 px-1 text-emerald-700 font-bold">Success</td>
+                                  <td class="py-1 px-1 font-sans">HNI</td>
+                                  <td class="py-1 px-1 text-right font-bold">₹1,18,000</td>
+                                  <td class="py-1 px-1 text-right">₹25.00</td>
+                                  <td class="py-1 px-1 text-right">₹21,240</td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1 px-1 font-bold text-blue-700">TXN-90414</td>
+                                  <td class="py-1 px-1">15-Nov-${simYear}</td>
+                                  <td class="py-1 px-1 font-sans font-semibold">Rohan Kulkarni</td>
+                                  <td class="py-1 px-1 font-sans">Card</td>
+                                  <td class="py-1 px-1 text-amber-600 font-bold">Pending</td>
+                                  <td class="py-1 px-1 font-sans">Retail</td>
+                                  <td class="py-1 px-1 text-right font-bold">₹19,200</td>
+                                  <td class="py-1 px-1 text-right">₹14.52</td>
+                                  <td class="py-1 px-1 text-right">₹3,456</td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1 px-1 font-bold text-blue-700">TXN-90415</td>
+                                  <td class="py-1 px-1">16-Nov-${simYear}</td>
+                                  <td class="py-1 px-1 font-sans font-semibold">Ananya Iyer</td>
+                                  <td class="py-1 px-1 font-sans">UPI</td>
+                                  <td class="py-1 px-1 text-rose-600 font-bold">Failed</td>
+                                  <td class="py-1 px-1 font-sans">Retail</td>
+                                  <td class="py-1 px-1 text-right font-bold">₹8,450</td>
+                                  <td class="py-1 px-1 text-right">₹0.00</td>
+                                  <td class="py-1 px-1 text-right">₹1,521</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="text-[8px] text-slate-400 pt-1 border-t border-slate-100 flex justify-between">
+                            <span>Right-click any visual on Overview Analysis → Drill-through → Transactions</span>
+                            <span class="font-bold text-slate-600">Slicers Synced ✓</span>
+                          </div>
+                        </div>
+                      `}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+    ];
+
+    // =========================================================================
+    // INTERACTIVITY & NAVIGATION CONTROLLERS
+    // =========================================================================
+    function toggleCheck(id, checked) {
+      checkedSteps[id] = checked;
+      localStorage.setItem('upgradx_pbi_finance_checks', JSON.stringify(checkedSteps));
+      updateChecklistProgress();
+    }
+
+    function resetChecklist() {
+      checkedSteps = {};
+      localStorage.removeItem('upgradx_pbi_finance_checks');
+      renderSlide(currentSlideIndex);
+      updateChecklistProgress();
+      showToast('All build progress checkboxes reset.');
+    }
+
+    function updateChecklistProgress() {
+      // Count total unique checkbox IDs across the 10 slides
+      const totalItems = 27;
+      const completed = Object.values(checkedSteps).filter(Boolean).length;
+      const pct = Math.min(100, Math.round((completed / totalItems) * 100));
+      const bar = document.getElementById('checklistProgressBar');
+      const txt = document.getElementById('checklistProgressText');
+      if (bar) bar.style.width = `${pct}%`;
+      if (txt) txt.textContent = `${completed}/${totalItems} (${pct}%)`;
+    }
+
+    function setSlide6Metric(order) {
+      slide6SelectedMetric = order;
+      renderSlide(5);
+    }
+
+    function setSimYear(val) {
+      simYear = val;
+      renderSlide(9);
+      showToast(`Simulated Year Slicer → ${val}`);
+    }
+
+    function setSimMetric(val) {
+      simMetric = val;
+      renderSlide(9);
+      showToast(`Simulated Dynamic Metric → ${val.toUpperCase()}`);
+    }
+
+    function setSimPage(page) {
+      simPage = page;
+      renderSlide(9);
+      showToast(`Switched Page Navigator → ${page === 'overview' ? 'Overview Analysis' : 'Transactions'}`);
+    }
+
+    function renderNavigation() {
+      const navList = document.getElementById('slideNavList');
+      const dotsContainer = document.getElementById('slideDots');
+
+      navList.innerHTML = slides.map((s, idx) => {
+        const active = idx === currentSlideIndex;
+        return `
+          <button onclick="goToSlide(${idx})"
+            class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-medium flex items-center justify-between transition ${
+              active
+                ? 'bg-brand-red text-white font-bold shadow-md shadow-brand-red/25'
+                : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+            }">
+            <span class="truncate">${s.navTitle}</span>
+            ${active ? '<i class="fa-solid fa-chevron-right text-[10px]"></i>' : ''}
+          </button>
+        `;
+      }).join('');
+
+      dotsContainer.innerHTML = slides.map((_, idx) => {
+        const active = idx === currentSlideIndex;
+        return `
+          <button onclick="goToSlide(${idx})" title="Go to Slide ${idx + 1}"
+            class="h-2 rounded-full transition-all ${
+              active ? 'w-6 bg-brand-red' : 'w-2 bg-slate-700 hover:bg-slate-500'
+            }"></button>
+        `;
+      }).join('');
+    }
+
+    function renderSlide(index) {
+      currentSlideIndex = index;
+      const slide = slides[index];
+      document.getElementById('slideContainer').innerHTML = slide.render();
+      document.getElementById('slideViewport').scrollTop = 0;
+
+      // Update Header Counter & Top Progress Bar
+      document.getElementById('currentSlideNum').textContent = String(index + 1).padStart(2, '0');
+      document.getElementById('totalSlidesNum').textContent = String(slides.length).padStart(2, '0');
+      const pct = ((index + 1) / slides.length) * 100;
+      document.getElementById('slideProgressBar').style.width = `${pct}%`;
+
+      // Update Footer Prev/Next Buttons
+      document.getElementById('prevBtn').disabled = index === 0;
+      const nextBtn = document.getElementById('nextBtn');
+      if (index === slides.length - 1) {
+        nextBtn.innerHTML = '<span>Restart Deck</span> <i class="fa-solid fa-rotate-right"></i>';
+      } else {
+        nextBtn.innerHTML = '<span>Next Slide</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+
+      renderNavigation();
+      updateChecklistProgress();
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < slides.length) {
+        renderSlide(index);
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < slides.length - 1) {
+        renderSlide(currentSlideIndex + 1);
+      } else {
+        renderSlide(0);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        renderSlide(currentSlideIndex - 1);
+      }
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    }
+
+    function togglePresentationMode() {
+      document.body.classList.toggle('presentation-mode');
+      const isPresent = document.body.classList.contains('presentation-mode');
+      const btn = document.getElementById('presentationBtn');
+      if (isPresent) {
+        btn.classList.add('border-brand-red', 'text-brand-red');
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+        showToast('Presentation Mode ON (Press Esc to exit)');
+      } else {
+        btn.classList.remove('border-brand-red', 'text-brand-red');
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // Keyboard Arrow Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'Escape' && document.body.classList.contains('presentation-mode')) {
+        togglePresentationMode();
+      }
+    });
+
+    // iFrame-Safe Clipboard Copy Helper
+    function copyText(text, successMsg = 'Copied to clipboard!') {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+      } catch (err) {
+        showToast('Unable to copy text.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    let toastTimeout;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('translate-y-12', 'opacity-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-12', 'opacity-0');
+      }, 2500);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 07: Page 3 ARPU Economics, Migrations & What-If Sliders</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-blue); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(59, 130, 246, 0.16);
+    border-color: var(--accent-blue);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(168, 85, 247, 0.08));
+    border-left: 4px solid var(--accent-blue);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #93c5fd; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 07 (2 Hours) • Page 3 Build: ARPU Decomposition, Waterfall Charts, Migration Matrix & What-If Sliders</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 20</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 07 Curriculum (20 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 07 Kickoff: Solving Question 2 (What's Happening to ARPU?)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Page 3 Economics</span>
+        <span class="tag tag-theory">00:00 – 00:08</span>
+      </div>
+      <h1 class="slide-title">Day 07 Kickoff: Building Page 3 — "ARPU & Migration Economics (Q2)"</h1>
+      <p class="slide-subtitle">CFO Rohan Bose and CMO Rashmi Iyer want to understand why high-tier yield is eroding while subscribers downgrade plans 3.68× faster than they upgrade.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Economics Analogy: Price Effect vs. Sales Mix Effect</div>
+        <p>In corporate finance, when average revenue per unit drops, the CFO always asks two questions: <strong>(1) Mix Effect:</strong> Are customers shifting toward cheaper products? <strong>(2) Rate Effect:</strong> Are existing customers spending less on overages and add-ons? Today we build the visuals and DAX measures to separate both effects!</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The 4 Deliverables on Page 3 Today</div>
+        <ol class="list-styled">
+          <li><strong>Q2a (24-Month Tier ARPU Trend):</strong> Multi-line chart tracking <code>Diamond</code>, <code>Premium</code>, and <code>Mass</code> ARPU side-by-side.</li>
+          <li><strong>Q2b (Mix vs. Rate Decomposition):</strong> Waterfall chart + Stacked 100% Column Chart showing tier share shifts and downward plan migrations (<code>3,717 Down vs. 1,011 Up</code>).</li>
+          <li><strong>Q2c (FY27 Revenue at Risk):</strong> Quantifying the exact annual rupee loss from downward migrations (<code>-₹9.72 Lakhs/month</code> gross downgrade drag!).</li>
+          <li><strong>Q2d (Interactive What-If Simulator):</strong> A live Power BI Numeric Parameter slider letting the CFO simulate ARPU recovery plays in the boardroom!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: 100% Stacked Column Chart (Visualizing Mix Shift)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Mix Shift Visual</span>
+        <span class="tag tag-lab">00:08 – 00:16</span>
+      </div>
+      <h1 class="slide-title">Topic 1: 100% Stacked Column Chart — Tracking Customer Pyramid Shifts</h1>
+      <p class="slide-subtitle">Look at how JioWave's billed subscriber mix evolved across FY24, FY25, and FY26.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified Tier Mix & ARPU Across Fiscal Years (Q2a & Q2b)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fiscal Year</th>
+              <th>Mass Share % (ARPU)</th>
+              <th>Premium Share % (ARPU)</th>
+              <th>Diamond Share % (ARPU)</th>
+              <th>Analytical Insight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>FY24</strong></td>
+              <td>73.69% (₹338.32)</td>
+              <td>22.07% (₹652.20)</td>
+              <td>4.25% (₹1,998.11)</td>
+              <td>Baseline launch mix</td>
+            </tr>
+            <tr>
+              <td><strong>FY25</strong></td>
+              <td>73.29% (₹344.77)</td>
+              <td>22.46% (₹647.46)</td>
+              <td>4.25% (₹2,275.10)</td>
+              <td>Diamond peak ARPU driven by high data overages</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>FY26</strong></td>
+              <td>72.42% (₹355.76)</td>
+              <td>23.06% (₹681.95)</td>
+              <td>4.52% (₹2,145.74)</td>
+              <td><strong>Diamond ARPU dropped -₹129.36 (-5.69%)</strong>; Premium dipped in Q4 FY26</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Waterfall Chart (Explaining Changes Between Two Points)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Waterfall Chart</span>
+        <span class="tag tag-lab">00:16 – 00:26</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Waterfall Charts — Bridging Rental, Overage & Add-on Changes</h1>
+      <p class="slide-subtitle">CFOs love Waterfall charts because every bar shows positive green gains and negative red drags leading from Start to End.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">How to Build the Net Migration Waterfall on Page 3</div>
+          <ol class="list-styled">
+            <li>Insert the <strong>Waterfall chart</strong> visual on Page 3.</li>
+            <li><strong>Category:</strong> Drag <code>fact_plan_migrations[direction]</code> (<code>Up</code> vs. <code>Down</code>).</li>
+            <li><strong>Breakdown:</strong> Drag <code>dim_plans[segment]</code> (<code>Prepaid</code>, <code>Postpaid</code>, <code>Broadband</code>).</li>
+            <li><strong>Y-Axis:</strong> Drag <code>[Net Monthly Rental Change]</code> (<code>SUM(fact_plan_migrations[rental_change])</code>).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">What the Waterfall Reveals Immediately</div>
+          <ul class="list-styled">
+            <li><strong>Upward Migrations (1,011 events):</strong> Adds <strong>+₹6,35,750/month</strong> (avg +₹628.83 per upgrade).</li>
+            <li><strong>Downward Migrations (3,717 events):</strong> Bleeds <strong>-₹9,71,950/month</strong> (avg -₹261.49 per downgrade).</li>
+            <li><strong>Net Monthly Recurring Drag:</strong> <code>+₹6,35,750 - ₹9,71,950 = <strong>-₹3,36,200/month</strong></code> (or <strong>-₹40.34 Lakhs/year</strong> annualized recurring bleed!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Migration Flow Matrix (`From Plan` × `To Plan`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Migration Forensics</span>
+        <span class="tag tag-lab">00:26 – 00:36</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Building the Plan-to-Plan Downgrade Matrix (`fact_plan_migrations`)</h1>
+      <p class="slide-subtitle">Look at `fact_plan_migrations`: it has TWO plan columns—`from_plan` and `to_plan`! Remember our Active vs. Inactive relationship rule from Day 2?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Modeling Two Plan Columns Cleanly</div>
+          <ul class="list-styled">
+            <li>Link <code>dim_plans[plan_id]</code> ➔ <code>fact_plan_migrations[from_plan]</code> as the <strong>Active (Solid)</strong> relationship.</li>
+            <li>In Power Query, merge <code>to_plan</code> with <code>plans</code> to bring in <code>To_Plan_Name</code> directly as a descriptive text column so you can place <code>From_Plan_Name</code> on Matrix Rows and <code>To_Plan_Name</code> on Matrix Columns!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Top Downgrade Corridors Discovered</div>
+          <ul class="list-styled">
+            <li><strong><code>PL002 (149) ➔ PL024 (Legacy 99)</code>:</strong> 375 users! Customers are downgrading into a retired legacy plan that wasn't blocked in the billing app!</li>
+            <li><strong><code>PL010 (Post 399) ➔ PL009 (Post 299)</code>:</strong> 320 users (-₹100/mo each).</li>
+            <li><strong><code>PL019 (Fiber 999) ➔ PL018 (Fiber 599)</code>:</strong> 168 users (-₹400/mo each).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: What-If Numeric Range Parameters (`GENERATESERIES`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Boardroom Simulation</span>
+        <span class="tag tag-lab">00:36 – 00:48</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Interactive What-If Sliders (`Modeling → New Parameter → Numeric Range`)</h1>
+      <p class="slide-subtitle">Remember Q2c & Q2d? "Quantify the FY27 revenue impact and recommend 3 intervention plays with expected rupee preservation." Let's build a live slider for CFO Rohan Bose!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">4-Click What-If Slider Setup</div>
+          <ol class="list-styled">
+            <li>Go to <code>Modeling Tab → New parameter → Numeric range</code>.</li>
+            <li><strong>Name:</strong> <code>ARPU Recovery Uplift (INR)</code> | <strong>Data type:</strong> Whole number | <strong>Min:</strong> <code>0</code> | <strong>Max:</strong> <code>150</code> | <strong>Increment:</strong> <code>10</code> | <strong>Default:</strong> <code>50</code>.</li>
+            <li>Power BI automatically generates a disconnected table using <code>GENERATESERIES(0, 150, 10)</code>, a helper measure <code>[ARPU Recovery Uplift Value]</code>, and puts a sleek slider directly on Page 3!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">DAX Measure Driven by the Live Slider</div>
+          <div class="code-block">
+            Projected FY27 Premium Uplift = <br>
+            <span class="kw">VAR</span> ActiveHighValSubs = 6842 <span class="cm">-- 5,723 Premium + 1,119 Diamond in Mar 26</span><br>
+            <span class="kw">VAR</span> MonthlyUplift = [ARPU Recovery Uplift Value]<br>
+            <span class="kw">RETURN</span><br>
+            &nbsp;&nbsp;ActiveHighValSubs * MonthlyUplift * 12
+          </div>
+          <p style="font-size:0.86rem; color:var(--accent-teal);">When the CFO drags the slider to <strong>₹50/month</strong>, the KPI card dynamically displays <strong>+₹41.05 Lakhs/year</strong> in FY27 revenue preserved!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Field Parameters (Letting the Board Switch Metrics & Axes)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Dynamic Visuals</span>
+        <span class="tag tag-lab">00:48 – 00:58</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Field Parameters — Switching Between ARPU, Total Revenue & Overage % in One Chart</h1>
+      <p class="slide-subtitle">Instead of cramming 3 separate trend charts onto Page 3, a Field Parameter lets Rashmi toggle the Y-axis metric with 1 button click!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">How to Create a Field Parameter</div>
+          <ol class="list-styled">
+            <li>Go to <code>Modeling Tab → New parameter → Fields</code>.</li>
+            <li>Name it <code>Select Metric</code> and check: <code>[Monthly ARPU]</code>, <code>[Total Revenue INR]</code>, and <code>[Overage Share %]</code>.</li>
+            <li>Drag <code>Select Metric</code> into the Y-axis of your Line Chart—Power BI adds a slicer that dynamically swaps the metric and number formatting!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Why Field Parameters Win Capstone Grading</div>
+          <p>Keeps Page 3 clean (under 6 visuals) while giving CFO Rohan Bose and CMO Rashmi Iyer three complete analytical views inside one single hero chart!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Auditing Top Plan Migration Corridors">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">00:58 – 01:06</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Quantifying JioWave's Worst Plan Downgrade Leaks</h1>
+      <p class="slide-subtitle">Watch how the instructor evaluates the top 4 plan migration corridors in `fact_plan_migrations` to uncover a major billing-system bug.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Top Plan Migration Corridors (`fact_plan_migrations` × `dim_plans`)</span><span>Click Reveal to highlight the billing bug & monthly rupee bleed</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>From Plan</th>
+              <th>To Plan</th>
+              <th>Direction</th>
+              <th>Events</th>
+              <th>Rental Change / Sub</th>
+              <th>Total Monthly Recurring Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>PL002</code> (JioBasic 149)</td>
+              <td><code>PL024</code> (JioLegacy 99)</td>
+              <td>Down</td>
+              <td class="cell-target" id="d7-inst-1">375</td>
+              <td>-₹50</td>
+              <td class="cell-target" id="d7-inst-2">-₹18,750 / mo (Billing Bug!)</td>
+            </tr>
+            <tr>
+              <td><code>PL002</code> (JioBasic 149)</td>
+              <td><code>PL001</code> (JioBasic 99)</td>
+              <td>Down</td>
+              <td>334</td>
+              <td>-₹50</td>
+              <td>-₹16,700 / mo</td>
+            </tr>
+            <tr>
+              <td><code>PL010</code> (JioPost 399)</td>
+              <td><code>PL009</code> (JioPost 299)</td>
+              <td>Down</td>
+              <td>320</td>
+              <td>-₹100</td>
+              <td>-₹32,000 / mo</td>
+            </tr>
+            <tr>
+              <td><code>PL019</code> (JioFiber 999)</td>
+              <td><code>PL018</code> (JioFiber 599)</td>
+              <td>Down</td>
+              <td>168</td>
+              <td>-₹400</td>
+              <td class="cell-target" id="d7-inst-3">-₹67,200 / mo (#1 Rupee Bleed!)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Strategic Diagnosis for Page 3 & Board Memo:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d7-inst-ans', ['d7-inst-1', 'd7-inst-2', 'd7-inst-3'])">🔍 Reveal Instructor Migration Audit</button>
+          <button class="btn" onclick="resetSim('d7-inst-ans', ['d7-inst-1', 'd7-inst-2', 'd7-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d7-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Two Huge Findings for CFO Rohan Bose:</h4>
+          <ol class="list-styled">
+            <li><strong>Self-Service Billing Bug (#1 Volume Corridor):</strong> <strong>375 subscribers</strong> downgraded from <code>PL002</code> to <code>PL024 (JioLegacy 99)</code>—even though <code>PL024</code> was officially retired on <code>2024-01-01</code>! Locking retired plans in the self-service app immediately stops this leak.</li>
+            <li><strong>Broadband Down-Tiering (#1 Rupee Bleed):</strong> Only 168 users downgraded from <code>JioFiber 999</code> to <code>JioFiber 599</code>, yet at <strong>-₹400/mo</strong> each, that single corridor bleeds <strong>-₹67,200/month</strong> (₹8.06 Lakhs/year)!</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Calculating Annualized Revenue at Risk (Q2c)">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:06 – 01:13</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Quantifying FY27 Revenue at Risk from High-Value ARPU Drop</h1>
+      <p class="slide-subtitle">Look at `Diamond` tier ARPU: in FY25 it was `₹2,275.10`, and in FY26 it fell to `₹2,145.74` (a drop of `-₹129.36/month` per user). With `1,119` active Diamond subscribers in March 2026, compute the monthly and annualized (12-month) FY27 revenue impact!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Diamond Tier FY27 Revenue-at-Risk Worksheet (Q2c)</span><span>Predict the 3 highlighted financial impact cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Formula</th>
+              <th>Computed Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Diamond ARPU Erosion (FY25 ➔ FY26)</td>
+              <td><code>₹2,145.74 - ₹2,275.10</code></td>
+              <td class="cell-target" id="d7-stu1-c1">-₹129.36 / subscriber / month</td>
+            </tr>
+            <tr>
+              <td>Monthly Diamond Revenue Drag (1,119 active subs)</td>
+              <td><code>1,119 × (-₹129.36)</code></td>
+              <td class="cell-target" id="d7-stu1-c2">-₹1,44,753.84 / month</td>
+            </tr>
+            <tr>
+              <td><strong>Annualized FY27 Revenue at Risk (12 Months)</strong></td>
+              <td><code>-₹1,44,753.84 × 12</code></td>
+              <td class="cell-target" id="d7-stu1-c3">-₹17,37,046 (₹17.37 Lakhs / year)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d7-stu1-ans', ['d7-stu1-c1', 'd7-stu1-c2', 'd7-stu1-c3'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d7-stu1-ans', ['d7-stu1-c1', 'd7-stu1-c2', 'd7-stu1-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d7-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Step-by-Step Arithmetic:</h4>
+          <p><code>-₹129.36 × 1,119 active Diamond subscribers × 12 months = <strong>-₹17,37,046.08 (₹17.37 Lakhs)</strong></code> in annual high-margin revenue lost purely from yield erosion on the existing Diamond base!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Simulating the What-If Recovery Slider (Q2d)">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:13 – 01:20</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Modeling 3 ARPU Defense Plays with Your What-If Slider</h1>
+      <p class="slide-subtitle">Using our active High-Value base in March 2026 (`5,723 Premium + 1,119 Diamond = 6,842 subscribers`), calculate the annualized FY27 rupee preservation if our retention & add-on bundle lifts ARPU by **+₹80/month** across those 6,842 users!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>What-If Slider Simulation (`ARPU Recovery Uplift = +₹80/mo`)</span><span>Predict the Monthly & Annualized FY27 Recovery</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Target Base</th>
+              <th>Active Subscribers (Mar 26)</th>
+              <th>Slider Uplift / Month</th>
+              <th>Monthly Revenue Preserved</th>
+              <th>Annualized FY27 Impact (12 Mo)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Premium + Diamond Combined</strong></td>
+              <td>6,842</td>
+              <td>+₹80 / mo</td>
+              <td class="cell-target" id="d7-stu2-c1">+₹5,47,360 / mo</td>
+              <td class="cell-target" id="d7-stu2-c2">+₹65,68,320 (₹65.68 Lakhs / yr)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d7-stu2-ans', ['d7-stu2-c1', 'd7-stu2-c2'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('d7-stu2-ans', ['d7-stu2-c1', 'd7-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d7-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Verified Slider Output:</h4>
+          <p><code>6,842 subscribers × ₹80/month = ₹5,47,360/month</code> ➔ <code>× 12 months = <strong>₹65,68,320 (₹65.68 Lakhs)</strong></code> in annual FY27 revenue recovery!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="Day 07 Build Checklist & Day 08 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Page 3 Complete!</span>
+        <span class="tag tag-theory">Next: Page 4 Network Capex</span>
+      </div>
+      <h1 class="slide-title">Day 07 Milestone: Page 3 ("ARPU & Migration Economics") Built!</h1>
+      <p class="slide-subtitle">Three of our five board pages are now complete. Tomorrow (Day 08), we build Page 4: Network Capex & Tower Utilization!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Page 3 Build Checklist</div>
+          <ol class="list-styled">
+            <li>Build the 100% Stacked Column Chart (Tier Mix Share) + Field-Parameter Line Chart (Monthly ARPU).</li>
+            <li>Add the Net Migration Waterfall Chart (`+₹6.36L Up vs. -₹9.72L Down`) and Top Downgrade Corridors table.</li>
+            <li>Add the Numeric Range What-If Slider (`ARPU Recovery Uplift`) linked to your FY27 Projected Uplift KPI card.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 08 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Page 4 Build (Network Capex & Tower Utilization — Q3):</strong> Filled Maps / Bubble Maps using <code>latitude</code> & <code>longitude</code> of all 279 towers, Scatter Plots (Utilization % vs. Churn Rate %), and isolating the 6 high-downtime city-months where churn spiked 2.3×!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 8" whenever you're ready for Page 4!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

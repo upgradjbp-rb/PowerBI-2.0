@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 01: JioWave Case Study</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+    --highlight-red: rgba(244, 63, 94, 0.22);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Top Navigation Bar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-main);
+  }
+
+  .brand-sub {
+    color: var(--accent-gold);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-teal);
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+
+  .btn-gold:hover {
+    filter: brightness(1.08);
+  }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  /* Progress Bar */
+  .progress-track {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-secondary);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-gold));
+    width: 4%;
+    transition: width 0.35s ease;
+  }
+
+  /* Main Layout */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* Sidebar Index */
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover {
+    background: var(--bg-card);
+    color: var(--text-main);
+  }
+
+  .slide-nav-item.active {
+    background: rgba(20, 184, 166, 0.14);
+    border-color: var(--accent-teal);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num {
+    color: var(--accent-gold);
+    font-weight: 700;
+    min-width: 24px;
+  }
+
+  /* Slide Stage */
+  .stage {
+    padding: 2rem 2.5rem;
+    max-width: 1180px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .slide {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .slide.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Slide Header */
+  .slide-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
+  }
+
+  .slide-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Content Cards & Grids */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.15rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-bottom: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(20, 184, 166, 0.08));
+    border-left: 4px solid var(--accent-gold);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title {
+    font-weight: 800;
+    color: var(--accent-gold);
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+
+  /* Code / M-Formula Box */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  /* Interactive Data Tables */
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: #0f172a;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-align: left;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Table Highlighting Classes */
+  .col-selected {
+    background: rgba(59, 130, 246, 0.16) !important;
+    border-left: 1px dashed #60a5fa;
+    border-right: 1px dashed #60a5fa;
+  }
+
+  .row-selected {
+    background: rgba(20, 184, 166, 0.15) !important;
+  }
+
+  .row-dropped {
+    background: rgba(244, 63, 94, 0.16) !important;
+    text-decoration: line-through;
+    color: #fca5a5;
+  }
+
+  .cell-dirty {
+    background: rgba(244, 63, 94, 0.25) !important;
+    color: #fecdd3;
+    font-weight: 700;
+    border: 1px solid #f43f5e;
+  }
+
+  .cell-target {
+    transition: all 0.3s ease;
+  }
+
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .cell-clean.revealed {
+    background: var(--highlight-green) !important;
+    border: 2px solid var(--accent-teal) !important;
+    color: #99f6e4 !important;
+    font-weight: 800;
+  }
+
+  /* Simulator Reveal Box */
+  .sim-panel {
+    background: #131c2e;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .sim-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+  }
+
+  .answer-drawer {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid var(--accent-teal);
+    border-radius: 10px;
+  }
+
+  .answer-drawer.open {
+    display: block;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .kpi-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .kpi-val {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+  }
+
+  .kpi-lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .ui-path {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    background: #0f172a;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #93c5fd;
+    margin: 0.3rem 0;
+  }
+
+  .list-styled {
+    padding-left: 1.35rem;
+    margin: 0.65rem 0;
+  }
+
+  .list-styled li {
+    margin-bottom: 0.45rem;
+  }
+
+  .badge-pill {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  /* Responsive Mobile/Tablet */
+  @media (max-width: 920px) {
+    .app-shell {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      display: none;
+    }
+    .stage {
+      padding: 1.25rem;
+    }
+    .slide-title {
+      font-size: 1.45rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Header -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 01 (2 Hours) • Business Framing, Architecture & Power Query Foundations</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 25</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- Main App Container -->
+<div class="app-shell">
+  <!-- Left Slide Navigator -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 01 Curriculum (25 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <!-- Active Slide Stage -->
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Welcome & The Analyst Mindset">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Case Kickoff</span>
+        <span class="tag tag-theory">00:00 – 00:05</span>
+      </div>
+      <h1 class="slide-title">Welcome to JioWave: You Are Not Learning a Software Tool</h1>
+      <p class="slide-subtitle">Over the next 15 days (30 hours), you are an embedded Subscriber & Network Data Analyst reporting to the CMO of an Indian telecom challenger.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Arts Analogy: The Tally Ledger vs. The Boardroom Story</div>
+        <p>Think of raw CSV files like 9 thick physical accounting registers dumped on your desk before an annual audit. Power BI is not "coding"—it is your <strong>automated audit desk</strong> that cleans messy vouchers, links ledgers together, calculates profit ratios automatically, and presents a live 5-page board report in 3 minutes.</p>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi-box"><div class="kpi-val">28,000</div><div class="kpi-lbl">Unique Subscribers</div></div>
+        <div class="kpi-box"><div class="kpi-val">32 Cities</div><div class="kpi-lbl">Pan-India Footprint</div></div>
+        <div class="kpi-box"><div class="kpi-val">279</div><div class="kpi-lbl">4G & 5G Cell Towers</div></div>
+        <div class="kpi-box"><div class="kpi-val">24 Plans</div><div class="kpi-lbl">Prepaid, Postpaid, Fiber</div></div>
+        <div class="kpi-box"><div class="kpi-val">₹197 Cr</div><div class="kpi-lbl">Annual Revenue</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Our 15-Day Roadmap to a Working 5-Page Executive Report</div>
+        <div class="grid-3">
+          <div><strong>Days 1–3 (ETL & Cleaning):</strong> Ingest all 9 JioWave CSVs via Power Query, fix duplicate IDs, standardize 96 dirty city spellings to 32, and audit NULLs.</div>
+          <div><strong>Days 4–5 (Data Modeling):</strong> Connect tables into a Star Schema (Fact vs. Dimension) and build a dedicated Calendar table.</div>
+          <div><strong>Days 6–10 (DAX & 5-Page Report):</strong> Write business KPIs in DAX and build our complete 5-page CMO Executive Dashboard.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="The Business Problem: Why Rashmi Doesn't Trust 11.97%">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Case Kickoff</span>
+        <span class="tag tag-theory">00:05 – 00:12</span>
+      </div>
+      <h1 class="slide-title">The CMO's Dilemma: When Averages Lie in Business</h1>
+      <p class="slide-subtitle">Rashmi Iyer (CMO, JioWave) has a Series-C board meeting in 3 weeks. Her current analysts say "Everything is fine." She disagrees.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">What the Current Report Shows (Surface Level)</div>
+          <ul class="list-styled">
+            <li><strong>Annual Churn Rate:</strong> <code>11.97%</code> (Just below the 12.0% TRAI industry benchmark).</li>
+            <li><strong>Blended ARPU:</strong> <code>₹704/month</code> (Looks flat and stable year-over-year).</li>
+            <li><strong>Network Uptime:</strong> <code>99.4%</code> (Meets engineering SLA).</li>
+          </ul>
+          <p style="color: var(--accent-rose); font-weight: 700; margin-top: 0.75rem;">Why is this dangerous? Averages hide pockets of massive financial bleeding!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">The 4 Decisions Rashmi Needs From Your Dashboard</div>
+          <ol class="list-styled">
+            <li><strong>Where is real churn hiding?</strong> Find the exact customer cohort churning at ~61% (5× the headline).</li>
+            <li><strong>Why is Premium ARPU dropping?</strong> Decompose the -6.4% drop (₹704 → ₹659).</li>
+            <li><strong>Is ₹47 Cr Tower Capex working?</strong> Are 43 new towers carrying fair traffic?</li>
+            <li><strong>Plan Portfolio Rationalization:</strong> Which 5 of 24 plans to retire, and which 2 to launch?</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Blended Gross Margin</div>
+        <p>Imagine a retail store selling luxury watches (50% margin) and basic batteries (5% margin). If watch sales crash while battery sales double, the store's <em>average</em> revenue might look flat, while profit quietly collapses. That is exactly what is happening to JioWave's Premium subscribers!</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="The PRISM Thinking Framework">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Analytical Methodology</span>
+        <span class="tag tag-module">00:12 – 00:18</span>
+      </div>
+      <h1 class="slide-title">The PRISM Framework: Think Before You Click</h1>
+      <p class="slide-subtitle">Never open Power BI and start dragging random charts. Senior analysts follow PRISM for every business question.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>PRISM 5-Step Analytical Loop — Applied to JioWave</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>Meaning</th>
+              <th>What You Do Before Touching Power BI</th>
+              <th>JioWave Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--accent-gold)">P</strong></td>
+              <td><strong>Problem</strong></td>
+              <td>Restate the business decision in plain English.</td>
+              <td>Which plans must we kill so we stop losing ₹140 Lakhs per 1% churn?</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--accent-gold)">R</strong></td>
+              <td><strong>Reframe</strong></td>
+              <td>Break broad questions into specific table slices.</td>
+              <td>Slice Churn by <code>Signup Quarter × Plan × City Tier</code>.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--accent-gold)">I</strong></td>
+              <td><strong>Investigate</strong></td>
+              <td>Audit raw CSVs for duplicates, NULLs, and dirty text.</td>
+              <td>Discover 200 duplicate rows and 96 spellings of 32 cities in <code>subscribers.csv</code>!</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--accent-gold)">S</strong></td>
+              <td><strong>Solve</strong></td>
+              <td>Decompose averages into segments; never trust blended totals.</td>
+              <td>Separate Prepaid, Postpaid, and Broadband ARPU trends.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--accent-gold)">M</strong></td>
+              <td><strong>Measure</strong></td>
+              <td>Quantify every recommendation in Rupees (₹) and subscriber counts.</td>
+              <td>"Migrating 1,200 users from retired plans recovers ₹X Lakhs in FY27."</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Anatomy of Power BI Desktop (3 Views)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 2: Tool Tour</span>
+        <span class="tag tag-theory">00:18 – 00:24</span>
+      </div>
+      <h1 class="slide-title">Inside Power BI Desktop: The Restaurant Kitchen Analogy</h1>
+      <p class="slide-subtitle">Power BI Desktop has two main windows and three core views on the left rail. Understand what happens where.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">1. Power Query Editor (The Prep Kitchen)</div>
+          <p>Opens in a separate window when you click <strong>Transform Data</strong>. Here you wash vegetables, peel onions, and throw away spoiled items—meaning you remove duplicates, fix spelling mistakes, and split columns <em>before</em> analysis.</p>
+          <div class="ui-path">Home Tab → Transform Data → Power Query Window</div>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Report View (The Dining Room)</div>
+          <p>The canvas where the CMO sees KPI cards, bar charts, maps, and slicers. If the prep kitchen served dirty data, the dining room serves wrong numbers.</p>
+          <div class="ui-path">Left Rail Icon 1: Bar Chart (Report Canvas)</div>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Table View (The Pantry Inspection)</div>
+          <p>Lets you inspect cleaned rows and columns just like an Excel spreadsheet to verify that dates, numbers, and text formatted properly.</p>
+          <div class="ui-path">Left Rail Icon 2: Grid (Table View)</div>
+        </div>
+        <div class="card">
+          <div class="card-title">4. Model View (The Recipe Wiring)</div>
+          <p>Where you draw relationship lines connecting <code>subscribers</code> to <code>revenue_monthly</code> and <code>towers</code>—replacing thousands of VLOOKUPs.</p>
+          <div class="ui-path">Left Rail Icon 3: Diagram (Model View)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Meet Our Project Dataset (All 9 JioWave CSVs)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 2: Data Architecture</span>
+        <span class="tag tag-lab">00:24 – 00:30</span>
+      </div>
+      <h1 class="slide-title">Our 15-Day Workspace: The 9 JioWave CSV Tables</h1>
+      <p class="slide-subtitle">We will NEVER use random toy datasets. Every single query from Day 1 to Day 15 runs on these exact 9 JioWave tables.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>JioWave Data Warehouse Inventory (FY24 – FY26)</span><span>Source: JioWave CSV Bundle</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>CSV File Name</th>
+              <th>Role in Business</th>
+              <th>Row Count</th>
+              <th>Primary Key</th>
+              <th>What Messiness Hides Inside?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td><strong>subscribers.csv</strong></td>
+              <td>Master Customer Register</td>
+              <td>28,200</td>
+              <td><code>subscriber_id</code></td>
+              <td>200 duplicate rows, 96 dirty city spellings, 848 NULL cities, comma text in <code>tenure_days</code></td>
+            </tr>
+            <tr>
+              <td><strong>plans.csv</strong></td>
+              <td>24 Tariff Plans Catalog</td>
+              <td>24</td>
+              <td><code>plan_id</code></td>
+              <td>2 retired legacy plans (PL023, PL024) with <code>retire_date</code> populated</td>
+            </tr>
+            <tr>
+              <td><strong>subscriptions.csv</strong></td>
+              <td>Plan Enrollment History</td>
+              <td>32,728</td>
+              <td><code>subscription_id</code></td>
+              <td>Multiple rows per subscriber when they switch plans</td>
+            </tr>
+            <tr>
+              <td><strong>towers.csv</strong></td>
+              <td>279 Cell Tower Assets</td>
+              <td>279</td>
+              <td><code>tower_id</code></td>
+              <td>Clean master lookup (32 standardized cities, 4G/5G install dates)</td>
+            </tr>
+            <tr>
+              <td><strong>tower_monthly_metrics.csv</strong></td>
+              <td>Monthly Tower Traffic & Faults</td>
+              <td>10,044</td>
+              <td><code>tower_metric_id</code></td>
+              <td>36 months × 279 towers; reveals over-utilized (>95%) and under-utilized towers</td>
+            </tr>
+            <tr>
+              <td><strong>revenue_monthly.csv</strong></td>
+              <td>Monthly Billing Ledger</td>
+              <td>564,274</td>
+              <td><code>revenue_id</code></td>
+              <td>Splits Rental, Overage, and Add-on INR per subscriber per month</td>
+            </tr>
+            <tr>
+              <td><strong>usage_monthly.csv</strong></td>
+              <td>Data, Voice & SMS Logs</td>
+              <td>564,274</td>
+              <td><code>usage_id</code></td>
+              <td>Extreme 50+ GB out-of-bundle usage ("Data Hogs")</td>
+            </tr>
+            <tr>
+              <td><strong>plan_migrations.csv</strong></td>
+              <td>Upgrade / Downgrade Events</td>
+              <td>4,728</td>
+              <td><code>migration_id</code></td>
+              <td>Shows 3.68× more downward migrations than upward migrations</td>
+            </tr>
+            <tr>
+              <td><strong>benchmarks.csv</strong></td>
+              <td>TRAI Industry Reference</td>
+              <td>20</td>
+              <td><code>metric_name</code></td>
+              <td>External reference benchmarks (12% churn, ₹180 industry ARPU)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 1: Data Ingestion (Get Data & Folder Connector)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Data Ingestion</span>
+        <span class="tag tag-lab">00:30 – 00:36</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Connecting Data — CSV vs. Folder Connector</h1>
+      <p class="slide-subtitle">How do we bring JioWave's files into Power BI Desktop so that next month's refresh takes 1 click instead of 2 hours?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Method A: Text/CSV Connector (Single File)</div>
+          <p><strong>Use Case:</strong> Loading one standalone file like <code>subscribers.csv</code> or <code>plans.csv</code>.</p>
+          <div class="ui-path">Home → Get Data → Text/CSV → Select File → Transform Data</div>
+          <p style="margin-top:0.6rem; font-size:0.9rem; color:var(--text-muted);"><strong>Limitation:</strong> If you have 12 monthly billing CSVs (Jan.csv, Feb.csv...), importing them one by one creates 12 separate tables!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Method B: Folder Connector (Enterprise Best Practice)</div>
+          <p><strong>Use Case:</strong> Pointing Power BI to an entire folder (e.g., <code>JioWave_CSV_Files/</code>). Power BI reads every file inside and lets you either load them individually or combine monthly dumps automatically.</p>
+          <div class="ui-path">Home → Get Data → More → Folder → Browse Folder → Transform Data</div>
+          <p style="margin-top:0.6rem; font-size:0.9rem; color:var(--accent-teal);"><strong>Advantage:</strong> Next quarter, drop new files into the folder and click <strong>Refresh</strong>!</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// Behind the scenes, Power Query writes M-Code automatically when you connect:</span><br>
+        <span class="kw">let</span><br>
+        &nbsp;&nbsp;Source = <span class="fn">Csv.Document</span>(<span class="fn">File.Contents</span>(<span class="str">"C:\JioWave\subscribers.csv"</span>), [Delimiter=<span class="str">","</span>, Columns=16, Encoding=65001]),<br>
+        &nbsp;&nbsp;PromotedHeaders = <span class="fn">Table.PromoteHeaders</span>(Source, [PromoteAllScalars=<span class="kw">true</span>])<br>
+        <span class="kw">in</span><br>
+        &nbsp;&nbsp;PromotedHeaders
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 2: Power Query Engine & Applied Steps">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Power Query Architecture</span>
+        <span class="tag tag-module">00:36 – 00:42</span>
+      </div>
+      <h1 class="slide-title">Topic 2: How Power Query Works (The Non-Destructive Recipe)</h1>
+      <p class="slide-subtitle">Why Power Query destroys manual Excel cleaning for recurring monthly reporting.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Recording a Macro vs. Manual Erasing</div>
+        <p>In Excel, if you delete a duplicate row and press Save, the original data is gone—and next month you must repeat all 20 clicks manually. Power Query <strong>never modifies your original CSV file</strong>. Instead, it records every click in a right-hand list called <strong>Applied Steps</strong> (written in M language). Next month, Power Query replays your recipe in 2 seconds!</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Ribbon (4 Main Tabs)</div>
+          <ul class="list-styled">
+            <li><strong>Home:</strong> Remove rows/columns, split, group, merge.</li>
+            <li><strong>Transform:</strong> Modify the <em>existing</em> column in-place.</li>
+            <li><strong>Add Column:</strong> Create a <em>brand new</em> column from existing ones.</li>
+            <li><strong>View:</strong> Turn on Column Quality & Distribution bars!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Formula Bar (M Language)</div>
+          <p>Case-sensitive functional language! <code>Table.Distinct</code> works; <code>table.distinct</code> throws an error. Always inspect the formula bar to learn the syntax.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Applied Steps (Right Pane)</div>
+          <p>Every transformation is a step. Click any previous step to "time-travel" and inspect what the table looked like at that exact stage.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 3: Data Profiling (Column Quality & Distribution)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Data Profiling</span>
+        <span class="tag tag-lab">00:42 – 00:48</span>
+      </div>
+      <h1 class="slide-title">Topic 3: X-Ray Vision — Data Profiling Before Cleaning</h1>
+      <p class="slide-subtitle">Never clean blindly. Turn on Power Query's three profiling bars to see errors, empty cells, and duplicates in 5 seconds.</p>
+
+      <div class="ui-path">Power Query → View Tab → Check: [✓] Column Quality &nbsp;|&nbsp; [✓] Column Distribution &nbsp;|&nbsp; [✓] Column Profile</div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Live Audit Output on JioWave `subscribers.csv` (28,200 Raw Rows)</span><span>Note: Power Query defaults to profiling top 1,000 rows unless switched to "Entire dataset" at bottom-left!</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column Name</th>
+              <th>Valid %</th>
+              <th>Error %</th>
+              <th>Empty (NULL) %</th>
+              <th>Distinct vs. Unique</th>
+              <th>Analyst Diagnosis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td><code>subscriber_id</code></td>
+              <td>100%</td>
+              <td>0%</td>
+              <td>0%</td>
+              <td>28,000 Distinct / 27,800 Unique</td>
+              <td><strong>RED FLAG!</strong> 200 IDs appear twice (28,200 total rows). Must deduplicate!</td>
+            </tr>
+            <tr>
+              <td><code>full_name</code></td>
+              <td>97.0%</td>
+              <td>0%</td>
+              <td class="cell-dirty">3.0% (844 empty)</td>
+              <td>24,110 Distinct</td>
+              <td>Missing customer names; replace NULL with <code>"Unknown Subscriber"</code>.</td>
+            </tr>
+            <tr class="row-selected">
+              <td><code>city</code></td>
+              <td>97.0%</td>
+              <td>0%</td>
+              <td class="cell-dirty">3.0% (848 empty)</td>
+              <td class="cell-dirty">96 Distinct Strings!</td>
+              <td><strong>DOUBLE BUG!</strong> 32 cities written in 3 cases (<code>MUMBAI</code>, <code>Mumbai</code>, <code>mumbai</code>) + 848 NULLs!</td>
+            </tr>
+            <tr>
+              <td><code>tenure_days</code></td>
+              <td>100%</td>
+              <td>0%</td>
+              <td>0%</td>
+              <td>Stored as ABC (Text)</td>
+              <td>Contains commas like <code>"1,062"</code>; must parse to Whole Number.</td>
+            </tr>
+            <tr>
+              <td><code>churn_date</code></td>
+              <td>12.0%</td>
+              <td>0%</td>
+              <td>88.0% (24,820 empty)</td>
+              <td>980 Distinct Dates</td>
+              <td><strong>VALID NULL!</strong> Active customers haven't churned yet—do NOT delete these rows!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="Topic 4: Deduplication (Table.Distinct)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Row Deduplication</span>
+        <span class="tag tag-lab">00:48 – 00:54</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Removing Duplicate Rows (`Table.Distinct`)</h1>
+      <p class="slide-subtitle">If a subscriber appears twice in our master dimension table, we will double-count their revenue and distort churn!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Syntax & Variations</div>
+          <div class="code-block">
+            <span class="cm">// Variation 1: Remove exact row duplicates across ALL columns</span><br>
+            <span class="fn">Table.Distinct</span>(PreviousStep)<br><br>
+            <span class="cm">// Variation 2: Deduplicate based on Primary Key column ONLY</span><br>
+            <span class="fn">Table.Distinct</span>(PreviousStep, {<span class="str">"subscriber_id"</span>})
+          </div>
+          <p style="font-size:0.9rem;"><strong>UI Path:</strong> Select <code>subscriber_id</code> column → <code>Home → Remove Rows → Remove Duplicates</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Critical Power Query Trap: Case Sensitivity!</div>
+          <p>In Power Query, <code>"sub001"</code> and <code>"SUB001"</code> are treated as <strong>different</strong> values! Always run <code>Transform → Format → UPPERCASE</code> on ID columns <em>before</em> clicking Remove Duplicates.</p>
+          <p style="margin-top:0.5rem; color:var(--accent-teal);"><strong>JioWave Impact:</strong> Removes 200 duplicate rows, bringing <code>subscribers</code> from 28,200 down to exactly <strong>28,000</strong>.</p>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: How `Table.Distinct(Source, {"subscriber_id"})` Operates on `subscribers.csv`</span><span>Highlighted rows are kept vs. dropped</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Row #</th>
+              <th class="col-selected">subscriber_id (Key)</th>
+              <th>full_name</th>
+              <th>segment</th>
+              <th>city</th>
+              <th>tenure_days</th>
+              <th>Action Taken by Engine</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td>9877</td>
+              <td class="col-selected"><strong>SUB000064</strong></td>
+              <td>Amit Pillai</td>
+              <td>Broadband</td>
+              <td>Surat</td>
+              <td>672</td>
+              <td><span class="badge-pill" style="background:rgba(20,184,166,0.25);color:#5eead4;">KEPT (1st Occurrence)</span></td>
+            </tr>
+            <tr class="row-dropped">
+              <td>13011</td>
+              <td class="col-selected">SUB000064</td>
+              <td>Amit Pillai</td>
+              <td>Broadband</td>
+              <td>Surat</td>
+              <td>672</td>
+              <td><span class="badge-pill" style="background:rgba(244,63,94,0.25);color:#fda4af;">DROPPED (Duplicate Key)</span></td>
+            </tr>
+            <tr class="row-selected">
+              <td>4281</td>
+              <td class="col-selected"><strong>SUB000146</strong></td>
+              <td>Aaryan Mehta</td>
+              <td>Prepaid</td>
+              <td><em>null</em></td>
+              <td>1,005</td>
+              <td><span class="badge-pill" style="background:rgba(20,184,166,0.25);color:#5eead4;">KEPT (1st Occurrence)</span></td>
+            </tr>
+            <tr class="row-dropped">
+              <td>5341</td>
+              <td class="col-selected">SUB000146</td>
+              <td>Aaryan Mehta</td>
+              <td>Prepaid</td>
+              <td><em>null</em></td>
+              <td>1,005</td>
+              <td><span class="badge-pill" style="background:rgba(244,63,94,0.25);color:#fda4af;">DROPPED (Duplicate Key)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="Topic 5: Text Standardization (Trim, Clean, Proper)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Text Hygiene</span>
+        <span class="tag tag-lab">00:54 – 01:00</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Fixing Dirty Text (`Text.Proper`, `Text.Trim`, `Text.Clean`)</h1>
+      <p class="slide-subtitle">Why does JioWave appear to operate in 96 cities instead of 32? Because regional CRM portals typed city names inconsistently.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. `Text.Trim` (Spaces)</div>
+          <p>Removes leading and trailing spaces (e.g., <code>" Mumbai "</code> → <code>"Mumbai"</code>). Does not remove spaces between words like <code>"New Delhi"</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. `Text.Clean` (Hidden Chars)</div>
+          <p>Strips invisible line breaks (Alt+Enter) and tab characters copied from PDFs or web forms.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. `Text.Proper` (Title Case)</div>
+          <p>Capitalizes the first letter of every word: <code>"MUMBAI"</code> and <code>"mumbai"</code> both become <code>"Mumbai"</code>.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// M-Code generated via Transform → Format → Capitalize Each Word on `subscribers.csv`:</span><br>
+        ProperCity = <span class="fn">Table.TransformColumns</span>(DeduplicatedRows, {{<span class="str">"city"</span>, <span class="fn">Text.Proper</span>, <span class="kw">type text</span>}})
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: Standardizing `city` Column in `subscribers.csv`</span><span>96 Distinct Values → 32 Clean Cities</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>subscriber_id</th>
+              <th>full_name</th>
+              <th class="col-selected">city (Before Cleaning)</th>
+              <th class="col-selected">city (After `Text.Proper` + `Text.Trim`)</th>
+              <th>Impact on Bar Chart</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SUB002005</td>
+              <td>Aarav Joshi</td>
+              <td class="cell-dirty">MUMBAI</td>
+              <td class="row-selected"><strong>Mumbai</strong></td>
+              <td>Merged into single Mumbai bar</td>
+            </tr>
+            <tr>
+              <td>SUB008065</td>
+              <td>Kabir Pillai</td>
+              <td class="cell-dirty">coimbatore</td>
+              <td class="row-selected"><strong>Coimbatore</strong></td>
+              <td>Merged into single Coimbatore bar</td>
+            </tr>
+            <tr>
+              <td>SUB001639</td>
+              <td>Ishaan Mukherjee</td>
+              <td class="cell-dirty">CHENNAI</td>
+              <td class="row-selected"><strong>Chennai</strong></td>
+              <td>Merged into single Chennai bar</td>
+            </tr>
+            <tr>
+              <td>SUB027554</td>
+              <td>Arjun Agarwal</td>
+              <td class="cell-dirty">bengaluru</td>
+              <td class="row-selected"><strong>Bengaluru</strong></td>
+              <td>Merged into single Bengaluru bar</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 -->
+    <section class="slide" data-title="Topic 6: Handling Missing Values (Replace vs. Fill vs. Lookup)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: NULL Strategy</span>
+        <span class="tag tag-lab">01:00 – 01:06</span>
+      </div>
+      <h1 class="slide-title">Topic 6: Smart NULL Handling — Don't Blindly Delete Rows!</h1>
+      <p class="slide-subtitle">In `subscribers.csv`, 848 rows have `city = null`, yet every single one of those 848 rows has a valid `home_tower_id`!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Auditor's Rule: Never Throw Away a Voucher Because One Field Is Blank</div>
+        <p>If a customer invoice has a blank "City" field, do you tear up the invoice and lose ₹10,000 of recorded revenue? No! You look up the branch code on the invoice to find the city. Similarly, every JioWave subscriber has a <code>home_tower_id</code> (like <code>TW0081</code>), and <code>towers.csv</code> knows that <code>TW0081</code> is in <strong>Mumbai</strong>!</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. `Table.ReplaceValue`</div>
+          <p>Best when NULL has a known default label. Used on <code>full_name</code> (844 nulls → <code>"Unknown Subscriber"</code>) and <code>occupation</code> (622 nulls → <code>"Not Disclosed"</code>).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. `Table.FillDown` / `FillUp`</div>
+          <p>Used when exported Excel reports leave blank cells below a group header. <strong>Never</strong> use FillDown on subscriber tables (it copies the previous customer's city onto the next customer!).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Relational Lookup (`Merge`)</div>
+          <p>The gold-standard fix for JioWave's 848 NULL cities: match <code>subscribers[home_tower_id]</code> with <code>towers[tower_id]</code> to recover the exact city!</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// Syntax for replacing NULL text values in `subscribers.csv`:</span><br>
+        <span class="fn">Table.ReplaceValue</span>(PrevStep, <span class="kw">null</span>, <span class="str">"Unknown Subscriber"</span>, <span class="fn">Replacer.ReplaceValue</span>, {<span class="str">"full_name"</span>})
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Topic 7: Data Types & Locale Parsing">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Data Types</span>
+        <span class="tag tag-lab">01:06 – 01:12</span>
+      </div>
+      <h1 class="slide-title">Topic 7: Data Types — Why "1,062" Breaks Math</h1>
+      <p class="slide-subtitle">Power BI stores numbers, dates, and text differently. Wrong data types prevent SUM/AVERAGE calculations and break date filters.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Common Type Traps in JioWave</div>
+          <ul class="list-styled">
+            <li><strong><code>tenure_days</code> in `subscribers.csv`:</strong> Contains commas (<code>"1,062"</code>). Stored as Text (ABC). Must convert to <strong>Whole Number (123)</strong>.</li>
+            <li><strong><code>rental_inr</code> in `revenue_monthly.csv`:</strong> Has paise decimals (<code>309.58</code>). Use <strong>Decimal Number (1.2)</strong> or <strong>Fixed Decimal Currency ($)</strong>.</li>
+            <li><strong><code>signup_date</code> & <code>churn_date</code>:</strong> Stored as <code>YYYY-MM-DD</code>. Convert to <strong>Date</strong> (not Date/Time, which wastes memory).</li>
+            <li><strong><code>billing_cycle_day</code> & <code>age</code>:</strong> Always <strong>Whole Number</strong>.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Using Locale (`Change Type → Using Locale`)</div>
+          <p>When CSV dates arrive in Indian/UK format (<code>DD-MM-YYYY</code> like <code>25-02-2025</code>) on a US-configured laptop, standard Date conversion throws an <strong>Error</strong> on day 25!</p>
+          <div class="code-block">
+            <span class="fn">Table.TransformColumnTypes</span>(Source, {{<span class="str">"signup_date"</span>, <span class="kw">type date</span>}}, <span class="str">"en-IN"</span>)
+          </div>
+          <p style="font-size:0.88rem; color:var(--accent-teal);">Always specify <code>"en-IN"</code> (English - India) when parsing regional dates and comma-formatted numbers!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13 -->
+    <section class="slide" data-title="Topic 8: Filtering Rows & Selecting Columns">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 8: Row & Column Shaping</span>
+        <span class="tag tag-lab">01:12 – 01:18</span>
+      </div>
+      <h1 class="slide-title">Topic 8: `Table.SelectRows` & `Table.SelectColumns`</h1>
+      <p class="slide-subtitle">Slimming down wide tables speeds up Power BI reports and isolates specific business segments like Postpaid vs. Prepaid.</p>
+
+      <div class="code-block">
+        <span class="cm">// Example 1: Filter `plans.csv` to keep only active plans (where retire_date is null)</span><br>
+        ActivePlans = <span class="fn">Table.SelectRows</span>(PlansSource, <span class="kw">each</span> ([retire_date] = <span class="kw">null</span>))<br><br>
+        <span class="cm">// Example 2: Keep only essential columns from `towers.csv` for clean reporting</span><br>
+        SlimTowers = <span class="fn">Table.SelectColumns</span>(TowersSource, {<span class="str">"tower_id"</span>, <span class="str">"city"</span>, <span class="str">"tower_tier"</span>, <span class="str">"generation"</span>, <span class="str">"install_date"</span>})
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: `Table.SelectRows(plans, each [segment] = "Postpaid" and [is_premium_tier] = 1)`</span><span>Blue Columns = Selected • Green Rows = Matched Filter</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-selected">plan_id</th>
+              <th class="col-selected">plan_name</th>
+              <th class="col-selected">segment</th>
+              <th class="col-selected">monthly_rental_inr</th>
+              <th class="col-selected">data_quota_gb</th>
+              <th>is_premium_tier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-dropped">
+              <td class="col-selected">PL008</td>
+              <td class="col-selected">JioMega 499</td>
+              <td class="col-selected">Prepaid</td>
+              <td class="col-selected">499</td>
+              <td class="col-selected">50.0</td>
+              <td>0</td>
+            </tr>
+            <tr class="row-dropped">
+              <td class="col-selected">PL011</td>
+              <td class="col-selected">JioPost 499</td>
+              <td class="col-selected">Postpaid</td>
+              <td class="col-selected">499</td>
+              <td class="col-selected">75.0</td>
+              <td>0</td>
+            </tr>
+            <tr class="row-selected">
+              <td class="col-selected"><strong>PL012</strong></td>
+              <td class="col-selected"><strong>JioPost 699</strong></td>
+              <td class="col-selected"><strong>Postpaid</strong></td>
+              <td class="col-selected"><strong>699</strong></td>
+              <td class="col-selected"><strong>100.0</strong></td>
+              <td><strong>1</strong></td>
+            </tr>
+            <tr class="row-selected">
+              <td class="col-selected"><strong>PL013</strong></td>
+              <td class="col-selected"><strong>JioPost 999</strong></td>
+              <td class="col-selected"><strong>Postpaid</strong></td>
+              <td class="col-selected"><strong>999</strong></td>
+              <td class="col-selected"><strong>150.0</strong></td>
+              <td><strong>1</strong></td>
+            </tr>
+            <tr class="row-selected">
+              <td class="col-selected"><strong>PL016</strong></td>
+              <td class="col-selected"><strong>JioPremium 1999</strong></td>
+              <td class="col-selected"><strong>Postpaid</strong></td>
+              <td class="col-selected"><strong>1999</strong></td>
+              <td class="col-selected"><strong>500.0</strong></td>
+              <td><strong>1</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 14 -->
+    <section class="slide" data-title="Topic 9: Adding Columns & Conditional Logic">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 9: Feature Engineering</span>
+        <span class="tag tag-lab">01:18 – 01:24</span>
+      </div>
+      <h1 class="slide-title">Topic 9: Conditional Columns (`if ... then ... else`)</h1>
+      <p class="slide-subtitle">Remember Question 3? The CNO spent ₹47 Cr building 43 new towers in FY24–26. Let's tag towers as "Recent Capex" vs. "Legacy"!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">UI Path & M-Syntax</div>
+          <div class="ui-path">Add Column Tab → Conditional Column</div>
+          <div class="code-block">
+            <span class="cm">// Tagging `towers.csv` by install_date (FY24 starts 2023-04-01)</span><br>
+            <span class="fn">Table.AddColumn</span>(PrevStep, <span class="str">"Capex_Cycle"</span>, <span class="kw">each</span><br>
+            &nbsp;&nbsp;<span class="kw">if</span> [install_date] >= #date(2023, 4, 1) <span class="kw">then</span> <span class="str">"Recent Capex (FY24-26)"</span><br>
+            &nbsp;&nbsp;<span class="kw">else</span> <span class="str">"Legacy Tower"</span>, <span class="kw">type text</span>)
+          </div>
+          <p style="font-size:0.88rem; color:var(--accent-rose);"><strong>Syntax Warning:</strong> M-code uses lowercase <code>if ... then ... else</code> (never uppercase <code>IF</code> like Excel!).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Live Output Preview on `towers.csv`</div>
+          <div class="table-wrapper" style="margin:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>tower_id</th>
+                  <th>city</th>
+                  <th>install_date</th>
+                  <th class="col-selected">Capex_Cycle (New Column)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>TW0168</td>
+                  <td>Chennai</td>
+                  <td>2019-11-01</td>
+                  <td class="col-selected">Legacy Tower</td>
+                </tr>
+                <tr>
+                  <td>TW0081</td>
+                  <td>Mumbai</td>
+                  <td>2022-07-07</td>
+                  <td class="col-selected">Legacy Tower</td>
+                </tr>
+                <tr class="row-selected">
+                  <td>TW0214</td>
+                  <td>Jaipur</td>
+                  <td>2024-02-15</td>
+                  <td class="col-selected"><strong>Recent Capex (FY24-26)</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15 -->
+    <section class="slide" data-title="Topic 10: Splitting & Extracting Columns">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 10: Text Parsing</span>
+        <span class="tag tag-lab">01:24 – 01:30</span>
+      </div>
+      <h1 class="slide-title">Topic 10: Splitting & Extracting Strings (`Text.BeforeDelimiter`)</h1>
+      <p class="slide-subtitle">Look at `occupation` in `subscribers.csv`: values are stored as `"Salaried-IT"` and `"Salaried-NonIT"`. How do we separate employment type from sector?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Split Column by Delimiter (`-`)</div>
+          <p>Splits one column into two columns at the hyphen <code>"-"</code>.</p>
+          <div class="ui-path">Transform / Add Column → Split Column → By Delimiter → Custom ("-")</div>
+          <div class="code-block">
+            <span class="fn">Table.SplitColumn</span>(PrevStep, <span class="str">"occupation"</span>,<br>
+            &nbsp;&nbsp;<span class="fn">Splitter.SplitTextByDelimiter</span>(<span class="str">"-"</span>, QuoteStyle.Csv),<br>
+            &nbsp;&nbsp;{<span class="str">"Employment_Type"</span>, <span class="str">"Sector"</span>})
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Extract Text Before Delimiter</div>
+          <p>Extracts only the prefix without creating extra columns—great for pulling <code>"JioPost"</code> from <code>"JioPost 699"</code> in <code>plans.csv</code>!</p>
+          <div class="code-block">
+            <span class="fn">Table.AddColumn</span>(Plans, <span class="str">"Plan_Family"</span>,<br>
+            &nbsp;&nbsp;<span class="kw">each</span> <span class="fn">Text.BeforeDelimiter</span>([plan_name], <span class="str">" "</span>))
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 16 -->
+    <section class="slide" data-title="Topic 11: Merge Queries (The Power BI VLOOKUP)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 11: Relational Joins</span>
+        <span class="tag tag-lab">01:30 – 01:36</span>
+      </div>
+      <h1 class="slide-title">Topic 11: `Table.NestedJoin` (Merge Queries = Supercharged VLOOKUP)</h1>
+      <p class="slide-subtitle">Remember those 848 NULL cities in `subscribers.csv`? Let's rescue every single one using `towers.csv`!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">6 Join Kinds in Power Query</div>
+          <ul class="list-styled">
+            <li><strong>Left Outer (90% of cases):</strong> Keep all 28,000 rows from <code>subscribers</code>, bring matching city from <code>towers</code>.</li>
+            <li><strong>Inner Join:</strong> Keep only rows that exist in BOTH tables.</li>
+            <li><strong>Left Anti Join (Audit Superpower!):</strong> Find orphan records—e.g., subscribers whose <code>home_tower_id</code> does not exist in <code>towers.csv</code>!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Step-by-Step Rescue Workflow</div>
+          <ol class="list-styled">
+            <li>Open <code>subscribers</code> → <code>Home → Merge Queries</code>.</li>
+            <li>Select <code>home_tower_id</code> in <code>subscribers</code> and <code>tower_id</code> in <code>towers</code> (Left Outer).</li>
+            <li>Click the <strong>Expand (↔)</strong> icon on the new <code>towers</code> column, uncheck "Use original column name as prefix", and select <code>city</code> & <code>tower_tier</code>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: Rescuing Missing Cities via Left Outer Merge (`subscribers` ⋈ `towers`)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>subscriber_id</th>
+              <th>raw city (Dirty)</th>
+              <th class="col-selected">home_tower_id (Join Key)</th>
+              <th class="col-selected">towers.city (Joined)</th>
+              <th>towers.tower_tier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td>SUB014195</td>
+              <td class="cell-dirty"><em>null</em></td>
+              <td class="col-selected"><strong>TW0081</strong></td>
+              <td class="col-selected"><strong>Mumbai</strong> (Rescued!)</td>
+              <td>Metro</td>
+            </tr>
+            <tr class="row-selected">
+              <td>SUB000146</td>
+              <td class="cell-dirty"><em>null</em></td>
+              <td class="col-selected"><strong>TW0081</strong></td>
+              <td class="col-selected"><strong>Mumbai</strong> (Rescued!)</td>
+              <td>Metro</td>
+            </tr>
+            <tr>
+              <td>SUB019449</td>
+              <td class="cell-dirty"><em>null</em></td>
+              <td class="col-selected"><strong>TW0112</strong></td>
+              <td class="col-selected"><strong>Ahmedabad</strong> (Rescued!)</td>
+              <td>Metro</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 17 -->
+    <section class="slide" data-title="Topic 12: Append Queries (Stacking Tables Vertically)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 12: Vertical Stacking</span>
+        <span class="tag tag-module">01:36 – 01:40</span>
+      </div>
+      <h1 class="slide-title">Topic 12: `Table.Combine` (Append Queries = Stacking Ledgers)</h1>
+      <p class="slide-subtitle">Understand the difference between Merge (adding columns sideways) and Append (stacking rows vertically).</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Adding Columns vs. Stapling Pages</div>
+        <p><strong>Merge</strong> is like looking up a customer's address from an address book and writing it in a new column on the right. <strong>Append</strong> is like taking April's sales register, May's sales register, and June's sales register (all having the exact same column headers) and stapling them together into one Q1 Sales table.</p>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// M-Syntax when stacking regional or monthly extracts:</span><br>
+        CombinedRevenue = <span class="fn">Table.Combine</span>({Revenue_FY24, Revenue_FY25, Revenue_FY26})
+      </div>
+      <p style="font-size:0.9rem; color:var(--text-muted);"><strong>Golden Rule of Append:</strong> Column names must match <em>exactly</em> (including spelling and case). If one table calls it <code>Revenue</code> and another calls it <code>revenue_inr</code>, Power Query creates two separate columns with NULLs!</p>
+    </section>
+
+    <!-- SLIDE 18 -->
+    <section class="slide" data-title="Topic 13: Group By (`Table.Group` Summary Tables)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 13: Pre-Aggregation</span>
+        <span class="tag tag-lab">01:40 – 01:45</span>
+      </div>
+      <h1 class="slide-title">Topic 13: `Table.Group` — Summarizing 564,274 Usage Rows</h1>
+      <p class="slide-subtitle">Before loading half a million monthly usage records, analysts often group data to detect extreme "Data Hogs" (subscribers consuming 50+ GB/month).</p>
+
+      <div class="code-block">
+        <span class="cm">// Summarize `usage_monthly.csv` by subscriber_id to get Total Data GB & Avg Voice Minutes:</span><br>
+        GroupedUsage = <span class="fn">Table.Group</span>(UsageSource, {<span class="str">"subscriber_id"</span>}, {<br>
+        &nbsp;&nbsp;{<span class="str">"Total_Data_GB"</span>, <span class="kw">each</span> <span class="fn">List.Sum</span>([data_consumed_gb]), <span class="kw">type number</span>},<br>
+        &nbsp;&nbsp;{<span class="str">"Active_Months"</span>, <span class="kw">each</span> <span class="fn">Table.RowCount</span>(_), Int64.Type}<br>
+        })
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Visual Trace: `Table.Group` Collapsing Monthly Rows into Subscriber Totals (`usage_monthly.csv`)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Raw `usage_monthly` (564,274 Rows)</th>
+              <th>→</th>
+              <th>Grouped Output (1 Row per Subscriber)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>SUB000001 | 2024-05 | 77.74 GB</code><br><code>SUB000001 | 2024-06 | 29.93 GB</code><br><code>SUB000001 | 2024-07 | 19.39 GB</code></td>
+              <td style="text-align:center; font-weight:800; color:var(--accent-gold);">Group By<br><code>subscriber_id</code></td>
+              <td class="row-selected"><code>SUB000001 | Total_Data_GB: 127.06 | Active_Months: 3</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 19 -->
+    <section class="slide" data-title="Topic 14: Pivoting & Unpivoting (Wide vs. Tall Data)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 14: Reshaping Tables</span>
+        <span class="tag tag-module">01:45 – 01:49</span>
+      </div>
+      <h1 class="slide-title">Topic 14: Unpivot Columns (`Table.UnpivotOtherColumns`)</h1>
+      <p class="slide-subtitle">The single most important button in Power BI when finance teams send you cross-tab Excel budgets (Jan, Feb, Mar as columns).</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Human-Readable (Wide Format — Bad for BI)</div>
+          <table style="font-size:0.8rem;">
+            <thead><tr><th>City</th><th>Apr-25</th><th>May-25</th><th>Jun-25</th></tr></thead>
+            <tbody><tr><td>Mumbai</td><td>₹12 Cr</td><td>₹12.5 Cr</td><td>₹13 Cr</td></tr></tbody>
+          </table>
+          <p style="font-size:0.85rem; margin-top:0.5rem; color:var(--accent-rose);">Power BI cannot filter by a single "Month" slicer if every month is a separate column!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Machine-Readable (Tall Format — Ideal for BI)</div>
+          <table style="font-size:0.8rem;">
+            <thead><tr><th>City</th><th>Month</th><th>Revenue</th></tr></thead>
+            <tbody>
+              <tr class="row-selected"><td>Mumbai</td><td>Apr-25</td><td>₹12.0 Cr</td></tr>
+              <tr class="row-selected"><td>Mumbai</td><td>May-25</td><td>₹12.5 Cr</td></tr>
+              <tr class="row-selected"><td>Mumbai</td><td>Jun-25</td><td>₹13.0 Cr</td></tr>
+            </tbody>
+          </table>
+          <div class="ui-path">Select `City` → Transform → Unpivot Other Columns</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 20 -->
+    <section class="slide" data-title="Topic 15: Query Diagnostics & Performance Rules">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 15: Best Practices</span>
+        <span class="tag tag-module">01:49 – 01:52</span>
+      </div>
+      <h1 class="slide-title">Topic 15: Power Query Hygiene & Performance Best Practices</h1>
+      <p class="slide-subtitle">Five habits that separate a ₹15 LPA Data Analyst from a spreadsheet hobbyist.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">1. Rename Your Applied Steps!</div>
+          <p>Instead of leaving <code>Changed Type1</code>, <code>Replaced Value2</code>, right-click and rename steps to <code>01_Removed_Duplicate_Subs</code>, <code>02_Standardized_City_Case</code>. Your future self (and your interviewer) will thank you.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Filter Early, Sort Late (or Never)</div>
+          <p>Always filter out unnecessary rows at the <em>top</em> of Applied Steps. Never sort tables inside Power Query—sorting 564,274 rows slows refresh speed and gets overridden by visuals anyway.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Disable Load on Staging Queries</div>
+          <p>If you import a helper table only to Merge it into another table, right-click the helper query and uncheck <strong>Enable Load</strong> so it doesn't bloat your Power BI data model.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">4. Document Your Data Quality Log</div>
+          <p>Remember the JioWave Grading Rubric (10% weight): every assumption (like rescuing NULL cities via <code>home_tower_id</code>) must be documented in <code>JioWave_Build_Notes.md</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 21: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Live Demo: Solving the Subscriber Audit">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:52 – 01:55</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Auditing & Cleaning `subscribers.csv`</h1>
+      <p class="slide-subtitle">Watch how the instructor traces exact transformations on the live JioWave subscriber extract before revealing the verified numbers.</p>
+
+      <div class="card">
+        <div class="card-title">Business Problem Statement (CMO Pre-Audit Check)</div>
+        <p>Before calculating JioWave's true churn rate, Rashmi asks: <em>"How many unique subscribers do we actually have, what is the exact city of subscriber <code>SUB014195</code> whose city field is blank, and how many clean cities do we operate in?"</em></p>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Live Audit Extract: `subscribers.csv` + `towers.csv` Lookup</span><span>Click "Reveal Instructor Solution" below to highlight target cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Row #</th>
+              <th>subscriber_id</th>
+              <th>full_name</th>
+              <th>raw city</th>
+              <th>home_tower_id</th>
+              <th>tenure_days</th>
+              <th>Verified Clean City</th>
+              <th>Deduplication Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>9877</td>
+              <td>SUB000064</td>
+              <td>Amit Pillai</td>
+              <td>Surat</td>
+              <td>TW0118</td>
+              <td>672</td>
+              <td>Surat</td>
+              <td>Kept (Unique ID #1)</td>
+            </tr>
+            <tr>
+              <td>13011</td>
+              <td>SUB000064</td>
+              <td>Amit Pillai</td>
+              <td>Surat</td>
+              <td>TW0118</td>
+              <td>672</td>
+              <td>Surat</td>
+              <td class="cell-target" id="inst-c1">DROPPED (Duplicate #1 of 200)</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>SUB014195</td>
+              <td><em>null</em></td>
+              <td class="cell-dirty"><em>null</em></td>
+              <td><strong>TW0081</strong></td>
+              <td>358</td>
+              <td class="cell-target" id="inst-c2">Mumbai (via TW0081)</td>
+              <td>Kept (Unique ID #2)</td>
+            </tr>
+            <tr>
+              <td>35</td>
+              <td>SUB002005</td>
+              <td>Aarav Joshi</td>
+              <td class="cell-dirty">MUMBAI</td>
+              <td>TW0088</td>
+              <td>854</td>
+              <td class="cell-target" id="inst-c3">Mumbai (via Text.Proper)</td>
+              <td>Kept (Unique ID #3)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor M-Pipeline Execution Check:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('inst-ans', ['inst-c1', 'inst-c2', 'inst-c3'])">🔍 Reveal Instructor Solution & Highlight Cells</button>
+          <button class="btn" onclick="resetSim('inst-ans', ['inst-c1', 'inst-c2', 'inst-c3'])">↺ Reset Table</button>
+        </div>
+        <div class="answer-drawer" id="inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Verified Instructor Solution (Step-by-Step):</h4>
+          <ol class="list-styled">
+            <li><strong>True Unique Subscribers:</strong> Raw file has <code>28,200</code> rows. Running <code>Table.Distinct(Source, {"subscriber_id"})</code> removes <strong>200 exact duplicate rows</strong>, leaving exactly <strong>28,000 unique subscribers</strong>.</li>
+            <li><strong>Rescuing <code>SUB014195</code>:</strong> Performing a Left Outer Merge on <code>home_tower_id = "TW0081"</code> against <code>towers.csv</code> reveals <code>TW0081</code> is located in <strong>Mumbai</strong> (Metro tier).</li>
+            <li><strong>Standardized City Count:</strong> Applying <code>Text.Proper</code> + <code>Text.Trim</code> collapses 96 raw uppercase/lowercase strings into exactly <strong>32 standardized Indian cities</strong>.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 22: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Plan Portfolio Filter & Cleaning">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:55 – 01:57</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Isolating Active Postpaid Plans</h1>
+      <p class="slide-subtitle">Solve this using the `plans.csv` extract below, then click the simulator button to verify your expected output cells.</p>
+
+      <div class="card">
+        <div class="card-title">Task for Students</div>
+        <p>Rashmi wants to examine only <strong>active Postpaid plans</strong> (where <code>retire_date</code> is <code>null</code> and <code>segment = "Postpaid"</code>) and extract the <strong>Plan Prefix</strong> before the space (e.g., <code>"JioPost"</code> from <code>"JioPost 699"</code>). Which rows survive the filter, and what is the extracted prefix for <code>PL015</code>?</p>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`plans.csv` Sample Extract (6 of 24 Plans)</span><span>Predict which cells light up before clicking Reveal!</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>plan_id</th>
+              <th>plan_name</th>
+              <th>segment</th>
+              <th>monthly_rental_inr</th>
+              <th>retire_date</th>
+              <th>Extracted Prefix (`Text.BeforeDelimiter`)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PL008</td>
+              <td>JioMega 499</td>
+              <td>Prepaid</td>
+              <td>499</td>
+              <td><em>null</em></td>
+              <td>Excluded (Prepaid)</td>
+            </tr>
+            <tr>
+              <td>PL012</td>
+              <td>JioPost 699</td>
+              <td>Postpaid</td>
+              <td>699</td>
+              <td><em>null</em></td>
+              <td class="cell-target" id="stu1-c1">JioPost (Kept)</td>
+            </tr>
+            <tr>
+              <td>PL015</td>
+              <td>JioPostFree6 399</td>
+              <td>Postpaid</td>
+              <td>399</td>
+              <td><em>null</em></td>
+              <td class="cell-target" id="stu1-c2">JioPostFree6 (Kept)</td>
+            </tr>
+            <tr>
+              <td>PL020</td>
+              <td>JioFiber 1499</td>
+              <td>Broadband</td>
+              <td>1499</td>
+              <td><em>null</em></td>
+              <td>Excluded (Broadband)</td>
+            </tr>
+            <tr>
+              <td>PL023</td>
+              <td>JioLegacy 199</td>
+              <td>Prepaid</td>
+              <td>199</td>
+              <td>2024-01-01</td>
+              <td>Excluded (Retired & Prepaid)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('stu1-ans', ['stu1-c1', 'stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('stu1-ans', ['stu1-c1', 'stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Correct Answer & M-Code Verification:</h4>
+          <ul class="list-styled">
+            <li><strong>Surviving Rows:</strong> Only <strong>PL012</strong> and <strong>PL015</strong> match both <code>[segment] = "Postpaid"</code> and <code>[retire_date] = null</code>.</li>
+            <li><strong>Extracted Prefix for <code>PL015</code>:</strong> <code>Text.BeforeDelimiter("JioPostFree6 399", " ")</code> returns <strong><code>JioPostFree6</code></strong> (notice how <code>PL015</code> is a special promotional plan launched July 2024—keep your eye on it in Q1 churn analysis!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 23: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Overage & Revenue Calculation">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:57 – 01:59</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Auditing Out-of-Bundle Billing (`revenue_monthly.csv`)</h1>
+      <p class="slide-subtitle">Combine data-type conversion with conditional column logic on subscriber `SUB000001`.</p>
+
+      <div class="card">
+        <div class="card-title">Task for Students</div>
+        <p>Look at <code>SUB000001</code>'s first 3 billing rows in <code>revenue_monthly.csv</code>. Notice that <code>total_inr = rental_inr + overage_inr + addon_inr</code>. Write a Conditional Column rule called <code>Billing_Alert</code> that outputs <strong><code>"High Overage (>50% of Rental)"</code></strong> whenever <code>overage_inr > (0.5 * rental_inr)</code>, else <code>"Normal Bill"</code>. Which row triggers the alert, and what is <code>SUB000001</code>'s 3-month total revenue?</p>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`revenue_monthly.csv` Real Rows for `SUB000001`</span><span>Verify arithmetic & conditional cell</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>revenue_id</th>
+              <th>revenue_month</th>
+              <th>rental_inr</th>
+              <th>overage_inr</th>
+              <th>addon_inr</th>
+              <th>total_inr</th>
+              <th>Billing_Alert (Conditional Column)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>REV0000001</td>
+              <td>2024-05-01</td>
+              <td>499.00</td>
+              <td class="cell-target" id="stu2-c1">309.58</td>
+              <td>0.00</td>
+              <td>808.58</td>
+              <td class="cell-target" id="stu2-c2">High Overage (>50% of Rental)</td>
+            </tr>
+            <tr>
+              <td>REV0000002</td>
+              <td>2024-06-01</td>
+              <td>499.00</td>
+              <td>0.00</td>
+              <td>0.00</td>
+              <td>499.00</td>
+              <td>Normal Bill</td>
+            </tr>
+            <tr>
+              <td>REV0000003</td>
+              <td>2024-07-01</td>
+              <td>499.00</td>
+              <td>0.00</td>
+              <td>0.00</td>
+              <td>499.00</td>
+              <td>Normal Bill</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('stu2-ans', ['stu2-c1', 'stu2-c2'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('stu2-ans', ['stu2-c1', 'stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Correct Answer & Arithmetic Proof:</h4>
+          <ul class="list-styled">
+            <li><strong>50% Rental Threshold:</strong> <code>0.5 × 499.00 = ₹249.50</code>.</li>
+            <li><strong>Triggered Row:</strong> In <code>REV0000001</code> (May 2024), <code>overage_inr = ₹309.58</code> (which exceeds ₹249.50—caused by consuming 77.74 GB on a 50 GB plan!).</li>
+            <li><strong>3-Month Total Revenue:</strong> <code>808.58 + 499.00 + 499.00 = ₹1,806.58</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 24 -->
+    <section class="slide" data-title="Day 01 Capstone Checklist & 5-Page Blueprint">
+      <div class="slide-meta">
+        <span class="tag tag-module">End-of-Day Milestone</span>
+        <span class="tag tag-theory">01:59 – 02:00</span>
+      </div>
+      <h1 class="slide-title">Day 01 Milestone Achieved + Our 5-Page Report Blueprint</h1>
+      <p class="slide-subtitle">Every single clean query you built today feeds directly into our 5-page board-ready Power BI deliverable by Day 10.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>The 5-Page JioWave Executive Dashboard Architecture (Target: Day 10)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Page #</th>
+              <th>Report Page Title</th>
+              <th>Primary Stakeholder</th>
+              <th>Core Business Question Answered</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Page 1</strong></td>
+              <td><strong>Executive Morning Brief (7:45 AM View)</strong></td>
+              <td>Rashmi Iyer (CMO) & Manish Kalra (CEO)</td>
+              <td>6 KPI cards with MoM trends + Watchlist flagging the 61.3% churn cohort</td>
+            </tr>
+            <tr>
+              <td><strong>Page 2</strong></td>
+              <td><strong>Cohort Churn Forensics (Q1)</strong></td>
+              <td>Rashmi Iyer (CMO)</td>
+              <td>Vintage Quarter × Plan × City Tier heatmap isolating the 2024Q3 × PL015 × Tier-2 cohort</td>
+            </tr>
+            <tr>
+              <td><strong>Page 3</strong></td>
+              <td><strong>ARPU & Migration Economics (Q2)</strong></td>
+              <td>Rohan Bose (CFO)</td>
+              <td>Premium ARPU drop (₹704 → ₹659), Mix vs. Rate effect, and 3.68× down-migration pressure</td>
+            </tr>
+            <tr>
+              <td><strong>Page 4</strong></td>
+              <td><strong>Network Capex & Tower Utilization (Q3)</strong></td>
+              <td>Vikram Tandon (CNO)</td>
+              <td>Traffic share of 43 recent-capex towers (₹47 Cr) vs. legacy towers & downtime churn spikes</td>
+            </tr>
+            <tr>
+              <td><strong>Page 5</strong></td>
+              <td><strong>Plan Portfolio & 90-Day Playbook (Q4)</strong></td>
+              <td>Board of Directors</td>
+              <td>5 plans to retire, 2 new plans to launch, migration simulation & FY27 Rupee impact</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 25 -->
+    <section class="slide" data-title="Homework & Day 02 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Action Items</span>
+        <span class="tag tag-lab">Take-Home Lab</span>
+      </div>
+      <h1 class="slide-title">Your Day 01 Take-Home Assignment & Day 02 Preview</h1>
+      <p class="slide-subtitle">Complete these 4 tasks in Power BI Desktop tonight so your `.pbix` file is ready for Data Modeling tomorrow.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Hands-On Checklist (30 Mins)</div>
+          <ol class="list-styled">
+            <li>Import all 9 CSV files from <code>JioWave_CSV_Files</code> into Power BI Desktop via Power Query.</li>
+            <li>Clean <code>subscribers.csv</code>: deduplicate <code>subscriber_id</code> (28,200 → 28,000), standardize <code>city</code> to Title Case, rescue 848 NULL cities via Left Outer Merge with <code>towers.csv</code>, and parse <code>tenure_days</code> as Whole Number.</li>
+            <li>Add the <code>Capex_Cycle</code> conditional column to <code>towers.csv</code> (<code>install_date >= 2023-04-01</code>).</li>
+            <li>Save your file as <code>JioWave_Day01_Cleaned.pbix</code>.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 02 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Advanced Power Query:</strong> Custom M Functions, Parameters, Query Folding, and handling the <code>subscriptions.csv</code> start/end date logic.</li>
+            <li><strong>Intro to Star Schema:</strong> Separating Fact tables (564K rows) from Dimension tables (24–28K rows) and building a dynamic DAX Calendar table.</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Ready for Day 02? Send "Day 2" whenever you want the next 25-slide interactive deck!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  // Build Sidebar Navigation Dynamically
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  // Keyboard Navigation (Left / Right Arrows)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  // Simulator Reveal & Reset Functions
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  // Initialize Button States
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

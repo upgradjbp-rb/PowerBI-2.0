@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 10 Grand Finale: RLS, Mobile Layout, Publishing & Capstone Submission</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #1e1b18;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-gold); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal), var(--accent-purple));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 285px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: var(--accent-gold);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(20, 184, 166, 0.1));
+    border-left: 4px solid var(--accent-gold);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: var(--accent-gold); font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  .phone-frame {
+    max-width: 310px;
+    margin: 0 auto;
+    background: #090d16;
+    border: 3px solid var(--accent-gold);
+    border-radius: 24px;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .phone-card {
+    background: var(--bg-card);
+    border-left: 4px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">GRAND FINALE • DAY 10</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 10 (2 Hours) • Row-Level Security (RLS), Mobile Layout, Power BI Service Refresh & Final Capstone Package</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 20</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 10 Grand Finale (20 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 10 Grand Finale: From Laptop `.pbix` to Enterprise Production">
+      <div class="slide-meta">
+        <span class="tag tag-module">Grand Finale Overview</span>
+        <span class="tag tag-theory">00:00 – 00:08</span>
+      </div>
+      <h1 class="slide-title">Grand Finale (Day 10): Taking JioWave Live to the Boardroom & C-Suite Phones</h1>
+      <p class="slide-subtitle">Look at Step 6 of the Workflow on Page 14 of the JioWave Brief: "Publish to Power BI Service. Configure RLS on city/region. Schedule daily refresh at 06:00 so Rashmi sees the dashboard refresh on her phone at 06:01!"</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Governance Analogy: Branch Manager Access vs. CFO Master View</div>
+        <p>In a multi-branch bank or retail chain, the <strong>West Zone Regional Manager</strong> should only see Mumbai, Pune, Ahmedabad, and Surat ledgers—never competitor zones—while <strong>CMO Rashmi Iyer</strong> sees All-India! In Power BI, we build <strong>one single 5-page report</strong> and use <strong>Row-Level Security (RLS)</strong> to automatically filter rows based on who logs in.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Governance & Security (RLS)</div>
+          <p>Static & Dynamic Row-Level Security roles so Zonal RMs see only their assigned region while executives see all 32 cities.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Mobile Phone Layout</div>
+          <p>Designing the vertical 7:45 AM Phone View for Page 1 so KPI cards and hero trends render crisply on iOS/Android.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Service Publishing & Capstone</div>
+          <p>Publishing to Power BI Service, configuring 6:00 AM scheduled refresh, and finalizing all 4 graded submission files!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Static Row-Level Security (RLS) in Power BI Desktop">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Data Governance (RLS)</span>
+        <span class="tag tag-lab">00:08 – 00:18</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Static Row-Level Security (`Modeling → Manage Roles`)</h1>
+      <p class="slide-subtitle">Because we built a clean Star Schema in Day 2, filtering `dim_subscribers[region]` automatically cascades downhill to filter `fact_revenue_monthly` and `fact_usage_monthly`!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">4-Step Static RLS Setup</div>
+          <ol class="list-styled">
+            <li>Go to <code>Modeling Tab → Security Group → Manage roles</code>.</li>
+            <li>Click <strong>+ New</strong> and create 5 regional roles: <code>RM_North</code>, <code>RM_South</code>, <code>RM_West</code>, <code>RM_East</code>, <code>RM_Central</code> (plus <code>Executive_All_India</code> with no filter).</li>
+            <li>Select <code>dim_subscribers</code> and enter the DAX filter expression: <code>[region] = "West"</code>.</li>
+            <li>Click <strong>Save</strong>, then click <strong>View as</strong> (Modeling Tab) and check <code>RM_West</code> to watch all 5 pages instantly recalculate for West Zone only!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">DAX Filter Expressions for Each Role</div>
+          <div class="code-block">
+            <span class="cm">// Role: RM_West (Applied on dim_subscribers)</span><br>
+            dim_subscribers[region] = <span class="str">"West"</span><br><br>
+            <span class="cm">// Role: RM_South</span><br>
+            dim_subscribers[region] = <span class="str">"South"</span><br><br>
+            <span class="cm">// Role: Executive_CMO (No filter = Full 28,000 base)</span><br>
+            <span class="kw">TRUE</span>()
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Dynamic Row-Level Security (`USERPRINCIPALNAME()`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Enterprise Dynamic RLS</span>
+        <span class="tag tag-lab">00:18 – 00:26</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Dynamic RLS with `USERPRINCIPALNAME()` (Interview Favorite!)</h1>
+      <p class="slide-subtitle">What if JioWave has 32 City Managers? Creating 32 manual roles is tedious. Instead, use ONE dynamic role tied to the logged-in user's corporate email!</p>
+
+      <div class="code-block">
+        <span class="cm">// Step 1: Maintain a small lookup table `dim_security_access` (Email | Assigned_City)</span><br>
+        <span class="cm">// Step 2: Create ONE role called `Dynamic_City_Manager` with this DAX rule:</span><br><br>
+        dim_security_access[Manager_Email] = <span class="fn">USERPRINCIPALNAME</span>()
+      </div>
+      <p style="font-size:0.9rem; color:var(--accent-teal);"><strong>How It Works:</strong> When <code>priya.sharma@jiowave.in</code> opens the dashboard on her laptop or phone, <code>USERPRINCIPALNAME()</code> detects her email, filters <code>dim_security_access</code> to <em>Pune</em>, and filters the entire Star Schema to Pune automatically!</p>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Designing the Mobile Phone Layout (`View → Mobile Layout`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Mobile UX Design</span>
+        <span class="tag tag-lab">00:26 – 00:36</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Mobile Layout — Optimizing Page 1 for CMO Rashmi's 7:45 AM Phone View</h1>
+      <p class="slide-subtitle">Desktop 16:9 widescreen charts look tiny on a smartphone screen unless you configure Power BI's dedicated Mobile Layout canvas.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Step-by-Step Mobile Canvas Configuration</div>
+          <ol class="list-styled">
+            <li>Open <strong>Page 1 (Executive Morning Brief)</strong>.</li>
+            <li>Go to <code>View Tab → Mobile layout</code> (a vertical smartphone frame appears on screen).</li>
+            <li>Drag only the <strong>top 4 KPI cards</strong>, the <strong>Tier ARPU Line Chart</strong>, and the <strong>Top At-Risk Cohort Watchlist</strong> onto the vertical phone grid.</li>
+            <li>Leave dense multi-column tables off the phone view—Rashmi uses Desktop/iPad for deep drill-downs!</li>
+          </ol>
+        </div>
+        <div>
+          <div class="phone-frame">
+            <div style="text-align:center; font-size:0.75rem; color:var(--accent-gold); font-weight:800; margin-bottom:0.5rem;">📱 07:45 AM • JIOWAVE CMO BRIEF</div>
+            <div class="phone-card"><strong>Annual Churn Rate:</strong> 11.97% <span style="color:var(--accent-teal);">(✓ ≤12%)</span></div>
+            <div class="phone-card" style="border-left-color:var(--accent-rose);"><strong>Worst Cohort (2024Q3 PL015):</strong> 68.43% <span style="color:var(--accent-rose);">(▲ 5.7×)</span></div>
+            <div class="phone-card" style="border-left-color:var(--accent-gold);"><strong>Premium ARPU (Mar 26):</strong> ₹687.60 <span style="color:var(--accent-gold);">(▲ &lt;₹700)</span></div>
+            <div class="phone-card" style="border-left-color:var(--accent-rose);"><strong>Down/Up Migration Ratio:</strong> 3.68× <span style="color:var(--accent-rose);">(▲ Pressure)</span></div>
+            <div class="phone-card" style="border-left-color:var(--accent-blue); text-align:center;">[Interactive Tier ARPU Trend Chart]</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Performance Analyzer & Model Optimization">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Speed & Tuning</span>
+        <span class="tag tag-lab">00:36 – 00:46</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Performance Analyzer — Making Every Page Load in Under 1 Second</h1>
+      <p class="slide-subtitle">Before publishing to Power BI Service, run the built-in Performance Analyzer (`View → Performance analyzer`) to catch slow visuals.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Check Visual Load Times</div>
+          <p>Click <strong>Start recording → Refresh visuals</strong>. Inspect <em>DAX query</em> time vs. <em>Visual display</em> time. Any visual taking &gt;1,500 ms needs optimization.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Keep Visuals ≤ 6 per Page</div>
+          <p>Every visual sends a separate DAX query to the engine. Six focused visuals load in 400 ms; twenty cluttered visuals crawl.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Turn Off Auto Date/Time</div>
+          <p>Verify <code>File → Options → Data Load → Auto date/time</code> is unchecked so hidden date tables don't waste memory.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Publishing to Power BI Service, Gateways & 06:00 AM Refresh">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 5: Cloud Deployment</span>
+        <span class="tag tag-lab">00:46 – 00:56</span>
+      </div>
+      <h1 class="slide-title">Topic 5: Publishing to Power BI Service & Scheduling Daily 06:00 AM Refresh</h1>
+      <p class="slide-subtitle">Power BI Desktop is where you author; Power BI Service (`app.powerbi.com`) is where executives consume and collaborate.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Deployment & Refresh Pipeline</div>
+          <ol class="list-styled">
+            <li>Click <code>Home Tab → Publish</code> and choose your workspace (e.g., <code>JioWave_Executive_Analytics</code>).</li>
+            <li>In Power BI Service, open the <strong>Semantic Model Settings</strong>: configure your <strong>On-premises Data Gateway</strong> (if reading local CSV folder) or Cloud credentials.</li>
+            <li>Expand <strong>Refresh → Schedule refresh</strong>: turn ON, set Frequency = <code>Daily</code>, Time = <code>06:00 AM IST</code>.</li>
+            <li>Go to <strong>Security</strong> on the Semantic Model and assign Zonal RMs to their RLS roles (<code>RM_West</code>, <code>RM_South</code>, etc.).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Creating a Power BI App for C-Suite</div>
+          <p>Package the 5-page report into a clean <strong>Power BI App</strong> with left-hand navigation tabs and share the direct link with Rashmi Iyer, Vikram Tandon, Rohan Bose, and Manish Kalra—so they can't accidentally edit formulas while exploring!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Verifying RLS Output Across All 5 Regions">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">00:56 – 01:04</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Testing Row-Level Security (`View As Role`) Across All 5 Regions</h1>
+      <p class="slide-subtitle">When the instructor switches roles in `Modeling → View as`, watch how every KPI on Page 1 dynamically updates to reflect only that Zonal Manager's territory!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified RLS Territory Partition (`dim_subscribers` ➔ `fact_revenue_monthly`)</span><span>Click Reveal to highlight the worst-churning & highest-revenue regions</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>RLS Role (`dim_subscribers[region]`)</th>
+              <th>Subscribers</th>
+              <th>Churned</th>
+              <th>Regional Churn Rate %</th>
+              <th>Total Revenue (Cr)</th>
+              <th>Row Avg ARPU</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>RM_Central</code> (<code>[region] = "Central"</code>)</td>
+              <td>1,884</td>
+              <td>277</td>
+              <td class="cell-target" id="d10-inst-1">14.70% (Highest Churn!)</td>
+              <td>₹1.55 Cr</td>
+              <td>₹418.64</td>
+            </tr>
+            <tr>
+              <td><code>RM_North</code> (<code>[region] = "North"</code>)</td>
+              <td>6,799</td>
+              <td>871</td>
+              <td>12.81%</td>
+              <td>₹6.77 Cr</td>
+              <td>₹497.03</td>
+            </tr>
+            <tr>
+              <td><code>RM_East</code> (<code>[region] = "East"</code>)</td>
+              <td>3,747</td>
+              <td>479</td>
+              <td>12.78%</td>
+              <td>₹3.74 Cr</td>
+              <td>₹495.99</td>
+            </tr>
+            <tr>
+              <td><code>RM_South</code> (<code>[region] = "South"</code>)</td>
+              <td>8,389</td>
+              <td>961</td>
+              <td>11.46%</td>
+              <td class="cell-target" id="d10-inst-2">₹8.82 Cr (#1 Revenue!)</td>
+              <td>₹516.26</td>
+            </tr>
+            <tr>
+              <td><code>RM_West</code> (<code>[region] = "West"</code>)</td>
+              <td>7,181</td>
+              <td>764</td>
+              <td class="cell-target" id="d10-inst-3">10.64% (Best Retention!)</td>
+              <td>₹7.39 Cr</td>
+              <td>₹510.02</td>
+            </tr>
+            <tr class="row-selected">
+              <td><code>Executive_CMO</code> (All-India Unfiltered)</td>
+              <td><strong>28,000</strong></td>
+              <td><strong>3,352</strong></td>
+              <td><strong>11.97%</strong></td>
+              <td><strong>₹28.26 Cr</strong></td>
+              <td><strong>₹500.90</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor RLS Verification Check:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d10-inst-ans', ['d10-inst-1', 'd10-inst-2', 'd10-inst-3'])">🔍 Reveal Instructor RLS Audit</button>
+          <button class="btn" onclick="resetSim('d10-inst-ans', ['d10-inst-1', 'd10-inst-2', 'd10-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d10-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Reconciliation Proof (100% Partition Accuracy):</h4>
+          <p><code>1,884 + 6,799 + 3,747 + 8,389 + 7,181 = <strong>28,000 exact subscribers</strong></code> and <code>₹1.55 + ₹6.77 + ₹3.74 + ₹8.82 + ₹7.39 = <strong>₹28.26 Cr exact revenue</strong></code>! Notice how <strong>Central Region (14.70% churn)</strong> needs urgent retention intervention while <strong>West Region (10.64% churn)</strong> serves as our operational benchmark!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Verifying Combined South + West RLS Role">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:04 – 01:10</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Writing & Testing a Dual-Region RLS Rule (`South + West`)</h1>
+      <p class="slide-subtitle">Suppose JioWave appoints one Senior VP covering both `South` and `West` regions (`dim_subscribers[region] IN {"South", "West"}`). Using the verified regional table from Slide 7, compute the combined Subscribers, Churned Subscribers, and Combined Churn Rate % for that Senior VP's view!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`VP_South_West` RLS Role Verification</span><span>Predict the 3 Combined Totals</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Scope</th>
+              <th>Subscribers</th>
+              <th>Churned Subscribers</th>
+              <th>Churn Rate %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>South Region</td>
+              <td>8,389</td>
+              <td>961</td>
+              <td>11.46%</td>
+            </tr>
+            <tr>
+              <td>West Region</td>
+              <td>7,181</td>
+              <td>764</td>
+              <td>10.64%</td>
+            </tr>
+            <tr>
+              <td><strong>Combined `VP_South_West` View</strong></td>
+              <td class="cell-target" id="d10-stu1-c1">15,570 (55.6% of JioWave)</td>
+              <td class="cell-target" id="d10-stu1-c2">1,725</td>
+              <td class="cell-target" id="d10-stu1-c3">11.08%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d10-stu1-ans', ['d10-stu1-c1', 'd10-stu1-c2', 'd10-stu1-c3'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d10-stu1-ans', ['d10-stu1-c1', 'd10-stu1-c2', 'd10-stu1-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d10-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact RLS Verification:</h4>
+          <p><code>Subscribers = 8,389 + 7,181 = <strong>15,570</strong></code> | <code>Churned = 961 + 764 = <strong>1,725</strong></code> | <code>Combined Churn % = 1,725 ÷ 15,570 = <strong>11.08%</strong></code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Final Capstone Submission Audit (All 4 Deliverables)">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:10 – 01:16</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Pre-Submission Audit Against the 100-Point Grading Rubric</h1>
+      <p class="slide-subtitle">Check every deliverable listed on Page 15 of the JioWave Case Study Brief before submitting your capstone package.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Official JioWave Capstone Submission Checklist (Page 15 Brief)</span><span>Click Reveal to verify the mandatory contents of each file</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Deliverable Filename</th>
+              <th>Format</th>
+              <th>Mandatory Contents for 90+ Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1</strong></td>
+              <td><code>JioWave_Dashboard.pbix</code></td>
+              <td>Power BI Desktop</td>
+              <td class="cell-target" id="d10-stu2-c1">5 Executive Pages + Hidden Tooltip/Drill-Through + 3 Bookmarks + RLS Roles + Mobile Layout</td>
+            </tr>
+            <tr>
+              <td><strong>2</strong></td>
+              <td><code>JioWave_DAX_Measures.txt</code></td>
+              <td>Plain Text / DAX</td>
+              <td>All commented DAX measures exported cleanly (Tabular Editor / DAX Query View)</td>
+            </tr>
+            <tr>
+              <td><strong>3</strong></td>
+              <td><code>JioWave_Board_Memo.pdf</code></td>
+              <td>3-Page Executive PDF</td>
+              <td class="cell-target" id="d10-stu2-c2">5-Retire + 2-Launch Portfolio Decision + Migration Sensitivity + 90-Day Playbook + Methodology</td>
+            </tr>
+            <tr>
+              <td><strong>4</strong></td>
+              <td><code>JioWave_Build_Notes.md</code></td>
+              <td>Markdown Log</td>
+              <td>NULL audit (848 cities rescued), 200 duplicate subscribers removed, mixed date locale fix & assumptions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Final Capstone Audit Check:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d10-stu2-ans', ['d10-stu2-c1', 'd10-stu2-c2'])">✅ Reveal Submission Verification</button>
+          <button class="btn" onclick="resetSim('d10-stu2-ans', ['d10-stu2-c1', 'd10-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d10-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Pro Tip for Exporting All DAX Measures in 5 Seconds:</h4>
+          <p>In Power BI Desktop, click the <strong>DAX Query View</strong> icon on the left rail → type <code>EVALUATE INFO.MEASURES()</code> and press Run—or right-click any measure and select <em>Define all measures in this model</em> to copy every single DAX measure cleanly into <code>JioWave_DAX_Measures.txt</code>!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="Graduation & Next Steps (Days 11–15 Capstone Coaching)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Course Complete!</span>
+        <span class="tag tag-instructor">upGrad DS 2.0</span>
+      </div>
+      <h1 class="slide-title">Congratulations! You Built an Enterprise Power BI Solution From Scratch</h1>
+      <p class="slide-subtitle">From raw, messy telecom CSVs on Day 1 to a 5-page board-ready Power BI report with Star Schema, Time Intelligence, AI Decomposition Trees, What-If Sliders, and Row-Level Security on Day 10.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Your Portfolio Story for Data Analyst Interviews</div>
+        <p>In interviews, never say <em>"I know Power BI charts and DAX."</em> Say: <strong>"I built an end-to-end Subscriber & Network Intelligence report for a 28,000-customer telecom operator—cleaning 9 raw tables in Power Query, modeling a Star Schema with Indian Fiscal Year DAX, uncovering a 68.4% churn cohort hidden behind an 11.97% headline average, and designing a 5-plan portfolio rationalization that recovers ₹37–46 Lakhs annually."</strong></p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">How to Use Days 11–15 (Capstone Polishing & Mock Board Defense)</div>
+        <ul class="list-styled">
+          <li><strong>Days 11–12:</strong> Finalize your 3-Page Board Memo PDF (`JioWave_Board_Memo.pdf`) and `JioWave_Build_Notes.md`.</li>
+          <li><strong>Days 13–14:</strong> Peer review & live mock presentation to Rashmi Iyer (CMO) and Rohan Bose (CFO) in 3 minutes flat.</li>
+          <li><strong>Day 15:</strong> Final portfolio showcase & interview Q&A drill!</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

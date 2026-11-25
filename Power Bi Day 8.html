@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 08: Page 4 Network Capex, Geospatial Maps & Scatter Quadrants</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-teal); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+    width: 5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(20, 184, 166, 0.16);
+    border-color: var(--accent-teal);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.14), rgba(59, 130, 246, 0.08));
+    border-left: 4px solid var(--accent-teal);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #5eead4; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 08 (2 Hours) • Page 4 Build: Network Capex, Geospatial Tower Maps, Scatter Quadrants & Downtime Churn</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 20</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 08 Curriculum (20 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 08 Kickoff: Solving Question 3 (Is Tower Capex Working?)">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Page 4 Network Analytics</span>
+        <span class="tag tag-theory">00:00 – 00:08</span>
+      </div>
+      <h1 class="slide-title">Day 08 Kickoff: Building Page 4 — "Network Capex & Tower Utilization (Q3)"</h1>
+      <p class="slide-subtitle">Chief Network Officer Vikram Tandon spent ₹47 Cr expanding JioWave's 279-tower footprint across 32 cities. Today we build Page 4 to audit network ROI, geospatial congestion, and downtime-driven churn!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Operations Analogy: Warehouse Capacity Utilization</div>
+        <p>Think of cell towers like regional warehouses. If a warehouse operates <strong>below 50% capacity</strong>, the company wasted capital building too big too early (Capex Waste). If a warehouse runs <strong>above 90–95% capacity</strong>, shipments get delayed and customers leave (Quality-of-Service Churn). The sweet spot is <strong>75%–85%</strong>!</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The 4 Deliverables on Page 4 Today</div>
+        <ol class="list-styled">
+          <li><strong>Q3a (Tower Generation & Traffic Mix):</strong> Stacked Bar Chart comparing <code>3G</code>, <code>4G</code>, and <code>5G</code> traffic volume across <code>Metro</code>, <code>Urban</code>, and <code>Tier-2</code> cities.</li>
+          <li><strong>Q3b (Geospatial Map of All 279 Towers):</strong> Interactive Bubble Map plotting exact <code>latitude</code> and <code>longitude</code> sized by Traffic GB and colored by Utilization %.</li>
+          <li><strong>Q3c (Scatter Plot Quadrant Analysis):</strong> Plotting <code>Avg Utilization %</code> vs. <code>Subscriber Churn %</code> across all 32 cities with dynamic quadrant reference lines!</li>
+          <li><strong>Q3d (Forward Capex Policy Table):</strong> Identifying where to <strong>Upgrade (5G)</strong>, where to <strong>Defer Capex</strong>, and where to <strong>Fix Faults</strong>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Network Technology Mix (3G vs. 4G vs. 5G)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Infrastructure Audit</span>
+        <span class="tag tag-lab">00:08 – 00:18</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Auditing JioWave's 279 Towers by Generation (`3G` / `4G` / `5G`)</h1>
+      <p class="slide-subtitle">Look at what happens when we slice `dim_towers` × `fact_tower_metrics` by `tower_tier` and `generation`.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Verified Network Footprint & Traffic Share (FY24–FY26)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tower Tier</th>
+              <th>Generation</th>
+              <th>Tower Count</th>
+              <th>Total Traffic (GB)</th>
+              <th>Avg Utilization %</th>
+              <th>Avg Monthly Downtime (Mins)</th>
+              <th>Total Faults</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td><strong>Metro</strong></td>
+              <td><strong>5G</strong></td>
+              <td>64</td>
+              <td><strong>1,40,67,807 GB (51.9%)</strong></td>
+              <td>77.19%</td>
+              <td>22.17 mins (Lowest!)</td>
+              <td>1,165</td>
+            </tr>
+            <tr>
+              <td><strong>Metro</strong></td>
+              <td>4G</td>
+              <td>68</td>
+              <td>49,97,073 GB (18.4%)</td>
+              <td>78.29%</td>
+              <td>39.15 mins</td>
+              <td>2,154</td>
+            </tr>
+            <tr>
+              <td><strong>Urban</strong></td>
+              <td>5G</td>
+              <td>11</td>
+              <td>20,82,584 GB (7.7%)</td>
+              <td>65.48%</td>
+              <td>23.56 mins</td>
+              <td>204</td>
+            </tr>
+            <tr>
+              <td><strong>Urban</strong></td>
+              <td>4G</td>
+              <td>56</td>
+              <td>33,18,735 GB (12.2%)</td>
+              <td>64.89%</td>
+              <td>38.74 mins</td>
+              <td>1,801</td>
+            </tr>
+            <tr>
+              <td><strong>Urban</strong></td>
+              <td>3G</td>
+              <td>5</td>
+              <td>56,568 GB (0.2%)</td>
+              <td>66.29%</td>
+              <td>67.53 mins</td>
+              <td>283</td>
+            </tr>
+            <tr>
+              <td><strong>Tier-2</strong></td>
+              <td>4G</td>
+              <td>49</td>
+              <td>23,52,620 GB (8.7%)</td>
+              <td>50.45%</td>
+              <td>36.94 mins</td>
+              <td>1,566</td>
+            </tr>
+            <tr class="cell-dirty">
+              <td><strong>Tier-2</strong></td>
+              <td><strong>3G (Legacy!)</strong></td>
+              <td><strong>26</strong></td>
+              <td>2,34,084 GB (0.9%)</td>
+              <td>52.49%</td>
+              <td><strong>71.98 mins (3.2× worse!)</strong></td>
+              <td><strong>1,519</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Geospatial Mapping (Latitude/Longitude & Data Categories)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Map Visuals</span>
+        <span class="tag tag-lab">00:18 – 00:28</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Power BI Maps — Using `Latitude` & `Longitude` Without Ambiguity</h1>
+      <p class="slide-subtitle">If you drag `city` into a map visual, Power BI sends text strings to Bing Maps—sometimes plotting "Indore" or "Salem" in the wrong country! Using exact coordinates solves this 100%.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Step 1: Set Data Categories (`Column Tools`)</div>
+          <ol class="list-styled">
+            <li>Go to <strong>Table View</strong> → select <code>dim_towers</code>.</li>
+            <li>Select <code>latitude</code> → <code>Column tools → Data category → Latitude</code> (also set Summarization = <strong>Don't summarize</strong>!).</li>
+            <li>Select <code>longitude</code> → <code>Column tools → Data category → Longitude</code> (Summarization = <strong>Don't summarize</strong>!).</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Step 2: Configure the 279-Tower Bubble Map</div>
+          <ul class="list-styled">
+            <li>Insert the <strong>Map</strong> (or <strong>Azure Map</strong>) visual on Page 4.</li>
+            <li><strong>Latitude / Longitude:</strong> Drag <code>dim_towers[latitude]</code> and <code>dim_towers[longitude]</code>.</li>
+            <li><strong>Legend:</strong> Drag <code>dim_towers[generation]</code> (<code>5G</code>, <code>4G</code>, <code>3G</code>).</li>
+            <li><strong>Bubble size:</strong> Drag <code>[Total Tower Traffic GB]</code>—Metro 5G hubs immediately pop out as large bubbles while Tier-2 3G towers appear tiny!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Scatter Plot & Quadrant Analysis (Analytics Pane)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Correlation & Quadrants</span>
+        <span class="tag tag-lab">00:28 – 00:40</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Scatter Plot Quadrant Analysis — Linking Tower Utilization to Churn</h1>
+      <p class="slide-subtitle">A Scatter Chart plots two numeric measures against each other across all 32 cities—turning raw metrics into an instant executive decision matrix!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Configuring the 32-City Scatter Plot</div>
+          <ul class="list-styled">
+            <li><strong>Values (Detail):</strong> Drag <code>dim_towers[city]</code> (32 bubbles).</li>
+            <li><strong>X-Axis:</strong> <code>[Avg Tower Utilization %]</code>.</li>
+            <li><strong>Y-Axis:</strong> <code>[Churn Rate %]</code>.</li>
+            <li><strong>Size:</strong> <code>[Total Subscribers]</code> | <strong>Legend:</strong> <code>dim_towers[tower_tier]</code>.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Adding Quadrant Reference Lines (🔍 Analytics Pane)</div>
+          <ul class="list-styled">
+            <li>Add an <strong>X-Axis Constant Line at <code>65%</code></strong> (separates Under-Utilized Capex on the left from High-Traffic Cities on the right).</li>
+            <li>Add a <strong>Y-Axis Constant Line at <code>12%</code></strong> (TRAI Churn Benchmark).</li>
+            <li><strong>Top-Left Quadrant (Low Util + High Churn):</strong> Tier-2 cities like <em>Vijayawada (48.96% util, 27.64% churn)</em> and <em>Nashik (49.82% util, 24.79% churn)</em>—capex is under-utilized AND legacy 3G faults are driving churn!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Network Uptime & Fault Metrics in DAX">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: Network SLA DAX</span>
+        <span class="tag tag-lab">00:40 – 00:50</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Writing Network Uptime % & Fault Density Measures in DAX</h1>
+      <p class="slide-subtitle">Each month has 43,200 minutes (`30 days × 24 hrs × 60 mins`). Let's convert `downtime_minutes` into an executive Network Uptime % SLA measure.</p>
+
+      <div class="code-block">
+        <span class="cm">// Total Possible Tower-Minutes in filtered period (43,200 mins per tower-month):</span><br>
+        Total Possible Minutes = <span class="fn">COUNTROWS</span>(fact_tower_metrics) * 43200<br><br>
+        Total Downtime Minutes = <span class="fn">SUM</span>(fact_tower_metrics[downtime_minutes])<br><br>
+        Network Uptime % = 1 - <span class="fn">DIVIDE</span>([Total Downtime Minutes], [Total Possible Minutes], 0)<br><br>
+        Avg Faults per Tower-Month = <span class="fn">AVERAGE</span>(fact_tower_metrics[fault_count])
+      </div>
+    </section>
+
+    <!-- SLIDE 6: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Auditing Metro vs. Tier-2 Network Economics">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">00:50 – 00:58</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Comparing Metro Congestion vs. Tier-2 Under-Utilization</h1>
+      <p class="slide-subtitle">Watch how the instructor contrasts JioWave's top Metro hubs against under-utilized Tier-2 cities to formulate Q3d's Forward Capex Policy.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>City-Level Network Utilization vs. Subscriber Churn (`dim_towers` + `fact_tower_metrics` + `dim_subscribers`)</span><span>Click Reveal to highlight the Capex Policy decisions</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Tier</th>
+              <th>Towers</th>
+              <th>Total Traffic (GB)</th>
+              <th>Avg Utilization %</th>
+              <th>Subscriber Churn %</th>
+              <th>Q3d Capex Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>New Delhi</strong></td>
+              <td>Metro</td>
+              <td>21</td>
+              <td>28,43,543 GB</td>
+              <td class="cell-target" id="d8-inst-1">79.19%</td>
+              <td>7.35%</td>
+              <td class="cell-target" id="d8-inst-2">Upgrade 4G ➔ 5G Capacity</td>
+            </tr>
+            <tr>
+              <td><strong>Bengaluru</strong></td>
+              <td>Metro</td>
+              <td>17</td>
+              <td>24,57,483 GB</td>
+              <td>77.47%</td>
+              <td>6.45%</td>
+              <td>Upgrade 4G ➔ 5G Capacity</td>
+            </tr>
+            <tr>
+              <td><strong>Chandigarh</strong></td>
+              <td>Tier-2</td>
+              <td>2</td>
+              <td>91,774 GB</td>
+              <td class="cell-target" id="d8-inst-3">45.12%</td>
+              <td>15.81%</td>
+              <td class="cell-target" id="d8-inst-4">Defer New Capex (&lt;50% Util)</td>
+            </tr>
+            <tr>
+              <td><strong>Vijayawada</strong></td>
+              <td>Tier-2</td>
+              <td>5</td>
+              <td>1,09,864 GB</td>
+              <td>48.96%</td>
+              <td>27.64%</td>
+              <td>Defer New Towers; Decommission 3G Faults</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor Forward Capex Policy Synthesis (Q3d):</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d8-inst-ans', ['d8-inst-1', 'd8-inst-2', 'd8-inst-3', 'd8-inst-4'])">🔍 Reveal Instructor Capex Policy</button>
+          <button class="btn" onclick="resetSim('d8-inst-ans', ['d8-inst-1', 'd8-inst-2', 'd8-inst-3', 'd8-inst-4'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d8-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Three-Bucket Forward Capex Rule for CNO Vikram Tandon:</h4>
+          <ol class="list-styled">
+            <li><strong>Upgrade Existing (Metro Hubs &gt;77% Util):</strong> New Delhi (79.19%) and Bengaluru (77.47%) carry massive data volume with low churn (6.4%–7.3%). Allocate FY27 capex to upgrading Metro 4G towers to 5G.</li>
+            <li><strong>Defer Greenfield Expansion (Tier-2 Cities &lt;50% Util):</strong> Chandigarh (45.12%), Bhubaneswar (47.46%), and Vijayawada (48.96%) sit below the 50% efficiency threshold—freeze new tower builds there!</li>
+            <li><strong>Retire Legacy 3G Equipment (31 Towers Total):</strong> 26 Tier-2 and 5 Urban 3G towers carry under 1% of total traffic while suffering <strong>71.98 mins/month average downtime</strong> (3.2× worse than 5G's 22.17 mins!).</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Calculating 5G Share of Total Network Traffic">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">00:58 – 01:04</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Computing 5G Traffic Share vs. 5G Tower Share</h1>
+      <p class="slide-subtitle">Using the verified network figures below (`Total Towers = 279`, `Total Network Traffic = 2,71,09,470 GB`), calculate what % of towers are `5G` (`64 Metro + 11 Urban = 75 towers`) vs. what % of total traffic `5G` carries (`1,40,67,807 + 20,82,584 = 1,61,50,391 GB`)!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>JioWave Generation Efficiency Table</span><span>Predict the 2 highlighted 5G Share % cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Generation</th>
+              <th>Tower Count</th>
+              <th>% Share of 279 Towers</th>
+              <th>Total Traffic (GB)</th>
+              <th>% Share of Total Traffic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>5G (Metro + Urban)</strong></td>
+              <td>75</td>
+              <td class="cell-target" id="d8-stu1-c1">26.88%</td>
+              <td>1,61,50,391 GB</td>
+              <td class="cell-target" id="d8-stu1-c2">59.57%</td>
+            </tr>
+            <tr>
+              <td><strong>4G (All Tiers)</strong></td>
+              <td>173</td>
+              <td>62.01%</td>
+              <td>1,06,68,428 GB</td>
+              <td>39.35%</td>
+            </tr>
+            <tr>
+              <td><strong>3G (Legacy)</strong></td>
+              <td>31</td>
+              <td>11.11%</td>
+              <td>2,90,652 GB</td>
+              <td>1.07%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d8-stu1-ans', ['d8-stu1-c1', 'd8-stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d8-stu1-ans', ['d8-stu1-c1', 'd8-stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d8-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Calculation & Capex Insight:</h4>
+          <ul class="list-styled">
+            <li><strong>5G Share of Fleet:</strong> <code>75 ÷ 279 = <strong>26.88%</strong></code> of towers.</li>
+            <li><strong>5G Share of Traffic:</strong> <code>1,61,50,391 ÷ 2,71,09,470 = <strong>59.57%</strong></code> of all data traffic! Just 26.88% of JioWave's towers carry nearly 60% of the company's entire data load (2.22× efficiency multiplier!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Calculating Uptime % on Worst-Fault Tower (`TW0268`)">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:04 – 01:10</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Computing Monthly Uptime % for `TW0268` (Bhopal)</h1>
+      <p class="slide-subtitle">In June 2025 (`2025-06-01`), Bhopal Tier-2 tower `TW0268` recorded `754 downtime minutes` out of `43,200` total minutes in the month. Compute its exact `Network Uptime %` and determine whether it breached JioWave's `99.0%` minimum SLA!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`fact_tower_metrics` Worst Single-Month Downtime Event</span><span>Predict Uptime % and SLA Status</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tower ID</th>
+              <th>City</th>
+              <th>Month</th>
+              <th>Downtime Minutes</th>
+              <th>Total Minutes</th>
+              <th>Network Uptime %</th>
+              <th>SLA Status (Target ≥ 99.0%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>TW0268</strong></td>
+              <td>Bhopal (Tier-2)</td>
+              <td>2025-06-01</td>
+              <td>754 mins</td>
+              <td>43,200 mins</td>
+              <td class="cell-target" id="d8-stu2-c1">98.25%</td>
+              <td class="cell-target" id="d8-stu2-c2">BREACHED SLA (-75 bps)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d8-stu2-ans', ['d8-stu2-c1', 'd8-stu2-c2'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('d8-stu2-ans', ['d8-stu2-c1', 'd8-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d8-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact SLA Arithmetic:</h4>
+          <p><code>1 - (754 ÷ 43,200) = 1 - 0.01745 = <strong>98.25%</strong></code>—breaching the 99.0% minimum telecom reliability floor by 75 basis points!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="Day 08 Build Checklist & Day 09 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Page 4 Complete!</span>
+        <span class="tag tag-theory">Next: Page 5 Capstone Portfolio</span>
+      </div>
+      <h1 class="slide-title">Day 08 Milestone: Page 4 ("Network Capex & Tower Utilization") Built!</h1>
+      <p class="slide-subtitle">Four of our five board pages are complete. Tomorrow (Day 09), we build Page 5: Plan Portfolio Rationalization (Retire 5, Launch 2) & 90-Day Churn Defense Playbook!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Page 4 Build Checklist</div>
+          <ol class="list-styled">
+            <li>Set <code>latitude</code> and <code>longitude</code> Data Categories on <code>dim_towers</code> and build the 279-tower Bubble Map.</li>
+            <li>Build the <code>Generation × Tower Tier</code> Stacked Bar Chart showing 5G carrying 59.57% of traffic.</li>
+            <li>Build the 32-city Scatter Plot (<code>Avg Utilization %</code> vs. <code>Churn Rate %</code>) with 65% and 12% Quadrant lines.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 09 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>Page 5 Build (Plan Portfolio & 90-Day Playbook — Q4):</strong> Ranking all 24 plans by subscriber count, ARPU, churn, and gross margin; identifying the exact <strong>5 plans to retire</strong>, mapping forced migrations, and designing <strong>2 new plans to launch</strong>!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 9" whenever you're ready for Page 5!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

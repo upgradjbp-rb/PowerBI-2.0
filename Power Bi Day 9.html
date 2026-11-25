@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 09: Page 5 Plan Portfolio & 90-Day Playbook</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-purple); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-gold));
+    width: 4.5%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(168, 85, 247, 0.16);
+    border-color: var(--accent-purple);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.14), rgba(245, 158, 11, 0.08));
+    border-left: 4px solid var(--accent-purple);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #d8b4fe; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 09 (2 Hours) • Page 5 Build: Plan Portfolio Rationalization (Retire 5, Launch 2), Bookmarks & 90-Day Playbook</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 20</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 09 Curriculum (20 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 09 Kickoff: Solving Question 4 & Capstone Playbook">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Page 5 Capstone</span>
+        <span class="tag tag-theory">00:00 – 00:08</span>
+      </div>
+      <h1 class="slide-title">Day 09 Kickoff: Building Page 5 — "Plan Portfolio & 90-Day Playbook (Q4)"</h1>
+      <p class="slide-subtitle">Today we complete the 5th and final page of our executive dashboard—the exact decision slide CMO Rashmi Iyer walks into the Series-C board vote with!</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Strategy Analogy: SKU Rationalization in Retail</div>
+        <p>When a supermarket carries 24 brands of biscuits, slow-moving SKUs tie up shelf space, confuse shoppers, and bloat accounting costs. Cutting the bottom 5 dead SKUs and introducing 2 high-margin SKUs simplifies operations and boosts profit per square foot. That is exact purpose of Q4!</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">What the Board Votes On Using Page 5 Today</div>
+        <ol class="list-styled">
+          <li><strong>Q4a (Plan Economics Ranking):</strong> Rank all 24 plans by Total Revenue, Active Subscribers, ARPU, and Churn Rate %.</li>
+          <li><strong>Q4b (Retire 5 Plans):</strong> Identify the 5 worst-performing / zombie plans to sunset immediately.</li>
+          <li><strong>Q4c (Forced Migration Mapping + Sensitivity):</strong> Map all 4,284 active subscribers on those 5 retired plans to target plans and quantify FY27 revenue gain (at 100% and 80% retention!).</li>
+          <li><strong>Q4d (Launch 2 New Plans + Bookmarks):</strong> Design 2 data-backed tariff plans and configure <strong>Bookmarks + Selection Pane</strong> so Rashmi can toggle views live!</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Complete 24-Plan Economics Audit (Top vs. Bottom Plans)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Plan Ranking (Q4a)</span>
+        <span class="tag tag-lab">00:08 – 00:18</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Plan Economics Ranking — Top Performers vs. Bottom Candidates</h1>
+      <p class="slide-subtitle">When we evaluate all 24 plans in `dim_plans` across `Total Revenue`, `Active Subscribers`, `ARPU`, and `Churn %`, clear winners and losers emerge.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>JioWave Plan Portfolio Extremes (`dim_plans` × `fact_revenue_monthly` × `dim_subscribers`)</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Plan ID & Name</th>
+              <th>Segment</th>
+              <th>Rental</th>
+              <th>Active Subs</th>
+              <th>Churn %</th>
+              <th>Avg ARPU</th>
+              <th>Total Revenue (Share %)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-selected">
+              <td><strong>#1</strong></td>
+              <td><code>PL018</code> (JioFiber 599)</td>
+              <td>Broadband</td>
+              <td>₹599</td>
+              <td>1,569</td>
+              <td>7.27%</td>
+              <td>₹804.78</td>
+              <td><strong>₹2.87 Cr (10.15%)</strong></td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>#2</strong></td>
+              <td><code>PL009</code> (JioPost 299)</td>
+              <td>Postpaid</td>
+              <td>₹299</td>
+              <td>2,260</td>
+              <td>6.34%</td>
+              <td>₹424.85</td>
+              <td><strong>₹2.24 Cr (7.92%)</strong></td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>#3</strong></td>
+              <td><code>PL012</code> (JioPost 699)</td>
+              <td>Postpaid</td>
+              <td>₹699</td>
+              <td>943</td>
+              <td>10.02%</td>
+              <td>₹858.56</td>
+              <td><strong>₹1.79 Cr (6.32%)</strong></td>
+            </tr>
+            <tr class="cell-dirty">
+              <td><strong>#21</strong></td>
+              <td><code>PL004</code> (JioSmart 249)</td>
+              <td>Prepaid</td>
+              <td>₹249</td>
+              <td>1,078</td>
+              <td>9.64%</td>
+              <td>₹283.91</td>
+              <td>₹64.70 L (2.29% — Redundant step)</td>
+            </tr>
+            <tr class="cell-dirty">
+              <td><strong>#22</strong></td>
+              <td><code>PL006</code> (JioPlus 349)</td>
+              <td>Prepaid</td>
+              <td>₹349</td>
+              <td>708</td>
+              <td>11.06%</td>
+              <td>₹384.13</td>
+              <td>₹59.63 L (2.11% — Redundant step)</td>
+            </tr>
+            <tr class="cell-dirty">
+              <td><strong>#23</strong></td>
+              <td><code>PL015</code> (JioPostFree6 399)</td>
+              <td>Postpaid</td>
+              <td>₹399</td>
+              <td>426</td>
+              <td><strong>69.77%</strong></td>
+              <td>₹211.63</td>
+              <td>₹42.16 L (1.49% — Toxic churn!)</td>
+            </tr>
+            <tr class="cell-dirty">
+              <td><strong>#24</strong></td>
+              <td><code>PL023</code> (JioLegacy 199) + <code>PL024</code> (99)</td>
+              <td>Prepaid</td>
+              <td>₹199 / ₹99</td>
+              <td>516 + 1,556</td>
+              <td>8.19% / 7.22%</td>
+              <td>₹239 / ₹148</td>
+              <td>Zombie legacy plans still active!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Designing the 2 New Plans to Launch (Q4d)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: New Product Strategy</span>
+        <span class="tag tag-lab">00:18 – 00:28</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Data-Backed Launch of 2 New Plans (`Q4d`)</h1>
+      <p class="slide-subtitle">Every new plan recommendation must be anchored to an exact gap we proved in Q1–Q3!</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 4px solid var(--accent-teal);">
+          <div class="card-title" style="color:var(--accent-teal);">New Plan #1: `JioPost Smart 349` (Postpaid Entry Tier-2)</div>
+          <ul class="list-styled">
+            <li><strong>Data Anchor (Q1 Finding):</strong> Replaces toxic <code>PL015 (JioPostFree6 399)</code> in Tier-2 cities without offering zero-rupee free trials that attract promo-hunters.</li>
+            <li><strong>Structure:</strong> ₹349/mo rental, 45 GB data, 1,000 mins, plus <strong>Month-4 & Month-7 Loyalty Cashback</strong> (₹50 credit in Months 4 & 7) to lock retention past the 6-month cliff!</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--accent-gold);">
+          <div class="card-title">New Plan #2: `JioPro Unlimited 1299` (5G Data-Hog Shield)</div>
+          <ul class="list-styled">
+            <li><strong>Data Anchor (Q2 & Q3 Findings):</strong> Stops Diamond/Premium ARPU erosion (<code>-₹129.36/mo</code>) and closes the huge ₹500 pricing gap between <code>JioPost 999</code> and <code>JioPost 1499</code>.</li>
+            <li><strong>Structure:</strong> ₹1,299/mo rental, 300 GB 5G high-speed data + free OTT & roaming bundle—converting heavy overage payers into predictable high-margin recurring revenue!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Bookmarks & Selection Pane (Boardroom Presentation Mode)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Interactive Storytelling</span>
+        <span class="tag tag-lab">00:28 – 00:40</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Bookmarks & Selection Pane — Switching Board Views in 1 Click</h1>
+      <p class="slide-subtitle">Remember Principle #6 on Page 11 of the JioWave Brief? "Three bookmarks — Executive Summary, Cohort Detail, Methodology. Rashmi clicks bookmarks during the board call. They must work the first time, every time."</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Step-by-Step Bookmark & Button Setup</div>
+          <ol class="list-styled">
+            <li>Go to <code>View Tab → Check [✓] Bookmarks & [✓] Selection</code>.</li>
+            <li>Use the <strong>Selection Pane</strong> (eye icons 👁️) to show/hide specific visual groups (e.g., show <em>Retire 5 Migration Table</em> vs. <em>90-Day Playbook Cards</em>).</li>
+            <li>Click <strong>Add</strong> in the Bookmarks pane, rename to <code>BM_Retire_5_Plan</code>, click the <code>...</code> menu and <strong>uncheck Data</strong> if you don't want the bookmark to reset the CMO's active slicers!</li>
+            <li>Insert <code>Insert → Buttons → Navigator → Bookmark navigator</code> to render sleek pill tabs at the top of Page 5!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Critical Bookmark Trap to Avoid</div>
+          <p>If you leave <strong>Data</strong> checked on a Bookmark, clicking the bookmark wipes out whatever <code>Fiscal_Year</code> or <code>City Tier</code> filter Rashmi had selected! Always uncheck <strong>Data</strong> when building view-switcher bookmarks.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Sensitivity Analysis in DAX (100% vs. 80% Retention)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: CFO Stress-Testing</span>
+        <span class="tag tag-lab">00:40 – 00:50</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Sensitivity Analysis — Winning Top-Quartile Capstone Grading</h1>
+      <p class="slide-subtitle">Look at Page 9 of the JioWave Brief: "A submission with a sensitivity analysis (what if cohort churn is half as concentrated or migration retention is 80% instead of 100%?) scores in the top quartile."</p>
+
+      <div class="code-block">
+        <span class="cm">// Modeling Base Case (100% migration retention) vs. Conservative Case (80% retention):</span><br>
+        Migration Annual Gain (Base 100%) = <span class="fn">SUM</span>(Portfolio_Migration[Annual_Gain_INR])  <span class="cm">-- ₹46.64 Lakhs</span><br><br>
+        Migration Annual Gain (Conservative 80%) = [Migration Annual Gain (Base 100%)] * 0.80  <span class="cm">-- ₹37.31 Lakhs</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Complete 5-Plan Retirement & Migration Matrix">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">00:50 – 00:58</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Quantifying the Exact 5-Plan Retirement & Migration Impact (Q4b & Q4c)</h1>
+      <p class="slide-subtitle">Watch how the instructor maps all 4,284 active subscribers across the 5 retired plans to their target plans and verifies the exact FY27 rupee uplift.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Board Vote Table: 5 Plans to Retire & Forced Migration Mapping (Q4b & Q4c)</span><span>Click Reveal to highlight total migrated subs & FY27 rupee recovery</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Retire Plan</th>
+              <th>Active Subs</th>
+              <th>Current Rental</th>
+              <th>Target Migration Plan</th>
+              <th>New Rental</th>
+              <th>Uplift / Sub</th>
+              <th>Annual Gain (100% Base)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>PL015</code> (JioPostFree6 399)</td>
+              <td>426</td>
+              <td>₹0 (Promo) / ₹212 ARPU</td>
+              <td><code>PL010</code> (JioPost 399)</td>
+              <td>₹399</td>
+              <td>+₹399/mo</td>
+              <td class="cell-target" id="d9-inst-1">₹20,39,688</td>
+            </tr>
+            <tr>
+              <td><code>PL023</code> (JioLegacy 199)</td>
+              <td>516</td>
+              <td>₹199</td>
+              <td><code>PL005</code> (JioPlus 299)</td>
+              <td>₹299</td>
+              <td>+₹100/mo</td>
+              <td>₹6,19,200</td>
+            </tr>
+            <tr>
+              <td><code>PL024</code> (JioLegacy 99)</td>
+              <td>1,556</td>
+              <td>₹99</td>
+              <td><code>PL002</code> (JioBasic 149)</td>
+              <td>₹149</td>
+              <td>+₹50/mo</td>
+              <td>₹9,33,600</td>
+            </tr>
+            <tr>
+              <td><code>PL006</code> (JioPlus 349)</td>
+              <td>708</td>
+              <td>₹349</td>
+              <td><code>PL007</code> (JioMega 399)</td>
+              <td>₹399</td>
+              <td>+₹50/mo</td>
+              <td>₹4,24,800</td>
+            </tr>
+            <tr>
+              <td><code>PL004</code> (JioSmart 249)</td>
+              <td>1,078</td>
+              <td>₹249</td>
+              <td><code>PL005</code> (JioPlus 299)</td>
+              <td>₹299</td>
+              <td>+₹50/mo</td>
+              <td>₹6,46,800</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>Total (5 Retired Plans)</strong></td>
+              <td class="cell-target" id="d9-inst-2"><strong>4,284 Subs</strong></td>
+              <td>—</td>
+              <td><strong>19 Clean Active Plans</strong></td>
+              <td>—</td>
+              <td>—</td>
+              <td class="cell-target" id="d9-inst-3"><strong>₹46,64,088 (₹46.64 L/yr)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor CFO Defense Summary:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d9-inst-ans', ['d9-inst-1', 'd9-inst-2', 'd9-inst-3'])">🔍 Reveal Instructor Migration Audit</button>
+          <button class="btn" onclick="resetSim('d9-inst-ans', ['d9-inst-1', 'd9-inst-2', 'd9-inst-3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d9-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Defensible CFO Numbers for the Board Memo:</h4>
+          <ul class="list-styled">
+            <li><strong>Portfolio Simplification:</strong> Cuts active tariff complexity by 21% (from 24 plans down to 19 core plans + 2 strategic launches = 21 total).</li>
+            <li><strong>Base Case (100% Migration Retention):</strong> Moving <strong>4,284 subscribers</strong> generates <strong>+₹3,88,674/month</strong> = <strong>+₹46.64 Lakhs/year</strong> in incremental rental revenue.</li>
+            <li><strong>Conservative Sensitivity Case (80% Retention, assuming 20% churn during forced migration):</strong> Still delivers <strong>+₹37.31 Lakhs/year</strong> net positive gain while eliminating the 69.77% churn bleed on <code>PL015</code>!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Verifying Conservative 80% Retention Sensitivity">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">00:58 – 01:04</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Computing Conservative FY27 Gain for `PL024` & `PL004`</h1>
+      <p class="slide-subtitle">CFO Rohan Bose asks: "What if 20% of subscribers on `PL024 (JioLegacy 99)` and `PL004 (JioSmart 249)` leave during forced migration, so only 80% accept the +₹50/mo step-up?" Calculate the conservative annual gain for each of those two plans!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>CFO Sensitivity Stress-Test Worksheet</span><span>Predict the 2 Conservative Annual Gain (80% Retention) cells</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Active Subs</th>
+              <th>Uplift / Mo</th>
+              <th>100% Base Annual Gain</th>
+              <th>80% Retained Subs</th>
+              <th>Conservative Annual Gain (80%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>PL024</code> (JioLegacy 99 ➔ 149)</td>
+              <td>1,556</td>
+              <td>+₹50</td>
+              <td>₹9,33,600</td>
+              <td>1,244.8 (~1,245)</td>
+              <td class="cell-target" id="d9-stu1-c1">₹7,46,880 (₹7.47 L)</td>
+            </tr>
+            <tr>
+              <td><code>PL004</code> (JioSmart 249 ➔ 299)</td>
+              <td>1,078</td>
+              <td>+₹50</td>
+              <td>₹6,46,800</td>
+              <td>862.4 (~862)</td>
+              <td class="cell-target" id="d9-stu1-c2">₹5,17,440 (₹5.17 L)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d9-stu1-ans', ['d9-stu1-c1', 'd9-stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d9-stu1-ans', ['d9-stu1-c1', 'd9-stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d9-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Exact Sensitivity Arithmetic:</h4>
+          <ul class="list-styled">
+            <li><strong><code>PL024</code> (80% Case):</strong> <code>₹9,33,600 × 0.80 = <strong>₹7,46,880</strong></code> (even after losing 20% of users, remaining users pay ₹149 instead of ₹99, yielding net +₹2.54 L higher total revenue than before!).</li>
+            <li><strong><code>PL004</code> (80% Case):</strong> <code>₹6,46,800 × 0.80 = <strong>₹5,17,440</strong></code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: Designing the 5-Bucket Capstone Action Matrix">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:04 – 01:10</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Completing the 5-Bucket Board Decision Table (Page 9 Brief)</h1>
+      <p class="slide-subtitle">Match each of the 5 Capstone Board Vote Buckets on Page 5 of your dashboard to its exact quantified JioWave target!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Page 5 Executive Decision Summary Table</span><span>Click Reveal to verify the quantified targets across all 5 buckets</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Board Vote Bucket</th>
+              <th>Anchored Finding</th>
+              <th>Quantified Board Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Plan Retirement (5 Plans)</td>
+              <td>Q4 Economics Ranking</td>
+              <td>Migrate 4,284 subs ➔ <strong>+₹37.3L – ₹46.6L/yr</strong></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>New Plan Launch (2 Plans)</td>
+              <td>Q1 Cohort + Q2 ARPU Gap</td>
+              <td class="cell-target" id="d9-stu2-c1"><code>JioPost Smart 349</code> + <code>JioPro Unlimited 1299</code></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Cohort-A Churn Defense</td>
+              <td>Q1 5.72× Cohort Concentration</td>
+              <td class="cell-target" id="d9-stu2-c2">Cut <code>PL015</code> Tier-2 churn from 68.4% ➔ &lt;25%</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Premium/Diamond ARPU Defense</td>
+              <td>Q2 -5.69% Diamond ARPU Erosion</td>
+              <td>+₹80/mo uplift on 6,842 subs ➔ <strong>+₹65.7L/yr</strong></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Network Capex Reallocation</td>
+              <td>Q3 5G Efficiency (59.6% traffic)</td>
+              <td>Upgrade Metro 4G➔5G; retire 31 legacy 3G towers</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d9-stu2-ans', ['d9-stu2-c1', 'd9-stu2-c2'])">✅ Reveal Capstone Targets</button>
+          <button class="btn" onclick="resetSim('d9-stu2-ans', ['d9-stu2-c1', 'd9-stu2-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d9-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">All 5 Pages of Your JioWave Power BI Report Are Now Architected!</h4>
+          <p>Tomorrow (Day 10) is our Capstone Polish, Row-Level Security (RLS), Mobile Layout, Power BI Service Publishing, and Executive Board Memo day!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="Day 09 Build Checklist & Day 10 Grand Finale Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">All 5 Report Pages Built!</span>
+        <span class="tag tag-theory">Next: Day 10 Polish, RLS & Publishing</span>
+      </div>
+      <h1 class="slide-title">Day 09 Milestone: All 5 Executive Report Pages Built!</h1>
+      <p class="slide-subtitle">Congratulations! You now have a complete 5-page working Power BI report answering every single question from the CMO, CFO, CNO, and CEO.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's Page 5 Build Checklist</div>
+          <ol class="list-styled">
+            <li>Build the 24-Plan Economics Horizontal Bar Chart & 5-Plan Retirement Migration Matrix.</li>
+            <li>Add the 2 New Plan Launch cards and the 5-Bucket 90-Day Playbook Summary Table.</li>
+            <li>Configure the 3 Bookmarks (`Executive Summary`, `Cohort Detail`, `Methodology`) and Bookmark Navigator buttons.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 10 (Grand Finale)</div>
+          <ul class="list-styled">
+            <li><strong>Row-Level Security (RLS):</strong> Configuring Zonal RM filters (`[region] = "West"`) vs. CMO All-India access.</li>
+            <li><strong>Mobile Phone Layout:</strong> Optimizing Page 1 for CMO Rashmi's 7:45 AM phone check.</li>
+            <li><strong>Publishing to Power BI Service, Scheduled Refresh & Submitting All 4 Capstone Deliverables!</strong></li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 10" whenever you're ready for the Grand Finale!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>

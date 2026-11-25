@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upGrad Data Science | Power BI Masterclass — Day 03: DAX Foundations & CALCULATE</title>
+<style>
+  :root {
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263349;
+    --accent-gold: #f59e0b;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-rose: #f43f5e;
+    --accent-purple: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-subtle: #334155;
+    --code-bg: #0f172a;
+    --highlight-cell: rgba(245, 158, 11, 0.25);
+    --highlight-border: #f59e0b;
+    --highlight-green: rgba(20, 184, 166, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-badge {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    font-weight: 800;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+  .brand-sub { color: var(--accent-purple); font-size: 0.85rem; font-weight: 600; }
+
+  .nav-controls { display: flex; align-items: center; gap: 0.65rem; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent-teal); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+    border: none;
+    color: #042f2e;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #d97706);
+    border: none;
+    color: #1e1b18;
+    font-weight: 700;
+  }
+  .btn-gold:hover { filter: brightness(1.08); }
+
+  .slide-counter {
+    background: var(--code-bg);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+  }
+
+  .progress-track { width: 100%; height: 4px; background: var(--bg-secondary); }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-gold));
+    width: 4%;
+    transition: width 0.35s ease;
+  }
+
+  .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+  }
+
+  .sidebar-header {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slide-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .slide-nav-item {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .slide-nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+  .slide-nav-item.active {
+    background: rgba(168, 85, 247, 0.16);
+    border-color: var(--accent-purple);
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .nav-num { color: var(--accent-gold); font-weight: 700; min-width: 24px; }
+
+  .stage { padding: 2rem 2.5rem; max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide { display: none; animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .tag-module { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .tag-theory { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+  .tag-lab { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+  .tag-instructor { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+  .tag-student { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+  .slide-title { font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.25; }
+  .slide-subtitle { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.15rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem; }
+
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.14), rgba(245, 158, 11, 0.08));
+    border-left: 4px solid var(--accent-purple);
+    padding: 1.1rem 1.25rem;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .analogy-title { font-weight: 800; color: #d8b4fe; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.35rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin: 0.85rem 0;
+  }
+
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #f59e0b; font-weight: 600; }
+  .str { color: #4ade80; }
+  .cm { color: #64748b; font-style: italic; }
+
+  .table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-header-bar {
+    background: #162032;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: var(--text-muted); font-weight: 700; text-align: left; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+  td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(51, 65, 85, 0.6); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  .col-selected { background: rgba(59, 130, 246, 0.16) !important; border-left: 1px dashed #60a5fa; border-right: 1px dashed #60a5fa; }
+  .row-selected { background: rgba(20, 184, 166, 0.15) !important; }
+  .cell-dirty { background: rgba(244, 63, 94, 0.25) !important; color: #fecdd3; font-weight: 700; border: 1px solid #f43f5e; }
+
+  .cell-target { transition: all 0.3s ease; }
+  .cell-target.revealed {
+    background: var(--highlight-cell) !important;
+    border: 2px solid var(--highlight-border) !important;
+    color: #fef08a !important;
+    font-weight: 800;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .sim-panel { background: #131c2e; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem; }
+  .sim-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem; }
+  .answer-drawer { display: none; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(20, 184, 166, 0.1); border: 1px solid var(--accent-teal); border-radius: 10px; }
+  .answer-drawer.open { display: block; animation: fadeIn 0.25s ease; }
+
+  .ui-path {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem;
+    background: #0f172a; padding: 0.35rem 0.7rem; border-radius: 6px;
+    border: 1px solid var(--border-subtle); font-size: 0.83rem; font-weight: 600; color: #93c5fd; margin: 0.3rem 0;
+  }
+
+  .list-styled { padding-left: 1.35rem; margin: 0.65rem 0; }
+  .list-styled li { margin-bottom: 0.45rem; }
+
+  @media (max-width: 920px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stage { padding: 1.25rem; }
+    .slide-title { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-badge">upGrad DS 2.0</span>
+    <div>
+      <div class="brand-title">Power BI Masterclass: JioWave Telecom Case Study</div>
+      <div class="brand-sub">Day 03 (2 Hours) • DAX Foundations, Context & The `CALCULATE()` Superpower</div>
+    </div>
+  </div>
+  <div class="nav-controls">
+    <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◀ Prev</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 / 24</span>
+    <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+  </div>
+</header>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span>Day 03 Curriculum (24 Slides)</span>
+      <span>120 Mins</span>
+    </div>
+    <ul class="slide-list" id="slideList"></ul>
+  </aside>
+
+  <main class="stage" id="stage">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Day 03 Kickoff: Power Query (M) vs. DAX">
+      <div class="slide-meta">
+        <span class="tag tag-module">Module 1: Entering DAX</span>
+        <span class="tag tag-theory">00:00 – 00:06</span>
+      </div>
+      <h1 class="slide-title">Day 03 Kickoff: Giving Our Star Schema a Brain with DAX</h1>
+      <p class="slide-subtitle">Over Days 1 and 2, we cleaned JioWave's raw CSVs in Power Query and wired our Star Schema. Today we write the formulas that answer CMO Rashmi's boardroom questions.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce & Arts Analogy: Stocking the Kitchen vs. Cooking Live to Order</div>
+        <p><strong>Power Query (M Language)</strong> happens <em>before</em> the restaurant opens—washing, chopping, and storing ingredients into your Star Schema tables. <strong>DAX (Data Analysis Expressions)</strong> happens <em>live at the dining table</em>: when the CMO clicks "Tier-2 Cities" or "Premium Tier," DAX recalculates Churn %, ARPU, and Revenue in milliseconds!</p>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Power Query (M) vs. DAX — Know Which Tool to Use</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Power Query (M)</th>
+              <th>DAX (Data Analysis Expressions)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Where It Lives</strong></td>
+              <td>Transform Data window (ETL Layer)</td>
+              <td>Report / Table / Model View (Analytics Layer)</td>
+            </tr>
+            <tr>
+              <td><strong>When It Runs</strong></td>
+              <td>Only during Data Refresh</td>
+              <td>Every single time a user clicks a Slicer or Chart!</td>
+            </tr>
+            <tr>
+              <td><strong>JioWave Job</strong></td>
+              <td>Remove 200 duplicate subscribers, fix 96 city names, parse dates</td>
+              <td>Compute <code>Annual Churn %</code>, <code>Premium ARPU</code>, <code>Top-20% Tower Traffic Share</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="Topic 1: Calculated Columns vs. Measures (Golden Rule)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 1: Core Architecture</span>
+        <span class="tag tag-module">00:06 – 00:13</span>
+      </div>
+      <h1 class="slide-title">Topic 1: Calculated Columns vs. Measures (The #1 Interview Question)</h1>
+      <p class="slide-subtitle">Look at Principle #3 in the JioWave Case Study Brief: "If it's in a visual, it's a measure. Calculated columns balloon the .pbix and don't respect filter context."</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 4px solid var(--accent-rose);">
+          <div class="card-title" style="color:var(--accent-rose);">Calculated Column (Stored in RAM)</div>
+          <ul class="list-styled">
+            <li>Computes <strong>row-by-row</strong> during data refresh and physically saves a new column inside the table.</li>
+            <li>Consumes laptop memory (RAM) on all 564,274 rows of <code>fact_revenue_monthly</code>.</li>
+            <li><strong>Only use when:</strong> You want to put the result on a <strong>Slicer, Chart Axis, or Table Row</strong> (e.g., <code>Age_Group</code> or <code>Vintage_Cohort</code>).</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--accent-teal);">
+          <div class="card-title" style="color:var(--accent-teal);">Measure (Calculated On-the-Fly)</div>
+          <ul class="list-styled">
+            <li>Computes an <strong>aggregate value</strong> dynamically based on whatever filters/slicers the CMO currently selected.</li>
+            <li>Takes <strong>0 bytes of RAM</strong>—it is just a saved formula definition!</li>
+            <li><strong>Always use for:</strong> KPIs, Ratios, Percentages, Sums, and Averages (<code>Churn %</code>, <code>ARPU</code>, <code>Total Revenue</code>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Why Ratios MUST Be Measures, Never Calculated Columns</div>
+        <p>Suppose Row 1 has Churn = 10% and Row 2 has Churn = 50%. If you create a Calculated Column for Churn % and drop it into a visual, Power BI averages 10% and 50% to give <strong>30%</strong>—even if Row 1 had 10,000 customers and Row 2 had 10 customers! A <strong>Measure</strong> sums total churned customers first, then divides by total subscribers.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Topic 2: Organizing Measures in a Dedicated _Measures Table">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 2: Enterprise Organization</span>
+        <span class="tag tag-lab">00:13 – 00:18</span>
+      </div>
+      <h1 class="slide-title">Topic 2: Building a Dedicated `_Measures` Folder Table</h1>
+      <p class="slide-subtitle">In a 9-table JioWave model, scattering 30 DAX measures across random tables makes them impossible to find. Create a clean home for them!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">4-Click Setup in Power BI Desktop</div>
+          <ol class="list-styled">
+            <li>Go to <code>Home Tab → Enter Data</code>.</li>
+            <li>Name the table <strong><code>_Measures</code></strong> (the underscore pins it to the very top of your Fields pane!) and click <strong>Load</strong>.</li>
+            <li>Right-click <code>_Measures</code> → <strong>New Measure</strong> and write your first KPI.</li>
+            <li>Right-click the dummy <code>Column1</code> → <strong>Hide</strong> (or Delete). The table icon automatically transforms into a <strong>Calculator Icon 🧮</strong>!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="card-title">Professional DAX Naming & Syntax Rule</div>
+          <div class="code-block">
+            <span class="cm">// Always reference columns as TableName[ColumnName]</span><br>
+            <span class="cm">// Always reference measures as [Measure Name] (NO table prefix!)</span><br><br>
+            Total Revenue INR = <span class="fn">SUM</span>(fact_revenue_monthly[total_inr])
+          </div>
+          <p style="font-size:0.86rem; color:var(--accent-teal);">Keeping table names off measures lets you move measures between folders later without breaking any formulas!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Topic 3: Basic Aggregators (SUM, COUNTROWS, DISTINCTCOUNT)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 3: Aggregation Functions</span>
+        <span class="tag tag-lab">00:18 – 00:25</span>
+      </div>
+      <h1 class="slide-title">Topic 3: Core Aggregators (`SUM`, `AVERAGE`, `COUNTROWS`, `DISTINCTCOUNT`)</h1>
+      <p class="slide-subtitle">Let's build our foundational JioWave KPIs and verify their exact values against the dataset.</p>
+
+      <div class="code-block">
+        <span class="cm">// 1. Total Billed Revenue across all 564,274 billing records:</span><br>
+        Total Revenue INR = <span class="fn">SUM</span>(fact_revenue_monthly[total_inr])  <span class="cm">-- Result: ₹28,26,42,978 (₹28.26 Cr)</span><br><br>
+        <span class="cm">// 2. Total Unique Subscribers in our cleaned Master Dimension:</span><br>
+        Total Subscribers = <span class="fn">COUNTROWS</span>(dim_subscribers)  <span class="cm">-- Result: 28,000</span><br><br>
+        <span class="cm">// 3. Unique Billed Subscribers inside the Fact table:</span><br>
+        Billed Subscribers = <span class="fn">DISTINCTCOUNT</span>(fact_revenue_monthly[subscriber_id])
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">`COUNT` vs. `COUNTROWS`</div>
+          <p><code>COUNT(dim_subscribers[city])</code> skips blank/null cells! <code>COUNTROWS(dim_subscribers)</code> counts every row in the table cleanly and runs faster in Power BI's VertiPaq engine.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Safe Division with `DIVIDE(Num, Denom, Alt)`</div>
+          <p>Never write <code>[Churned] / [Total]</code> with a slash <code>/</code>! If a filter yields 0 subscribers, <code>/</code> displays ugly <code>Infinity</code> or <code>NaN</code>. Always use <code>DIVIDE([Churned], [Total], 0)</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="Topic 4: Row Context vs. Filter Context (Heart of DAX)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 4: The Two Contexts</span>
+        <span class="tag tag-module">00:25 – 00:34</span>
+      </div>
+      <h1 class="slide-title">Topic 4: Row Context vs. Filter Context — Mastering the DAX Brain</h1>
+      <p class="slide-subtitle">90% of DAX confusion disappears once you separate these two concepts.</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-left: 4px solid var(--accent-gold);">
+          <div class="card-title">1. Row Context ("One Row at a Time")</div>
+          <p>Exists automatically inside a <strong>Calculated Column</strong> or an <strong>Iterator function (`SUMX`, `AVERAGEX`)</strong>.</p>
+          <p style="margin-top:0.5rem;">Imagine pointing your finger at Row 1 of <code>fact_revenue_monthly</code> and computing <code>rental_inr + overage_inr + addon_inr</code>, then moving your finger to Row 2. Row Context knows "which row I am on," NOT "what the total of the table is."</p>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--accent-blue);">
+          <div class="card-title">2. Filter Context ("The Active Slice of Data")</div>
+          <p>Exists automatically inside every <strong>Visual & Measure</strong>.</p>
+          <p style="margin-top:0.5rem;">Before <code>SUM(fact_revenue_monthly[total_inr])</code> calculates anything, Power BI applies all active filters from Slicers, Table Rows, Chart Axes, and Star Schema relationships—shrinking the visible table to only matching rows!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Topic 5: Visual Filter Context Walkthrough">
+      <div class="slide-meta">
+        <span class="tag tag-lab">Visual Filter Trace</span>
+        <span class="tag tag-theory">00:34 – 00:40</span>
+      </div>
+      <h1 class="slide-title">Topic 5: How Filter Context Evaluates Every Cell in a Matrix</h1>
+      <p class="slide-subtitle">Look at what happens behind the scenes when you place `subscriber_tier` on rows and `[Total Revenue INR]` in values.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Filter Context Engine Trace on JioWave `dim_subscribers` ➔ `fact_revenue_monthly`</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Matrix Row (`subscriber_tier`)</th>
+              <th>Active Filter Injected by Visual</th>
+              <th>Visible Billing Rows</th>
+              <th class="col-selected">Evaluated `[Total Revenue INR]`</th>
+              <th>Evaluated Row Avg ARPU</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Diamond</strong></td>
+              <td><code>dim_subscribers[subscriber_tier] = "Diamond"</code></td>
+              <td>24,745 rows</td>
+              <td class="col-selected"><strong>₹5,36,68,690 (₹5.37 Cr)</strong></td>
+              <td>₹2,168.87</td>
+            </tr>
+            <tr>
+              <td><strong>Premium</strong></td>
+              <td><code>dim_subscribers[subscriber_tier] = "Premium"</code></td>
+              <td>1,28,112 rows</td>
+              <td class="col-selected"><strong>₹8,52,79,732 (₹8.53 Cr)</strong></td>
+              <td>₹665.67</td>
+            </tr>
+            <tr>
+              <td><strong>Mass</strong></td>
+              <td><code>dim_subscribers[subscriber_tier] = "Mass"</code></td>
+              <td>4,11,417 rows</td>
+              <td class="col-selected"><strong>₹14,36,94,555 (₹14.37 Cr)</strong></td>
+              <td>₹349.27</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>Total (No Row Filter)</strong></td>
+              <td><code>ALL visible subscribers (28,000)</code></td>
+              <td>5,64,274 rows</td>
+              <td class="col-selected"><strong>₹28,26,42,978 (₹28.26 Cr)</strong></td>
+              <td>₹500.90</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Topic 6: Iterator Functions (`SUMX`, `AVERAGEX`, `COUNTX`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 6: Row-by-Row Iterators</span>
+        <span class="tag tag-lab">00:40 – 00:48</span>
+      </div>
+      <h1 class="slide-title">Topic 6: Iterator Functions (`SUMX`, `AVERAGEX`) — Multiplication Without Extra Columns</h1>
+      <p class="slide-subtitle">Standard `SUM()` only accepts a single column name. What if you want to compute `Rental + Overage` row-by-row inside a Measure?</p>
+
+      <div class="code-block">
+        <span class="cm">// Syntax: SUMX( &lt;Table to Loop Over&gt;, &lt;Expression Evaluated on Each Row&gt; )</span><br><br>
+        <span class="cm">// Example 1: Compute Base + Overage Revenue without creating a Calculated Column:</span><br>
+        Core Billed Revenue = <span class="fn">SUMX</span>(fact_revenue_monthly, fact_revenue_monthly[rental_inr] + fact_revenue_monthly[overage_inr])<br><br>
+        <span class="cm">// Example 2: Average Monthly Bill per Subscriber using AVERAGEX:</span><br>
+        Avg Monthly Bill = <span class="fn">AVERAGEX</span>(fact_revenue_monthly, fact_revenue_monthly[total_inr])
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Step-by-Step Visual Trace: How `SUMX` Loops Row-by-Row on `SUB000001`</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>revenue_id</th>
+              <th>rental_inr</th>
+              <th>overage_inr</th>
+              <th class="col-selected">Step 1: Row Evaluation (`rental + overage`)</th>
+              <th>Step 2: Final Aggregation (`SUM`)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>REV0000001</td>
+              <td>499.00</td>
+              <td>309.58</td>
+              <td class="col-selected">499.00 + 309.58 = <strong>808.58</strong></td>
+              <td rowspan="3" style="vertical-align:middle; background:rgba(20,184,166,0.12); font-weight:800; color:var(--accent-teal);">808.58 + 499.00 + 499.00<br>= <strong>₹1,806.58</strong><br>(Stored in 0 bytes RAM!)</td>
+            </tr>
+            <tr>
+              <td>REV0000002</td>
+              <td>499.00</td>
+              <td>0.00</td>
+              <td class="col-selected">499.00 + 0.00 = <strong>499.00</strong></td>
+            </tr>
+            <tr>
+              <td>REV0000003</td>
+              <td>499.00</td>
+              <td>0.00</td>
+              <td class="col-selected">499.00 + 0.00 = <strong>499.00</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="Topic 7: The King of DAX — `CALCULATE()`">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 7: Context Modification</span>
+        <span class="tag tag-module">00:48 – 00:58</span>
+      </div>
+      <h1 class="slide-title">Topic 7: `CALCULATE()` — The Single Most Powerful Function in Power BI</h1>
+      <p class="slide-subtitle">If you master only one function in DAX, make it `CALCULATE()`. It is the ONLY function capable of changing Filter Context.</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">Commerce Analogy: Adding an Overriding Clause to an Audit Query</div>
+        <p>Suppose your dashboard page has no filter selected, and you want a dedicated KPI card that <strong>always</strong> shows <em>Churned Subscribers</em> (where <code>is_churned = 1</code>) or <em>Premium Tier Revenue</em>—regardless of other visuals. <code>CALCULATE()</code> steps in <em>before</em> the math runs, applies your custom filter rules, and then evaluates the expression!</p>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// Syntax: CALCULATE( &lt;Expression&gt;, &lt;Filter 1&gt;, &lt;Filter 2&gt;, ... )</span><br><br>
+        <span class="cm">// 1. Count Churned Subscribers across JioWave:</span><br>
+        Churned Subscribers = <span class="fn">CALCULATE</span>(<span class="fn">COUNTROWS</span>(dim_subscribers), dim_subscribers[is_churned] = 1)<br><br>
+        <span class="cm">// 2. Annual / Overall Churn Rate %:</span><br>
+        Churn Rate % = <span class="fn">DIVIDE</span>([Churned Subscribers], [Total Subscribers], 0)<br><br>
+        <span class="cm">// 3. Premium-Tier Revenue (Always locked to Premium segment):</span><br>
+        Premium Tier Revenue = <span class="fn">CALCULATE</span>([Total Revenue INR], dim_subscribers[subscriber_tier] = <span class="str">"Premium"</span>)
+      </div>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="Topic 8: Filter Modifiers (`ALL`, `ALLEXCEPT`, `REMOVEFILTERS`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 8: Percentage of Total</span>
+        <span class="tag tag-lab">00:58 – 01:08</span>
+      </div>
+      <h1 class="slide-title">Topic 8: `ALL()` & `REMOVEFILTERS()` — Computing "% Share of Total"</h1>
+      <p class="slide-subtitle">Remember CMO Rashmi's question: "What share of total churned subscribers comes from the worst cohort?" To compute "% of Total," we must divide a filtered slice by the unfiltered grand total!</p>
+
+      <div class="code-block">
+        <span class="cm">// Step 1: Ignore any filter on subscriber_tier to get Grand Total Churned (3,352):</span><br>
+        All Churned Subscribers = <span class="fn">CALCULATE</span>([Churned Subscribers], <span class="fn">REMOVEFILTERS</span>(dim_subscribers[subscriber_tier]))<br><br>
+        <span class="cm">// Step 2: Share of Total Churn %:</span><br>
+        Share of Total Churn % = <span class="fn">DIVIDE</span>([Churned Subscribers], [All Churned Subscribers], 0)
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>How `REMOVEFILTERS()` Enables "% Share of Total" in a Table Visual</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>subscriber_tier</th>
+              <th>[Churned Subscribers]</th>
+              <th class="col-selected">[All Churned Subscribers] (`REMOVEFILTERS`)</th>
+              <th class="row-selected">[Share of Total Churn %]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Mass</td>
+              <td>2,685</td>
+              <td class="col-selected">3,352</td>
+              <td class="row-selected">2,685 ÷ 3,352 = <strong>80.10%</strong></td>
+            </tr>
+            <tr>
+              <td>Premium</td>
+              <td>581</td>
+              <td class="col-selected">3,352</td>
+              <td class="row-selected">581 ÷ 3,352 = <strong>17.33%</strong></td>
+            </tr>
+            <tr>
+              <td>Diamond</td>
+              <td>86</td>
+              <td class="col-selected">3,352</td>
+              <td class="row-selected">86 ÷ 3,352 = <strong>2.57%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="Topic 9: `KEEPFILTERS()` — Intersecting Instead of Overwriting">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 9: Subtle DAX Behavior</span>
+        <span class="tag tag-module">01:08 – 01:15</span>
+      </div>
+      <h1 class="slide-title">Topic 9: `KEEPFILTERS()` — Avoiding the "Repeated Number" Bug</h1>
+      <p class="slide-subtitle">What happens if you put `[Premium Tier Revenue]` inside a table broken down by `subscriber_tier`?</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Without `KEEPFILTERS` (Overwrites Row Filter!)</div>
+          <div class="code-block">
+            <span class="fn">CALCULATE</span>([Total Revenue INR], dim_subscribers[subscriber_tier] = <span class="str">"Premium"</span>)
+          </div>
+          <p style="font-size:0.88rem; color:var(--accent-rose);">Even on the <strong>Mass</strong> row and <strong>Diamond</strong> row, it overwrites the row filter and repeats <strong>₹8.53 Cr</strong> on every single line!</p>
+        </div>
+        <div class="card">
+          <div class="card-title">With `KEEPFILTERS` (Respects Row Filter!)</div>
+          <div class="code-block">
+            <span class="fn">CALCULATE</span>([Total Revenue INR], <span class="fn">KEEPFILTERS</span>(dim_subscribers[subscriber_tier] = <span class="str">"Premium"</span>))
+          </div>
+          <p style="font-size:0.88rem; color:var(--accent-teal);">Shows <strong>₹8.53 Cr</strong> on the Premium row and <strong>Blank</strong> on Mass & Diamond rows—clean and intuitive!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 -->
+    <section class="slide" data-title="Topic 10: `FILTER()` Table Function Inside `CALCULATE`">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 10: Complex Conditions</span>
+        <span class="tag tag-lab">01:15 – 01:23</span>
+      </div>
+      <h1 class="slide-title">Topic 10: `FILTER()` — Multi-Column & Measure-Based Conditions</h1>
+      <p class="slide-subtitle">Simple boolean filters in `CALCULATE` (like `is_churned = 1`) only allow a single column compared to a fixed value. What if we want to compare two columns or filter by a Measure?</p>
+
+      <div class="code-block">
+        <span class="cm">// Example 1: Find billing rows where Overage exceeded 50% of Rental (2 columns compared!):</span><br>
+        High Overage Billing Count = <br>
+        <span class="fn">CALCULATE</span>(<br>
+        &nbsp;&nbsp;<span class="fn">COUNTROWS</span>(fact_revenue_monthly),<br>
+        &nbsp;&nbsp;<span class="fn">FILTER</span>(fact_revenue_monthly, fact_revenue_monthly[overage_inr] > 0.5 * fact_revenue_monthly[rental_inr])<br>
+        )<br><br>
+        <span class="cm">// Example 2: Count "Data Hog" monthly events (>50 GB consumed):</span><br>
+        Data Hog Events = <span class="fn">CALCULATE</span>(<span class="fn">COUNTROWS</span>(fact_usage_monthly), fact_usage_monthly[data_consumed_gb] > 50)
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Topic 11: Activating Dotted Lines (`USERELATIONSHIP`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 11: Multi-Date Modeling</span>
+        <span class="tag tag-lab">01:23 – 01:31</span>
+      </div>
+      <h1 class="slide-title">Topic 11: `USERELATIONSHIP()` — Counting Monthly Churns vs. Acquisitions</h1>
+      <p class="slide-subtitle">Remember Day 2 Slide 15? Our `dim_date` table has an Active solid line to `signup_date` and an Inactive dotted line to `churn_date`.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Measure 1: New Acquisitions (Uses Active Line)</div>
+          <div class="code-block">
+            New Acquisitions = <span class="fn">COUNTROWS</span>(dim_subscribers)
+          </div>
+          <p style="font-size:0.88rem;">When you plot this by <code>dim_date[Month_Name]</code>, Power BI automatically uses the solid line on <code>signup_date</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Measure 2: Monthly Churned Users (Activates Dotted Line!)</div>
+          <div class="code-block">
+            Monthly Churned Users = <br>
+            <span class="fn">CALCULATE</span>(<br>
+            &nbsp;&nbsp;<span class="fn">COUNTROWS</span>(dim_subscribers),<br>
+            &nbsp;&nbsp;dim_subscribers[is_churned] = 1,<br>
+            &nbsp;&nbsp;<span class="fn">USERELATIONSHIP</span>(dim_date[Date], dim_subscribers[churn_date])<br>
+            )
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13 -->
+    <section class="slide" data-title="Topic 12: Logical Functions (`IF`, `SWITCH(TRUE())`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 12: Dynamic KPI Flags</span>
+        <span class="tag tag-lab">01:31 – 01:38</span>
+      </div>
+      <h1 class="slide-title">Topic 12: `SWITCH(TRUE())` — Clean Conditional Logic for Watchlist Flags</h1>
+      <p class="slide-subtitle">Remember the Morning Dashboard on Page 14 of the JioWave PDF? Rashmi wants status flags (`✓ Within tolerance`, `▲ Cohort accelerating`) on every KPI card!</p>
+
+      <div class="code-block">
+        <span class="cm">// Much cleaner than nested IF(IF(IF(...))) statements!</span><br>
+        Churn Status Flag = <br>
+        <span class="fn">SWITCH</span>(<br>
+        &nbsp;&nbsp;<span class="kw">TRUE</span>(),<br>
+        &nbsp;&nbsp;[Churn Rate %] > 0.25, <span class="str">"▲ CRITICAL COHORT ALERT"</span>,<br>
+        &nbsp;&nbsp;[Churn Rate %] > 0.12, <span class="str">"▲ Above 12% Benchmark"</span>,<br>
+        &nbsp;&nbsp;<span class="str">"✓ Within Tolerance"</span><br>
+        )
+      </div>
+    </section>
+
+    <!-- SLIDE 14 -->
+    <section class="slide" data-title="Topic 13: Variables in DAX (`VAR ... RETURN`)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 13: Clean & Fast DAX</span>
+        <span class="tag tag-lab">01:38 – 01:45</span>
+      </div>
+      <h1 class="slide-title">Topic 13: Writing Readable, High-Speed DAX with `VAR ... RETURN`</h1>
+      <p class="slide-subtitle">Variables let you break complex business formulas into named steps—making them 3× easier to debug and twice as fast to execute!</p>
+
+      <div class="code-block">
+        <span class="cm">// Example: Compute Plan Migration Down-to-Up Pressure Ratio (Target: 3.68x)</span><br>
+        Down to Up Migration Ratio = <br>
+        <span class="kw">VAR</span> DownCount = <span class="fn">CALCULATE</span>(<span class="fn">COUNTROWS</span>(fact_plan_migrations), fact_plan_migrations[direction] = <span class="str">"Down"</span>)<br>
+        <span class="kw">VAR</span> UpCount   = <span class="fn">CALCULATE</span>(<span class="fn">COUNTROWS</span>(fact_plan_migrations), fact_plan_migrations[direction] = <span class="str">"Up"</span>)<br>
+        <span class="kw">RETURN</span><br>
+        &nbsp;&nbsp;<span class="fn">DIVIDE</span>(DownCount, UpCount, 0)
+      </div>
+      <p style="font-size:0.88rem; color:var(--accent-teal);"><strong>Debugging Trick:</strong> Temporarily replace the expression after <code>RETURN</code> with <code>DownCount</code> to inspect intermediate step results in a KPI card!</p>
+    </section>
+
+    <!-- SLIDE 15 -->
+    <section class="slide" data-title="Topic 14: Context Transition (`CALCULATE` Inside Iterators)">
+      <div class="slide-meta">
+        <span class="tag tag-theory">Topic 14: Advanced DAX Concept</span>
+        <span class="tag tag-module">01:45 – 01:51</span>
+      </div>
+      <h1 class="slide-title">Topic 14: Context Transition — Why Calling a Measure Inside `AVERAGEX` Works</h1>
+      <p class="slide-subtitle">Remember Principle #4 in the JioWave PDF? "CALCULATE() is the workhorse. Understand context transition."</p>
+
+      <div class="analogy-box">
+        <div class="analogy-title">What Is Context Transition?</div>
+        <p>Whenever you call a <strong>Measure</strong> (like <code>[Total Revenue INR]</code>) inside a row-by-row loop like <code>AVERAGEX(dim_subscribers, [Total Revenue INR])</code>, Power BI silently wraps the measure in <code>CALCULATE()</code>—turning the current subscriber's row into a <strong>Filter Context</strong>! That means for Subscriber 1, it sums only Subscriber 1's bills; for Subscriber 2, only Subscriber 2's bills, and then averages them all!</p>
+      </div>
+
+      <div class="code-block">
+        <span class="cm">// True Customer Lifetime Revenue per Subscriber (LTV):</span><br>
+        Avg Lifetime Revenue per Sub = <span class="fn">AVERAGEX</span>(dim_subscribers, [Total Revenue INR])
+      </div>
+    </section>
+
+    <!-- SLIDE 16: INSTRUCTOR LIVE SIMULATOR -->
+    <section class="slide" data-title="Instructor Simulator: Tier-Wise ARPU & Churn Decomposition">
+      <div class="slide-meta">
+        <span class="tag tag-instructor">Instructor Live Walkthrough</span>
+        <span class="tag tag-lab">01:51 – 01:54</span>
+      </div>
+      <h1 class="slide-title">Instructor Simulator: Decomposing JioWave Revenue & Churn by Tier</h1>
+      <p class="slide-subtitle">Watch how our newly built `CALCULATE` and `DIVIDE` measures evaluate across `Diamond`, `Premium`, and `Mass` subscriber tiers.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>Live DAX Matrix Output on JioWave Warehouse</span><span>Click Reveal to highlight the Premium Tier insights for CMO Rashmi</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Subscriber Tier</th>
+              <th>[Total Subscribers]</th>
+              <th>[Churned Subscribers]</th>
+              <th>[Churn Rate %]</th>
+              <th>[Total Revenue INR]</th>
+              <th>Row Avg ARPU</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Diamond</strong></td>
+              <td>1,205</td>
+              <td>86</td>
+              <td>7.14%</td>
+              <td>₹5,36,68,690</td>
+              <td>₹2,168.87</td>
+            </tr>
+            <tr>
+              <td><strong>Premium</strong></td>
+              <td>6,301</td>
+              <td class="cell-target" id="d3-inst-1">581</td>
+              <td class="cell-target" id="d3-inst-2">9.22%</td>
+              <td class="cell-target" id="d3-inst-3">₹8,52,79,732</td>
+              <td class="cell-target" id="d3-inst-4">₹665.67</td>
+            </tr>
+            <tr>
+              <td><strong>Mass</strong></td>
+              <td>20,494</td>
+              <td>2,685</td>
+              <td>13.10%</td>
+              <td>₹14,36,94,555</td>
+              <td>₹349.27</td>
+            </tr>
+            <tr class="row-selected">
+              <td><strong>Grand Total</strong></td>
+              <td><strong>28,000</strong></td>
+              <td><strong>3,352</strong></td>
+              <td><strong>11.97%</strong></td>
+              <td><strong>₹28,26,42,978</strong></td>
+              <td><strong>₹500.90</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Instructor DAX Evaluation & CMO Takeaway:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-gold" onclick="toggleSim('d3-inst-ans', ['d3-inst-1', 'd3-inst-2', 'd3-inst-3', 'd3-inst-4'])">🔍 Reveal Instructor DAX Evaluation</button>
+          <button class="btn" onclick="resetSim('d3-inst-ans', ['d3-inst-1', 'd3-inst-2', 'd3-inst-3', 'd3-inst-4'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d3-inst-ans">
+          <h4 style="color:var(--accent-gold); margin-bottom:0.4rem;">Verified DAX Numbers & Strategic Takeaway:</h4>
+          <ol class="list-styled">
+            <li><strong>Headline Verification:</strong> <code>3,352 ÷ 28,000 = 11.97%</code> overall churn—matching the CMO brief to two decimal places!</li>
+            <li><strong>The Revenue Paradox:</strong> Even though <strong>Mass</strong> represents 73.2% of subscribers (20,494), <strong>Premium + Diamond</strong> (just 26.8% of users) generate nearly half of total revenue (₹13.89 Cr out of ₹28.26 Cr)! Protecting Premium ARPU (₹665.67 average across 3 years, slipping to ₹659 recently) is vital for Series-C valuation.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 17: STUDENT LAB QUESTION 1 -->
+    <section class="slide" data-title="Student Lab 1: Overage Revenue Share % Measure">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 1</span>
+        <span class="tag tag-lab">01:54 – 01:57</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 1: Computing Out-of-Bundle Overage Share %</h1>
+      <p class="slide-subtitle">Write a DAX measure `Overage Share %` using `DIVIDE` and `SUM` on `fact_revenue_monthly` to see how much revenue comes from customers exceeding their data/voice quotas.</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`fact_revenue_monthly` Warehouse Totals (564,274 Rows)</span><span>Predict the Overage Share % cell</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>DAX Formula</th>
+              <th>Evaluated Amount (INR)</th>
+              <th>Share of Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base Plan Rentals (`rental_inr`)</td>
+              <td><code>SUM(fact_revenue_monthly[rental_inr])</code></td>
+              <td>₹25,41,10,492</td>
+              <td>89.91%</td>
+            </tr>
+            <tr>
+              <td>Overage Charges (`overage_inr`)</td>
+              <td><code>SUM(fact_revenue_monthly[overage_inr])</code></td>
+              <td class="cell-target" id="d3-stu1-c1">₹1,94,60,886</td>
+              <td class="cell-target" id="d3-stu1-c2">6.89%</td>
+            </tr>
+            <tr>
+              <td>Add-on Packs (`addon_inr`)</td>
+              <td><code>SUM(fact_revenue_monthly[addon_inr])</code></td>
+              <td>₹90,71,600</td>
+              <td>3.21%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #1:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d3-stu1-ans', ['d3-stu1-c1', 'd3-stu1-c2'])">✅ Reveal Student Answer #1</button>
+          <button class="btn" onclick="resetSim('d3-stu1-ans', ['d3-stu1-c1', 'd3-stu1-c2'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d3-stu1-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Verified DAX Syntax & Result:</h4>
+          <div class="code-block">
+            Overage Share % = <span class="fn">DIVIDE</span>(<span class="fn">SUM</span>(fact_revenue_monthly[overage_inr]), [Total Revenue INR], 0)
+          </div>
+          <p><strong>Calculation:</strong> <code>₹1,94,60,885.78 ÷ ₹28,26,42,977.78 = 6.89%</code>. Nearly ₹1.95 Cr of JioWave's revenue comes from out-of-bundle overage fees!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 18: STUDENT LAB QUESTION 2 -->
+    <section class="slide" data-title="Student Lab 2: High-Value Tier (Premium + Diamond) Churn">
+      <div class="slide-meta">
+        <span class="tag tag-student">Student Practice Lab 2</span>
+        <span class="tag tag-lab">01:57 – 01:59</span>
+      </div>
+      <h1 class="slide-title">Student Challenge 2: Using `IN` Inside `CALCULATE` for Combined Tier Churn</h1>
+      <p class="slide-subtitle">CFO Rohan Bose wants one combined KPI for High-Value Subscribers (`subscriber_tier IN {"Premium", "Diamond"}`). Calculate their combined subscriber count and combined churn rate!</p>
+
+      <div class="table-wrapper">
+        <div class="table-header-bar"><span>`dim_subscribers` Tier Breakdown</span><span>Predict the Combined High-Value Totals</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Segment</th>
+              <th>Subscribers</th>
+              <th>Churned Subscribers</th>
+              <th>Churn Rate %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Diamond</td>
+              <td>1,205</td>
+              <td>86</td>
+              <td>7.14%</td>
+            </tr>
+            <tr>
+              <td>Premium</td>
+              <td>6,301</td>
+              <td>581</td>
+              <td>9.22%</td>
+            </tr>
+            <tr>
+              <td><strong>Combined High-Value (`Premium + Diamond`)</strong></td>
+              <td class="cell-target" id="d3-stu2-c1">7,506</td>
+              <td class="cell-target" id="d3-stu2-c2">667</td>
+              <td class="cell-target" id="d3-stu2-c3">8.89%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sim-panel">
+        <strong>Student Simulator Check #2:</strong>
+        <div class="sim-actions">
+          <button class="btn btn-primary" onclick="toggleSim('d3-stu2-ans', ['d3-stu2-c1', 'd3-stu2-c2', 'd3-stu2-c3'])">✅ Reveal Student Answer #2</button>
+          <button class="btn" onclick="resetSim('d3-stu2-ans', ['d3-stu2-c1', 'd3-stu2-c2', 'd3-stu2-c3'])">↺ Reset</button>
+        </div>
+        <div class="answer-drawer" id="d3-stu2-ans">
+          <h4 style="color:var(--accent-teal); margin-bottom:0.4rem;">Verified DAX Syntax & Result:</h4>
+          <div class="code-block">
+            High Value Churn Rate % = <br>
+            <span class="fn">CALCULATE</span>([Churn Rate %], dim_subscribers[subscriber_tier] <span class="kw">IN</span> {<span class="str">"Premium"</span>, <span class="str">"Diamond"</span>})
+          </div>
+          <p><strong>Calculation:</strong> <code>(86 + 581) ÷ (1,205 + 6,301) = 667 ÷ 7,506 = 8.89%</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 19 -->
+    <section class="slide" data-title="Day 03 DAX Measure Dictionary & Day 04 Preview">
+      <div class="slide-meta">
+        <span class="tag tag-module">Wrap-Up & Next Steps</span>
+        <span class="tag tag-theory">01:59 – 02:00</span>
+      </div>
+      <h1 class="slide-title">Day 03 Complete: Your Core `_Measures` Library & Day 04 Preview</h1>
+      <p class="slide-subtitle">Add all 8 measures from today into your `_Measures` table tonight, and get ready for Time Intelligence tomorrow!</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Tonight's `_Measures` Checklist</div>
+          <ul class="list-styled">
+            <li><code>Total Subscribers</code>, <code>Churned Subscribers</code>, <code>Churn Rate %</code></li>
+            <li><code>Total Revenue INR</code>, <code>Overage Share %</code>, <code>Premium Tier Revenue</code></li>
+            <li><code>Down to Up Migration Ratio</code> (using <code>VAR ... RETURN</code>)</li>
+            <li><code>Monthly Churned Users</code> (using <code>USERELATIONSHIP</code>)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Coming Up Tomorrow — Day 04 (2 Hours)</div>
+          <ul class="list-styled">
+            <li><strong>DAX Time Intelligence:</strong> <code>SAMEPERIODLASTYEAR</code>, <code>PREVIOUSMONTH</code>, <code>DATEADD</code>, and <code>DATESYTD</code> (with Indian Fiscal Year <code>"3-31"</code>!).</li>
+            <li><strong>Solving Q2 (Premium ARPU Drop):</strong> Building MoM and YoY ARPU trend measures to quantify the exact ₹ FY27 revenue at risk!</li>
+          </ul>
+          <p style="margin-top:0.85rem; color:var(--accent-gold); font-weight:700;">Say "Day 4" whenever you're ready for the next interactive deck!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const slideList = document.getElementById('slideList');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+
+  slides.forEach((slide, index) => {
+    const li = document.createElement('li');
+    li.className = 'slide-nav-item' + (index === 0 ? ' active' : '');
+    const title = slide.getAttribute('data-title') || `Slide ${index + 1}`;
+    li.innerHTML = `<span class="nav-num">${String(index + 1).padStart(2, '0')}</span><span>${title}</span>`;
+    li.onclick = () => goToSlide(index);
+    slideList.appendChild(li);
+  });
+
+  function goToSlide(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[currentSlide].classList.remove('active');
+    slideList.children[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    slideList.children[currentSlide].classList.add('active');
+    slideList.children[currentSlide].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+    progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === slides.length - 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeSlide(delta) {
+    goToSlide(currentSlide + delta);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  function toggleSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    const isOpen = drawer.classList.toggle('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (isOpen) el.classList.add('revealed');
+        else el.classList.remove('revealed');
+      }
+    });
+  }
+
+  function resetSim(drawerId, cellIds) {
+    const drawer = document.getElementById(drawerId);
+    drawer.classList.remove('open');
+    cellIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('revealed');
+    });
+  }
+
+  prevBtn.disabled = true;
+</script>
+</body>
+</html>
